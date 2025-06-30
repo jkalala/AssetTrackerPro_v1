@@ -13,6 +13,7 @@ import { useAuth } from "@/components/auth/auth-provider"
 import { createClient } from "@/lib/supabase/client"
 import { updateAssetQRCodeUrl } from "@/lib/qr-actions"
 import { toast } from "@/components/ui/use-toast"
+import clsx from "clsx"
 
 interface QRGeneratorProps {
   assets: any[]
@@ -206,6 +207,13 @@ export default function QRGenerator({ assets, onQRGenerated, settings }: QRGener
     )
   }
 
+  // Add global print styles to hide all except .print:block
+  if (typeof window !== "undefined") {
+    const style = document.createElement("style");
+    style.innerHTML = `@media print { body * { display: none !important; } .print\\:block, .print\\:block * { display: block !important; } }`;
+    document.head.appendChild(style);
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -336,19 +344,30 @@ export default function QRGenerator({ assets, onQRGenerated, settings }: QRGener
 
             {/* Preview Panel */}
             <div className="space-y-4">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center min-h-[300px] flex items-center justify-center">
+              <div className={clsx("border-2 border-dashed border-gray-300 rounded-lg p-8 text-center min-h-[300px] flex items-center justify-center", "print:block print:text-center")}>
                 {generatedQR ? (
-                  <div className="space-y-4">
+                  <div className={clsx("space-y-4", "print:block print:text-center")}>
                     <img
                       src={generatedQR || "/placeholder.svg"}
                       alt="Generated QR Code"
-                      className="mx-auto border rounded"
+                      className="mx-auto border rounded print:mx-auto print:my-8 print:w-48 print:h-48"
                       style={{
                         width: `${qrSize}px`,
                         height: `${qrSize}px`,
                         maxWidth: "100%",
                       }}
                     />
+                    {/* Print asset info below QR code when printing */}
+                    {selectedAsset && (
+                      <div className="hidden print:block print:mt-4 print:text-lg">
+                        <div><strong>ID:</strong> {selectedAsset.asset_id}</div>
+                        <div><strong>Name:</strong> {selectedAsset.name}</div>
+                        <div><strong>Category:</strong> {selectedAsset.category}</div>
+                      </div>
+                    )}
+                    <Button onClick={() => window.print()} className="w-full mt-2 print:hidden" variant="outline">
+                      Print QR
+                    </Button>
                     <div className="space-y-2">
                       <Button onClick={handleDownload} className="w-full">
                         <Download className="h-4 w-4 mr-2" />

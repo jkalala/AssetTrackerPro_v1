@@ -1,3 +1,4 @@
+"use client";
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
@@ -12,14 +13,6 @@ import { useEffect } from "react"
 import HelpdeskWidget from "@/components/helpdesk-widget"
 
 const inter = Inter({ subsets: ["latin"] })
-
-export const metadata: Metadata = {
-  title: "AssetTracker Pro - Professional Asset Management System",
-  description:
-    "Comprehensive asset management solution with QR code integration, real-time tracking, and advanced analytics for businesses.",
-  keywords: "asset management, QR codes, inventory tracking, business tools, asset tracking",
-    generator: 'v0.dev'
-}
 
 function BrandingStyle() {
   const branding = useBranding();

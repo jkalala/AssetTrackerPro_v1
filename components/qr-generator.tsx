@@ -12,18 +12,23 @@ import { generateAssetQRCode } from "@/lib/qr-actions"
 import { useAuth } from "@/components/auth/auth-provider"
 import { createClient } from "@/lib/supabase/client"
 import { updateAssetQRCodeUrl } from "@/lib/qr-actions"
+import { toast } from "@/components/ui/use-toast"
 
 interface QRGeneratorProps {
-  assets?: Array<{
-    id: string
-    asset_id: string
-    name: string
-    category: string
-  }>
-  onQRGenerated?: (assetId: string, qrCode: string) => void
+  assets: any[]
+  onQRGenerated: (assetId: string, qrCode: string) => void
+  settings: {
+    autoGenerate: boolean
+    includeDetails: boolean
+    trackAnalytics: boolean
+    mobileNotifications: boolean
+    defaultSize: string
+    errorCorrection: string
+    defaultFormat: string
+  }
 }
 
-export default function QRGenerator({ assets = [], onQRGenerated }: QRGeneratorProps) {
+export default function QRGenerator({ assets, onQRGenerated, settings }: QRGeneratorProps) {
   const { user, loading: authLoading } = useAuth()
   const [selectedAssetId, setSelectedAssetId] = useState("")
   const [customAssetId, setCustomAssetId] = useState("")
@@ -35,6 +40,8 @@ export default function QRGenerator({ assets = [], onQRGenerated }: QRGeneratorP
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [selectedAsset, setSelectedAsset] = useState<any | null>(null)
+  const [generating, setGenerating] = useState(false)
 
   const handleGenerate = async () => {
     const assetId = selectedAssetId || customAssetId
@@ -52,50 +59,88 @@ export default function QRGenerator({ assets = [], onQRGenerated }: QRGeneratorP
     setError(null)
 
     try {
-      // 1. Generate QR code (data URL)
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cloudeleavepro.vercel.app"
-      const assetUrl = `${baseUrl}/asset/${assetId}`
-      const qrCodeDataURL = await import("@/lib/qr-code-utils").then(m => m.QRCodeGenerator.generateAssetQR({
-        assetId,
+      setGenerating(true)
+      setSelectedAsset(assets.find((asset) => asset.asset_id === assetId))
+
+      // Create QR code data with settings
+      const qrData = settings.includeDetails ? {
+        assetId: assetId,
         name: selectedAsset?.name || assetId,
         category: selectedAsset?.category || "",
-        url: assetUrl,
-      }))
+        url: `${window.location.origin}/asset/${assetId}`
+      } : assetId
 
-      // 2. Upload to Supabase Storage
+      const QRCode = (await import('qrcode')).default
+      const qrCodeDataUrl = await QRCode.toDataURL(JSON.stringify(qrData), {
+        width: parseInt(settings.defaultSize),
+        margin: 1,
+        errorCorrectionLevel: settings.errorCorrection as 'L' | 'M' | 'Q' | 'H',
+      })
+
+      // Save QR code to Supabase
       const supabase = createClient()
-      const res = await fetch(qrCodeDataURL)
-      const blob = await res.blob()
-      const filePath = `qr-codes/${assetId}-${Date.now()}.png`
-      const { data, error: uploadError } = await supabase.storage
-        .from("qr-codes")
-        .upload(filePath, blob, { contentType: "image/png", upsert: true })
-      if (uploadError) {
-        setError("Failed to upload QR code: " + uploadError.message)
-        setLoading(false)
-        return
-      }
-      const { data: publicUrlData } = supabase.storage.from("qr-codes").getPublicUrl(filePath)
-      const qrCodePublicUrl = publicUrlData.publicUrl
+      
+      // Convert base64 to blob
+      const response = await fetch(qrCodeDataUrl)
+      const blob = await response.blob()
+      
+      // Generate unique filename
+      const fileName = `qr_${assetId}_${Date.now()}.${settings.defaultFormat}`
+      const filePath = `qr-codes/${fileName}`
 
-      // 3. Update asset with QR code public URL
-      const updateResult = await updateAssetQRCodeUrl(assetId, qrCodePublicUrl)
-      if (updateResult.error) {
-        setError(updateResult.error)
-        setLoading(false)
-        return
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('assets')
+        .upload(filePath, blob, {
+          contentType: `image/${settings.defaultFormat}`
+        })
+
+      if (uploadError) throw uploadError
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('assets')
+        .getPublicUrl(filePath)
+
+      // Update asset with QR code URL
+      const { error: updateError } = await supabase
+        .from('assets')
+        .update({ 
+          qr_code: publicUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', selectedAsset?.id)
+
+      if (updateError) throw updateError
+
+      // Track analytics if enabled
+      if (settings.trackAnalytics) {
+        await supabase.from('qr_analytics').insert({
+          asset_id: selectedAsset?.id,
+          event_type: 'generated',
+          created_at: new Date().toISOString()
+        })
       }
 
-      setGeneratedQR(qrCodePublicUrl)
-      setAssetUrl(assetUrl)
-      if (onQRGenerated) {
-        onQRGenerated(assetId, qrCodePublicUrl)
-      }
-    } catch (err) {
-      console.error("QR Generator: Generation failed:", err)
-      setError(`Failed to generate QR code: ${err instanceof Error ? err.message : "Unknown error"}`)
+      toast({
+        title: "QR Code Generated",
+        description: "QR code has been generated and saved successfully",
+      })
+
+      setGeneratedQR(publicUrl)
+      setAssetUrl(publicUrl)
+      onQRGenerated(assetId, publicUrl)
+    } catch (error) {
+      console.error('QR generation error:', error)
+      toast({
+        title: "Generation Failed",
+        description: "Failed to generate QR code",
+        variant: "destructive"
+      })
     } finally {
       setLoading(false)
+      setGenerating(false)
+      setSelectedAsset(null)
     }
   }
 
@@ -119,8 +164,6 @@ export default function QRGenerator({ assets = [], onQRGenerated }: QRGeneratorP
       console.error("Failed to copy URL:", err)
     }
   }
-
-  const selectedAsset = assets.find((asset) => asset.asset_id === selectedAssetId)
 
   // Show loading state while auth is loading
   if (authLoading) {
@@ -280,7 +323,7 @@ export default function QRGenerator({ assets = [], onQRGenerated }: QRGeneratorP
                 className="w-full"
                 disabled={loading || (!selectedAssetId && !customAssetId)}
               >
-                {loading ? (
+                {generating ? (
                   <>
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                     Generating...

@@ -52,9 +52,9 @@ export default function AssetDashboard() {
 
           // Calculate stats
           if (data) {
-            const activeAssets = data.filter((asset) => asset.status === "active").length
-            const maintenanceAssets = data.filter((asset) => asset.status === "maintenance").length
-            const retiredAssets = data.filter((asset) => asset.status === "retired").length
+            const activeAssets = data.filter((asset: any) => asset.status === "active").length
+            const maintenanceAssets = data.filter((asset: any) => asset.status === "maintenance").length
+            const retiredAssets = data.filter((asset: any) => asset.status === "retired").length
 
             setStats({
               total: data.length,

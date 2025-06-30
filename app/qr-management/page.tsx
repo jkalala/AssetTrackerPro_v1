@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { QrCode, Scan, Download, Upload, Package, BarChart3, Settings, Printer } from "lucide-react"
+import { QrCode, Scan, Download, Upload, Package, BarChart3, Settings, Printer, AlertCircle } from "lucide-react"
 import QRGenerator from "@/components/qr-generator"
 import QRScanner from "@/components/qr-scanner"
 import BulkQROperations from "@/components/bulk-qr-operations"
 import { createClient } from "@/lib/supabase/client"
+import { Switch } from "@/components/ui/switch"
+import QRImageUpload from "@/components/qr-image-upload"
+import { toast } from "@/components/ui/use-toast"
 
 export default function QRManagementPage() {
   const [assets, setAssets] = useState<any[]>([])
@@ -21,6 +24,15 @@ export default function QRManagementPage() {
     assetsWithQR: 0,
     qrCoverage: 0,
     recentScans: 0,
+  })
+  const [settings, setSettings] = useState({
+    autoGenerate: false,
+    includeDetails: true,
+    trackAnalytics: true,
+    mobileNotifications: false,
+    defaultSize: "300",
+    errorCorrection: "M",
+    defaultFormat: "png"
   })
 
   // Fetch assets from Supabase
@@ -60,6 +72,86 @@ export default function QRManagementPage() {
       recentScans: 12, // Mock data
     })
   }, [assets])
+
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('qrSettings')
+    if (savedSettings) {
+      setSettings(JSON.parse(savedSettings))
+    }
+  }, [])
+
+  // Save settings to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('qrSettings', JSON.stringify(settings))
+  }, [settings])
+
+  const handleSettingChange = (key: keyof typeof settings, value: any) => {
+    setSettings(prev => ({ ...prev, [key]: value }))
+    
+    // Apply settings immediately
+    if (key === 'autoGenerate') {
+      // Update auto-generate setting in Supabase
+      updateAutoGenerateSettings(value)
+    }
+  }
+
+  const updateAutoGenerateSettings = async (enabled: boolean) => {
+    try {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('settings')
+        .upsert({ 
+          key: 'qr_auto_generate', 
+          value: enabled,
+          updated_at: new Date().toISOString()
+        })
+
+      if (error) throw error
+
+      toast({
+        title: "Settings Updated",
+        description: `Auto-generate QR codes ${enabled ? 'enabled' : 'disabled'}`,
+      })
+    } catch (error) {
+      console.error('Failed to update settings:', error)
+      toast({
+        title: "Settings Update Failed",
+        description: "Failed to save auto-generate settings",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleQRImageUploaded = async (assetId: string, imageUrl: string) => {
+    try {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('assets')
+        .update({ 
+          qr_code: imageUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('asset_id', assetId)
+
+      if (error) throw error
+
+      toast({
+        title: "QR Code Updated",
+        description: "Asset QR code has been updated successfully",
+      })
+
+      // Refresh assets list
+      fetchAssets()
+    } catch (error) {
+      console.error('Failed to update asset:', error)
+      toast({
+        title: "Update Failed",
+        description: "Failed to update asset QR code",
+        variant: "destructive"
+      })
+    }
+  }
 
   // Re-fetch assets after QR code generation
   const handleQRGenerated = async (assetId: string, qrCode: string) => {
@@ -237,7 +329,10 @@ export default function QRManagementPage() {
           </TabsContent>
 
           <TabsContent value="generate">
-            <QRGenerator assets={assets} onQRGenerated={handleQRGenerated} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <QRGenerator assets={assets} onQRGenerated={handleQRGenerated} settings={settings} />
+              <QRImageUpload onUploadComplete={handleQRImageUploaded} />
+            </div>
           </TabsContent>
 
           <TabsContent value="scan">
@@ -270,7 +365,11 @@ export default function QRManagementPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Default Size</label>
-                    <select className="w-full px-3 py-2 border rounded-md">
+                    <select 
+                      className="w-full px-3 py-2 border rounded-md"
+                      value={settings.defaultSize}
+                      onChange={(e) => handleSettingChange('defaultSize', e.target.value)}
+                    >
                       <option value="200">200x200 px</option>
                       <option value="300">300x300 px</option>
                       <option value="400">400x400 px</option>
@@ -279,7 +378,11 @@ export default function QRManagementPage() {
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Error Correction Level</label>
-                    <select className="w-full px-3 py-2 border rounded-md">
+                    <select 
+                      className="w-full px-3 py-2 border rounded-md"
+                      value={settings.errorCorrection}
+                      onChange={(e) => handleSettingChange('errorCorrection', e.target.value)}
+                    >
                       <option value="L">Low (7%)</option>
                       <option value="M">Medium (15%)</option>
                       <option value="Q">Quartile (25%)</option>
@@ -289,14 +392,16 @@ export default function QRManagementPage() {
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Default Format</label>
-                    <select className="w-full px-3 py-2 border rounded-md">
+                    <select 
+                      className="w-full px-3 py-2 border rounded-md"
+                      value={settings.defaultFormat}
+                      onChange={(e) => handleSettingChange('defaultFormat', e.target.value)}
+                    >
                       <option value="png">PNG</option>
                       <option value="svg">SVG</option>
                       <option value="pdf">PDF</option>
                     </select>
                   </div>
-
-                  <Button className="w-full">Save Settings</Button>
                 </CardContent>
               </Card>
 
@@ -305,13 +410,16 @@ export default function QRManagementPage() {
                   <CardTitle>Integration Settings</CardTitle>
                   <CardDescription>Configure QR code integrations and features</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">Auto-generate QR codes</p>
                       <p className="text-sm text-gray-600">Automatically create QR codes for new assets</p>
                     </div>
-                    <input type="checkbox" className="toggle" />
+                    <Switch 
+                      checked={settings.autoGenerate}
+                      onCheckedChange={(checked) => handleSettingChange('autoGenerate', checked)}
+                    />
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -319,7 +427,10 @@ export default function QRManagementPage() {
                       <p className="font-medium">Include asset details</p>
                       <p className="text-sm text-gray-600">Embed asset information in QR codes</p>
                     </div>
-                    <input type="checkbox" className="toggle" defaultChecked />
+                    <Switch 
+                      checked={settings.includeDetails}
+                      onCheckedChange={(checked) => handleSettingChange('includeDetails', checked)}
+                    />
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -327,7 +438,10 @@ export default function QRManagementPage() {
                       <p className="font-medium">Track scan analytics</p>
                       <p className="text-sm text-gray-600">Monitor QR code usage and scans</p>
                     </div>
-                    <input type="checkbox" className="toggle" defaultChecked />
+                    <Switch 
+                      checked={settings.trackAnalytics}
+                      onCheckedChange={(checked) => handleSettingChange('trackAnalytics', checked)}
+                    />
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -335,7 +449,22 @@ export default function QRManagementPage() {
                       <p className="font-medium">Mobile notifications</p>
                       <p className="text-sm text-gray-600">Send alerts for QR code scans</p>
                     </div>
-                    <input type="checkbox" className="toggle" />
+                    <Switch 
+                      checked={settings.mobileNotifications}
+                      onCheckedChange={(checked) => handleSettingChange('mobileNotifications', checked)}
+                    />
+                  </div>
+
+                  <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                    <div className="flex items-start space-x-2">
+                      <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-blue-800">Settings are automatically saved</p>
+                        <p className="text-sm text-blue-600">
+                          Your preferences will be applied to all new QR code operations
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

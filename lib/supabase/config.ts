@@ -33,5 +33,11 @@ export function getStorageUrl(bucket: string, path: string): string {
 // Helper function to get the correct redirect URL
 export function getRedirectUrl(path = ""): string {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cloudeleavepro.vercel.app"
+  return path.startsWith("http") ? path : `${baseUrl}${path}`
+}
+
+// Helper function to get auth redirect URL
+export function getAuthRedirectUrl(path = "/auth/callback"): string {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cloudeleavepro.vercel.app"
   return `${baseUrl}${path}`
 }

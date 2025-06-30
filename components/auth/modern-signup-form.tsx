@@ -12,23 +12,32 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
-import { Package, AlertCircle, Loader2, Github, Mail, ArrowRight, CheckCircle } from "lucide-react"
+import { Package, AlertCircle, Loader2, Github, Mail, ArrowRight, CheckCircle, Building2 } from "lucide-react"
 import { motion } from "framer-motion"
+import { useBranding } from "@/components/branding-provider"
 
 export default function SignupForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
+  const [orgName, setOrgName] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [githubLoading, setGithubLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const router = useRouter()
+  const branding = useBranding()
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
+
+    if (!orgName.trim()) {
+      setError("Organization name is required")
+      setLoading(false)
+      return
+    }
 
     try {
       // Dynamically import to prevent SSR issues
@@ -41,6 +50,7 @@ export default function SignupForm() {
         options: {
           data: {
             full_name: name,
+            org_name: orgName,
           },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
@@ -60,26 +70,32 @@ export default function SignupForm() {
   }
 
   const handleGithubSignup = async () => {
+    if (!orgName.trim()) {
+      setError("Organization name is required")
+      return
+    }
     setGithubLoading(true)
     setError(null)
 
     try {
       const { createClient } = await import("@/lib/supabase/client")
       const supabase = createClient()
-
+      // Store org name in a cookie before GitHub OAuth
+      document.cookie = `signup_org_name=${encodeURIComponent(orgName)}; path=/; max-age=300`
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "github",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       })
-
       if (error) {
         setError(error.message)
+        document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
       }
     } catch (err) {
       console.error("GitHub signup error:", err)
       setError("Failed to authenticate with GitHub. Please try again.")
+      document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
     } finally {
       setGithubLoading(false)
     }
@@ -90,8 +106,12 @@ export default function SignupForm() {
       {/* Header */}
       <header className="w-full py-6 px-4 sm:px-6 lg:px-8 flex justify-center">
         <Link href="/" className="flex items-center space-x-2">
-          <Package className="h-8 w-8 text-blue-600" />
-          <span className="text-2xl font-bold text-gray-900">AssetTracker Pro</span>
+          {branding?.logoUrl && (
+            <img src={branding.logoUrl} alt="Logo" className="h-12 w-12 rounded bg-white border" />
+          )}
+          <span className="text-2xl font-bold text-gray-900">
+            {branding?.companyName || "AssetTracker Pro"}
+          </span>
         </Link>
       </header>
 
@@ -167,6 +187,22 @@ export default function SignupForm() {
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="orgName">Organization Name</Label>
+                  <div className="relative">
+                    <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="orgName"
+                      type="text"
+                      placeholder="Enter your organization name"
+                      value={orgName}
+                      onChange={(e) => setOrgName(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
 
                 <Tabs defaultValue="github" className="w-full">
                   <TabsList className="grid w-full grid-cols-2">

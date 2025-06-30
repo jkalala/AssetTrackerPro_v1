@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, Mail, Lock, User, AlertTriangle, Package, Shield, Github, CheckCircle } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, User, AlertTriangle, Package, Shield, Github, CheckCircle, Building2 } from "lucide-react"
 import Link from "next/link"
 import { signUpWithEmail, signInWithGitHub } from "@/lib/auth-actions"
 
@@ -16,6 +16,7 @@ export default function ProductionSignupForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [fullName, setFullName] = useState("")
+  const [orgName, setOrgName] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -28,8 +29,14 @@ export default function ProductionSignupForm() {
     setLoading(true)
     setError("")
 
+    if (!orgName.trim()) {
+      setError("Organization name is required")
+      setLoading(false)
+      return
+    }
+
     try {
-      const result = await signUpWithEmail(email, password, fullName)
+      const result = await signUpWithEmail(email, password, fullName, orgName)
       if (result.error) {
         setError(result.error)
       } else if (result.needsConfirmation) {
@@ -47,17 +54,27 @@ export default function ProductionSignupForm() {
   }
 
   const handleGitHubSignup = async () => {
+    if (!orgName.trim()) {
+      setError("Organization name is required")
+      return
+    }
+
     setLoading(true)
     setError("")
 
     try {
+      // Store org name in a cookie before GitHub OAuth
+      document.cookie = `signup_org_name=${encodeURIComponent(orgName)}; path=/; max-age=300` // 5 minutes expiry
+      
       const result = await signInWithGitHub()
       if (result.error) {
         setError(result.error)
+        document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
       }
       // GitHub OAuth will handle the redirect
     } catch (err) {
       setError("Failed to sign up with GitHub")
+      document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
       setLoading(false)
     }
   }
@@ -141,10 +158,30 @@ export default function ProductionSignupForm() {
               )}
 
               {/* GitHub OAuth */}
-              <Button onClick={handleGitHubSignup} variant="outline" className="w-full" disabled={loading}>
-                <Github className="h-4 w-4 mr-2" />
-                Continue with GitHub
-              </Button>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="orgName" className="text-sm font-medium">
+                    Organization Name
+                  </label>
+                  <div className="relative">
+                    <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      id="orgName"
+                      type="text"
+                      placeholder="Enter your organization name"
+                      value={orgName}
+                      onChange={(e) => setOrgName(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <Button onClick={handleGitHubSignup} variant="outline" className="w-full" disabled={loading}>
+                  <Github className="h-4 w-4 mr-2" />
+                  Continue with GitHub
+                </Button>
+              </div>
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">

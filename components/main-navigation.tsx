@@ -39,6 +39,7 @@ import {
   Sparkles,
 } from "lucide-react"
 import Link from "next/link"
+import SignOutButton from "@/components/auth/sign-out-button"
 
 interface MainNavigationProps {
   className?: string
@@ -384,6 +385,9 @@ export default function MainNavigation({ className }: MainNavigationProps) {
             </div>
           </CardContent>
         </Card>
+        <div className="flex items-center space-x-4">
+          {user && <SignOutButton />}
+        </div>
       </div>
     </div>
   )

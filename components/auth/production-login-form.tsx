@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator"
 import { Package, Github, Mail, Eye, EyeOff, Loader2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import { useBranding } from "@/components/branding-provider"
 
 export default function ProductionLoginForm() {
   const [email, setEmail] = useState("")
@@ -21,6 +22,7 @@ export default function ProductionLoginForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
+  const branding = useBranding()
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,9 +76,13 @@ export default function ProductionLoginForm() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <Package className="h-10 w-10 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">AssetTracker Pro</h1>
+          <div className="flex flex-col items-center space-y-2 mb-6">
+            {branding?.logoUrl && (
+              <img src={branding.logoUrl} alt="Logo" className="h-12 w-12 rounded bg-white border" />
+            )}
+            <h1 className="text-3xl font-bold text-gray-900">
+              {branding?.companyName || "AssetTracker Pro"}
+            </h1>
           </div>
           <p className="text-gray-600">Professional Asset Management System</p>
         </div>

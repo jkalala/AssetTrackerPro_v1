@@ -38,12 +38,18 @@ import {
   Sparkles,
   ArrowRight,
   TrendingUp,
-  Activity
+  Activity,
+  Building2,
+  CreditCard,
+  User
 } from "lucide-react"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import { getAssetStats } from "@/lib/asset-actions"
 import { Progress } from "@/components/ui/progress"
+import SignOutButton from "@/components/auth/sign-out-button"
+import NotificationsBell from "@/components/notifications-bell"
+import { useBranding } from "@/components/branding-provider"
 
 interface AssetStats {
   total: number
@@ -51,6 +57,20 @@ interface AssetStats {
   byCategory: Record<string, number>
   totalValue: number
   recentAdditions?: number
+}
+
+function DashboardHeader() {
+  const branding = useBranding();
+  return (
+    <div className="flex items-center space-x-3">
+      {branding?.logoUrl && (
+        <img src={branding.logoUrl} alt="Logo" className="h-8 w-8 rounded bg-white border" />
+      )}
+      <h1 className="text-2xl font-bold text-gray-900">
+        {branding?.companyName || "AssetTracker Pro"}
+      </h1>
+    </div>
+  );
 }
 
 export default function DashboardContent() {
@@ -319,10 +339,10 @@ export default function DashboardContent() {
       borderColor: "border-red-200",
       description: "Advanced system administration tools",
       features: [
-        { name: "Database Management", href: "/debug-supabase", icon: Database },
-        { name: "Auth Debug", href: "/auth/debug", icon: Shield },
-        { name: "Supabase Status", href: "/supabase-test", icon: CheckCircle },
-        { name: "Environment Debug", href: "/debug-urls", icon: Settings }
+        { name: "Organization Settings", href: "/settings/tenant", icon: Building2 },
+        { name: "Billing & Plans", href: "/settings/billing", icon: CreditCard },
+        { name: "Team Management", href: "/settings/team", icon: Users },
+        { name: "Security Settings", href: "/settings/security", icon: Shield }
       ]
     }
   ]
@@ -334,11 +354,16 @@ export default function DashboardContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
-              <Package className="h-8 w-8 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">AssetTracker Pro</h1>
+              <DashboardHeader />
             </div>
             <div className="flex items-center space-x-4">
+              <NotificationsBell />
               <span className="text-sm text-gray-600">Welcome, {profile.full_name || user.email}</span>
+              <Link href="/settings/profile" className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
+                <User className="h-4 w-4" />
+                Profile
+              </Link>
+              <SignOutButton />
               <Button asChild size="sm">
                 <Link href="/add-asset">
                   <Plus className="h-4 w-4 mr-2" />

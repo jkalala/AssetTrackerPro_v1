@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
+import { getAuthRedirectUrl } from "@/lib/supabase/config"
 
 const getURL = () => {
   let url = process.env.NEXT_PUBLIC_APP_URL ?? "https://cloudeleavepro.vercel.app"
@@ -28,10 +29,15 @@ export async function signInWithEmail(email: string, password: string) {
   return { success: true }
 }
 
-export async function signUpWithEmail(email: string, password: string, fullName: string) {
+export async function signUpWithEmail(
+  email: string, 
+  password: string, 
+  fullName: string,
+  orgName?: string
+) {
   const supabase = await createClient()
 
-  const redirectUrl = `${getURL()}auth/callback`
+  const redirectUrl = getAuthRedirectUrl()
   console.log("Signup redirect URL:", redirectUrl)
 
   const { data, error } = await supabase.auth.signUp({
@@ -41,6 +47,7 @@ export async function signUpWithEmail(email: string, password: string, fullName:
       emailRedirectTo: redirectUrl,
       data: {
         full_name: fullName,
+        org_name: orgName
       },
     },
   })
@@ -76,7 +83,7 @@ export async function signUpWithEmail(email: string, password: string, fullName:
 export async function signInWithGitHub() {
   const supabase = await createClient()
 
-  const redirectUrl = `${getURL()}auth/callback`
+  const redirectUrl = getAuthRedirectUrl()
   console.log("GitHub OAuth redirect URL:", redirectUrl)
 
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -86,7 +93,7 @@ export async function signInWithGitHub() {
       queryParams: {
         access_type: "offline",
         prompt: "consent",
-      },
+      }
     },
   })
 
@@ -117,7 +124,7 @@ export async function signOut() {
 export async function resetPassword(email: string) {
   const supabase = await createClient()
 
-  const redirectUrl = `${getURL()}auth/reset-password`
+  const redirectUrl = getAuthRedirectUrl("/auth/reset-password")
   console.log("Password reset redirect URL:", redirectUrl)
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -138,7 +145,7 @@ export async function resetPassword(email: string) {
 export async function resendConfirmation(email: string) {
   const supabase = await createClient()
 
-  const redirectUrl = `${getURL()}auth/callback`
+  const redirectUrl = getAuthRedirectUrl()
   console.log("Resend confirmation redirect URL:", redirectUrl)
 
   const { error } = await supabase.auth.resend({

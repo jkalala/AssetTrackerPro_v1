@@ -9,13 +9,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, Mail, Lock, User, Github } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, User, Github, Building2 } from "lucide-react"
 import Link from "next/link"
 
 export default function SignupForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [fullName, setFullName] = useState("")
+  const [orgName, setOrgName] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [githubLoading, setGithubLoading] = useState(false)
@@ -29,6 +30,12 @@ export default function SignupForm() {
     setLoading(true)
     setError("")
 
+    if (!orgName.trim()) {
+      setError("Organization name is required")
+      setLoading(false)
+      return
+    }
+
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -36,6 +43,7 @@ export default function SignupForm() {
         options: {
           data: {
             full_name: fullName,
+            org_name: orgName,
           },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
@@ -58,37 +66,49 @@ export default function SignupForm() {
   }
 
   const handleGithubSignup = async () => {
+    if (!orgName.trim()) {
+      setError("Organization name is required")
+      return
+    }
     setGithubLoading(true)
     setError("")
-
     try {
+      // Store org name in a cookie before GitHub OAuth
+      document.cookie = `signup_org_name=${encodeURIComponent(orgName)}; path=/; max-age=300`
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "github",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       })
-
       if (error) {
         setError(error.message)
+        document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
       }
     } catch (err) {
       setError("Failed to authenticate with GitHub")
+      document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
     } finally {
       setGithubLoading(false)
     }
   }
 
   const handleGoogleSignup = async () => {
+    if (!orgName.trim()) {
+      setError("Organization name is required")
+      return
+    }
+    // Store org name in a cookie before Google OAuth
+    document.cookie = `signup_org_name=${encodeURIComponent(orgName)}; path=/; max-age=300`
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     })
-
     if (error) {
       setError(error.message)
+      document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
     }
   }
 
@@ -136,6 +156,25 @@ export default function SignupForm() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
+
+          {/* Organization Name Field */}
+          <div className="space-y-2">
+            <label htmlFor="orgName" className="text-sm font-medium">
+              Organization Name
+            </label>
+            <div className="relative">
+              <Building2 className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                id="orgName"
+                type="text"
+                placeholder="Enter your organization name"
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+                className="pl-10"
+                required
+              />
+            </div>
+          </div>
 
           {/* Social Signup Buttons */}
           <div className="space-y-3">

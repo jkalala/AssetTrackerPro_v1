@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
@@ -11,14 +13,12 @@ export async function GET(request: Request) {
   console.log("Auth callback received:", { code: !!code, error, provider })
 
   // if "next" is in param, use it as the redirect URL
-  const next = requestUrl.searchParams.get("next") ?? "/dashboard"
+  const next = requestUrl.searchParams.get("next") || "/dashboard"
 
   // Handle error cases
   if (error) {
     console.error("Auth callback error:", error, error_description)
-    return NextResponse.redirect(
-      `${requestUrl.origin}/auth/auth-code-error?error=${encodeURIComponent(error_description || error)}`,
-    )
+    return redirect("/auth/auth-code-error")
   }
 
   // Check if we have Supabase configuration
@@ -26,85 +26,110 @@ export async function GET(request: Request) {
 
   if (!hasSupabaseConfig) {
     console.log("No Supabase configuration found, redirecting to demo")
-    return NextResponse.redirect(`${requestUrl.origin}/demo`)
+    return redirect("/demo")
   }
 
   if (code) {
-    try {
-      const supabase = await createClient()
+    const cookieStore = cookies()
+    const supabase = await createClient()
 
-      console.log("Exchanging code for session...")
-      const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+    console.log("Exchanging code for session...")
+    const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
-      if (exchangeError) {
-        console.error("Code exchange error:", exchangeError)
-        return NextResponse.redirect(
-          `${requestUrl.origin}/auth/auth-code-error?error=${encodeURIComponent(exchangeError.message)}`,
-        )
+    if (exchangeError) {
+      console.error("Code exchange error:", exchangeError)
+      return redirect("/auth/auth-code-error")
+    }
+
+    console.log("Session created successfully, user:", data.user?.id)
+
+    if (data.user) {
+      // Get user data
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        console.error("No user found after code exchange")
+        return redirect("/auth/auth-code-error")
       }
 
-      console.log("Session created successfully, user:", data.user?.id)
+      // Get full name from user metadata
+      const fullName = user.user_metadata?.full_name || user.user_metadata?.name || null
+      const avatarUrl = user.user_metadata?.avatar_url || null
 
-      if (data.user) {
-        // Check if user profile exists, create if not
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("id", data.user.id)
-          .single()
+      // Get organization name from metadata or cookie
+      let orgName = user.user_metadata?.org_name
+      if (!orgName) {
+        // Try to get from cookie for GitHub signups
+        const signupOrgName = cookieStore.get("signup_org_name")
+        if (signupOrgName) {
+          orgName = decodeURIComponent(signupOrgName.value)
+          // Clear the cookie
+          cookieStore.delete("signup_org_name")
+        }
+      }
 
-        if (profileError && profileError.code === "PGRST116") {
-          console.log("Creating new profile for user:", data.user.id)
-          // Profile doesn't exist, create it
-          let fullName = null
-          let avatarUrl = null
+      // Create profile if it doesn't exist
+      const { data: existingProfile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single()
 
-          if (data.user.app_metadata?.provider === "github") {
-            fullName = data.user.user_metadata?.full_name || data.user.user_metadata?.name || null
-            avatarUrl = data.user.user_metadata?.avatar_url || null
-            console.log("GitHub user metadata:", data.user.user_metadata)
-          } else if (data.user.app_metadata?.provider === "google") {
-            fullName = data.user.user_metadata?.full_name || data.user.user_metadata?.name || null
-            avatarUrl = data.user.user_metadata?.avatar_url || data.user.user_metadata?.picture || null
-          } else {
-            // Email signup
-            fullName = data.user.user_metadata?.full_name || null
-          }
+      if (!existingProfile) {
+        const { error: insertError } = await supabase.from("profiles").insert({
+          id: user.id,
+          full_name: fullName,
+          avatar_url: avatarUrl,
+          role: "admin", // First user is admin
+          email: user.email
+        })
 
-          const { error: insertError } = await supabase.from("profiles").insert({
-            id: data.user.id,
-            email: data.user.email!,
-            full_name: fullName,
-            avatar_url: avatarUrl,
-            role: "user",
-          })
-
-          if (insertError) {
-            console.error("Profile creation error:", insertError)
-            // Continue to dashboard even if profile creation fails
-          } else {
-            console.log("Profile created successfully")
-          }
-        } else if (profileError) {
-          console.error("Profile check error:", profileError)
-          // Continue to dashboard even if profile check fails
+        if (insertError) {
+          console.error("Profile creation error:", insertError)
         } else {
-          console.log("User profile already exists")
+          console.log("Profile created successfully")
+
+          // Create default tenant for the user
+          const { data: tenant, error: tenantError } = await supabase.from("tenants").insert({
+            name: orgName || `${fullName}'s Organization`,
+            plan: "free",
+            status: "active",
+            max_users: 5,
+            max_assets: 100,
+            features: {
+              qrCodes: true,
+              analytics: false,
+              api: false,
+              customBranding: false,
+              multipleLocations: false,
+              advancedReports: false
+            }
+          }).select().single()
+
+          if (tenantError) {
+            console.error("Tenant creation error:", tenantError)
+          } else if (tenant) {
+            // Update profile with tenant info and make user the owner
+            const { error: updateError } = await supabase.from("profiles")
+              .update({
+                tenant_id: tenant.id,
+                role: "owner"
+              })
+              .eq("id", user.id)
+
+            if (updateError) {
+              console.error("Profile update error:", updateError)
+            }
+          }
         }
       }
 
       // Successful authentication - redirect to dashboard
       console.log("Redirecting to dashboard after successful authentication")
-      return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
-    } catch (err) {
-      console.error("Unexpected auth callback error:", err)
-      return NextResponse.redirect(
-        `${requestUrl.origin}/auth/auth-code-error?error=${encodeURIComponent("Authentication failed")}`,
-      )
+      return redirect(next)
     }
   }
 
   // No code provided - redirect to login
   console.log("No auth code provided, redirecting to login")
-  return NextResponse.redirect(`${requestUrl.origin}/login`)
+  return redirect("/login")
 }

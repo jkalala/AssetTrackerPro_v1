@@ -17,13 +17,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { format = 'json', reportType = 'all' } = await request.json()
+    const { format = 'json', reportType = 'all', dateFrom, dateTo, category, status } = await request.json()
 
     // Get current date and calculate date ranges
     const now = new Date()
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
     const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
+
+    let query = supabase.from('assets').select('id, name, status, category, purchase_value, created_at')
+    if (dateFrom) query = query.gte('created_at', dateFrom)
+    if (dateTo) query = query.lte('created_at', dateTo)
+    if (category) query = query.eq('category', category)
+    if (status) query = query.eq('status', status)
+
+    const { data, error } = await query
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 
     // Fetch comprehensive analytics data
     const [
@@ -175,6 +184,41 @@ export async function POST(request: Request) {
         contentType = 'application/json'
         filename = `assetpro-analytics-${reportType}-${now.toISOString().split('T')[0]}.json`
         break
+      
+      case 'pdf':
+        const { default: jsPDF } = await import('jspdf')
+        const doc = new jsPDF()
+        doc.text("Asset Report", 10, 10)
+        let y = 20
+        data.forEach((asset: any, i: number) => {
+          doc.text(`${i + 1}. ${asset.name} | ${asset.category} | ${asset.status} | $${asset.purchase_value} | ${asset.created_at}`, 10, y)
+          y += 10
+        })
+        const pdf = doc.output("arraybuffer")
+        return new NextResponse(Buffer.from(pdf), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": "attachment; filename=asset-report.pdf"
+          }
+        })
+      
+      case 'xlsx':
+        const ExcelJS = (await import('exceljs')).default
+        const workbook = new ExcelJS.Workbook()
+        const sheet = workbook.addWorksheet("Assets")
+        sheet.addRow(["Name", "Category", "Status", "Value", "Created At"])
+        data.forEach((asset: any) => {
+          sheet.addRow([asset.name, asset.category, asset.status, asset.purchase_value, asset.created_at])
+        })
+        const buffer = await workbook.xlsx.writeBuffer()
+        return new NextResponse(Buffer.from(buffer), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Content-Disposition": "attachment; filename=asset-report.xlsx"
+          }
+        })
       
       default:
         return NextResponse.json({ error: 'Unsupported format' }, { status: 400 })

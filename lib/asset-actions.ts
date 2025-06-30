@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
+import { logAuditEvent } from './audit-log'
 
 export interface Asset {
   id?: string
@@ -87,6 +88,16 @@ export async function addAsset(assetData: Omit<Asset, 'id' | 'created_at' | 'upd
     revalidatePath('/assets')
     revalidatePath('/dashboard')
     
+    // Audit log: asset created
+    await logAuditEvent({
+      user_id: user.id,
+      action: 'create',
+      entity: 'asset',
+      entity_id: data.id,
+      details: { asset_id: data.asset_id, name: data.name },
+      tenant_id: data.tenant_id || undefined,
+    })
+    
     return { data }
   } catch (error) {
     console.error('Error in addAsset:', error)
@@ -141,6 +152,16 @@ export async function updateAsset(assetId: string, updates: Partial<Asset>) {
     revalidatePath(`/asset/${assetId}`)
     revalidatePath('/dashboard')
     
+    // Audit log: asset updated
+    await logAuditEvent({
+      user_id: user.id,
+      action: 'update',
+      entity: 'asset',
+      entity_id: assetId,
+      details: { updates },
+      tenant_id: data?.tenant_id || undefined,
+    })
+    
     return { data }
   } catch (error) {
     console.error('Error in updateAsset:', error)
@@ -188,6 +209,16 @@ export async function deleteAsset(assetId: string) {
 
     revalidatePath('/assets')
     revalidatePath('/dashboard')
+    
+    // Audit log: asset deleted
+    await logAuditEvent({
+      user_id: user.id,
+      action: 'delete',
+      entity: 'asset',
+      entity_id: assetId,
+      details: {},
+      // tenant_id: can be added if asset/tenant info is available
+    })
     
     return { success: true }
   } catch (error) {
@@ -449,7 +480,7 @@ export async function getAssetStats() {
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-    assets.forEach(asset => {
+    assets.forEach((asset: { status: string; category: string; purchase_value?: number; created_at?: string }) => {
       // Status counts
       stats.byStatus[asset.status] = (stats.byStatus[asset.status] || 0) + 1
       
@@ -462,7 +493,7 @@ export async function getAssetStats() {
       }
       
       // Recent additions
-      if (new Date(asset.created_at) > thirtyDaysAgo) {
+      if (asset.created_at && new Date(asset.created_at) > thirtyDaysAgo) {
         stats.recentAdditions++
       }
     })

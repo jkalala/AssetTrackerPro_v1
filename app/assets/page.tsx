@@ -10,6 +10,7 @@ import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import AssetManagement from "@/components/asset-management"
 import { Asset, getAssets } from "@/lib/asset-actions"
+import BulkAssetImport from "@/components/BulkAssetImport"
 
 export default function AssetsPage() {
   const { user, loading: authLoading } = useAuth()
@@ -142,6 +143,9 @@ export default function AssetsPage() {
             </AlertDescription>
           </Alert>
         )}
+
+        {/* Bulk Import UI */}
+        <BulkAssetImport />
 
         {/* Asset Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

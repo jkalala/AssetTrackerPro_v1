@@ -1,0 +1,18 @@
+{
+  "welcome": "Bienvenue",
+  "login": "Connexion",
+  "logout": "Déconnexion",
+  "dashboard": "Tableau de bord",
+  "admin_panel": "Panneau d'administration",
+  "users": "Utilisateurs",
+  "assets": "Actifs",
+  "settings": "Paramètres",
+  "reports": "Rapports",
+  "save": "Enregistrer",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "edit": "Modifier",
+  "create": "Créer",
+  "search": "Rechercher",
+  "language": "Langue"
+} 

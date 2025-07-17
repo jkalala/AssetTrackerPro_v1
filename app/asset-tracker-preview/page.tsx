@@ -38,11 +38,29 @@ import {
   Camera,
 } from "lucide-react"
 import Link from "next/link"
+import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function AssetTrackerPreview() {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null)
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; asset: any | null }>({ open: false, asset: null });
+  const { toast } = useToast();
+  const router = useRouter();
+
+  // Add state for bulk selection and dialogs
+  const [bulkSelected, setBulkSelected] = useState<string[]>([]);
+  const [bulkUpdateDialog, setBulkUpdateDialog] = useState(false);
+  const [bulkUpdateStatus, setBulkUpdateStatus] = useState("");
+  const [bulkUpdateCategory, setBulkUpdateCategory] = useState("");
+  const [bulkUpdateLocation, setBulkUpdateLocation] = useState("");
+  const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);
+  const [undoBulkUpdateData, setUndoBulkUpdateData] = useState<any[]>([]);
+  const [undoBulkUpdateIds, setUndoBulkUpdateIds] = useState<string[]>([]);
+  const [undoBulkDeleteData, setUndoBulkDeleteData] = useState<any[]>([]);
+  const [undoBulkDeleteIds, setUndoBulkDeleteIds] = useState<string[]>([]);
 
   // Mock data for preview
   const mockUser = {
@@ -193,6 +211,126 @@ export default function AssetTrackerPreview() {
       DU
     </div>
   )
+
+  const handleDelete = async (asset: any) => {
+    setDeleteDialog({ open: false, asset: null });
+    try {
+      const res = await fetch(`/api/assets/${asset.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: "Delete Failed", description: data.error || "Failed to delete asset", variant: "destructive" });
+      } else {
+        toast({ title: "Asset Deleted", description: `${asset.name} has been deleted.` });
+        // Remove from local state if using mock data
+        // setAssets((prev) => prev.filter((a) => a.id !== asset.id));
+      }
+    } catch (e) {
+      toast({ title: "Delete Failed", description: "An unexpected error occurred", variant: "destructive" });
+    }
+  };
+
+  // Bulk select handler
+  const handleBulkSelect = (assetId: string) => {
+    setBulkSelected(prev => prev.includes(assetId) ? prev.filter(id => id !== assetId) : [...prev, assetId]);
+  };
+  const handleBulkSelectAll = () => {
+    if (bulkSelected.length === filteredAssets.length) setBulkSelected([]);
+    else setBulkSelected(filteredAssets.map(a => a.id));
+  };
+  // Bulk update handler
+  const handleBulkUpdate = async () => {
+    try {
+      // Fetch previous asset data for undo
+      const res = await fetch("/api/assets/bulk-fetch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assetIds: bulkSelected }),
+      });
+      const prevData = await res.json();
+      setUndoBulkUpdateData(prevData.assets || []);
+      setUndoBulkUpdateIds(bulkSelected);
+      // Prepare update fields
+      const updateFields: any = {};
+      if (bulkUpdateStatus) updateFields.status = bulkUpdateStatus;
+      if (bulkUpdateCategory) updateFields.category = bulkUpdateCategory;
+      if (bulkUpdateLocation) updateFields.location = bulkUpdateLocation;
+      // Update assets (mock: just show toast)
+      toast({
+        title: "Assets updated",
+        description: `${bulkSelected.length} assets updated` + (Object.keys(updateFields).length ? ` (${Object.keys(updateFields).join(", ")})` : ""),
+        action: (
+          <Button variant="outline" onClick={handleUndoBulkUpdate}>Undo</Button>
+        ),
+      });
+      setBulkUpdateDialog(false);
+      setBulkSelected([]);
+      setBulkUpdateStatus("");
+      setBulkUpdateCategory("");
+      setBulkUpdateLocation("");
+      // In real app: refetch assets
+    } catch {
+      toast({ title: "Error", description: "Failed to update assets", variant: "destructive" });
+    }
+  };
+  // Undo bulk update handler
+  const handleUndoBulkUpdate = async () => {
+    try {
+      await fetch("/api/assets/bulk-restore", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assets: undoBulkUpdateData }),
+      });
+      toast({ title: "Undo successful", description: `${undoBulkUpdateIds.length} assets restored` });
+      setUndoBulkUpdateData([]);
+      setUndoBulkUpdateIds([]);
+      // In real app: refetch assets
+    } catch {
+      toast({ title: "Error", description: "Failed to undo update", variant: "destructive" });
+    }
+  };
+  // Bulk delete handler
+  const handleBulkDelete = async () => {
+    try {
+      // Fetch previous asset data for undo
+      const res = await fetch("/api/assets/bulk-fetch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assetIds: bulkSelected }),
+      });
+      const prevData = await res.json();
+      setUndoBulkDeleteData(prevData.assets || []);
+      setUndoBulkDeleteIds(bulkSelected);
+      // Delete assets (mock: just show toast)
+      toast({
+        title: "Assets deleted",
+        description: `${bulkSelected.length} assets deleted`,
+        action: (
+          <Button variant="outline" onClick={handleUndoBulkDelete}>Undo</Button>
+        ),
+      });
+      setBulkDeleteDialog(false);
+      setBulkSelected([]);
+      // In real app: refetch assets
+    } catch {
+      toast({ title: "Error", description: "Failed to delete assets", variant: "destructive" });
+    }
+  };
+  // Undo bulk delete handler
+  const handleUndoBulkDelete = async () => {
+    try {
+      await fetch("/api/assets/bulk-restore", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assets: undoBulkDeleteData }),
+      });
+      toast({ title: "Undo successful", description: `${undoBulkDeleteIds.length} assets restored` });
+      setUndoBulkDeleteData([]);
+      setUndoBulkDeleteIds([]);
+      // In real app: refetch assets
+    } catch {
+      toast({ title: "Error", description: "Failed to undo delete", variant: "destructive" });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -576,9 +714,22 @@ export default function AssetTrackerPreview() {
                       <CardDescription>Manage and track all your assets</CardDescription>
                     </CardHeader>
                     <CardContent>
+                      {bulkSelected.length > 0 && (
+                        <div className="flex gap-2 mb-2">
+                          <Button variant="secondary" onClick={() => setBulkUpdateDialog(true)}>
+                            Update Selected ({bulkSelected.length})
+                          </Button>
+                          <Button variant="destructive" onClick={() => setBulkDeleteDialog(true)}>
+                            Delete Selected ({bulkSelected.length})
+                          </Button>
+                        </div>
+                      )}
                       <Table>
                         <TableHeader>
                           <TableRow>
+                            <TableHead>
+                              <input type="checkbox" checked={bulkSelected.length === filteredAssets.length && filteredAssets.length > 0} onChange={handleBulkSelectAll} />
+                            </TableHead>
                             <TableHead>Asset</TableHead>
                             <TableHead>Category</TableHead>
                             <TableHead>Status</TableHead>
@@ -592,6 +743,9 @@ export default function AssetTrackerPreview() {
                         <TableBody>
                           {filteredAssets.map((asset) => (
                             <TableRow key={asset.id} className="hover:bg-gray-50">
+                              <TableCell>
+                                <input type="checkbox" checked={bulkSelected.includes(asset.id)} onChange={() => handleBulkSelect(asset.id)} />
+                              </TableCell>
                               <TableCell>
                                 <div className="flex items-center space-x-3">
                                   <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -631,16 +785,13 @@ export default function AssetTrackerPreview() {
                               </TableCell>
                               <TableCell>
                                 <div className="flex space-x-1">
-                                  <Button variant="ghost" size="sm" onClick={() => setSelectedAsset(asset.id)}>
+                                  <Button variant="ghost" size="sm" onClick={() => router.push(`/asset/${asset.id}`)} title="Preview">
                                     <Eye className="h-4 w-4" />
                                   </Button>
-                                  <Button variant="ghost" size="sm">
+                                  <Button variant="ghost" size="sm" onClick={() => router.push(`/asset/${asset.id}/edit`)} title="Edit">
                                     <Edit className="h-4 w-4" />
                                   </Button>
-                                  <Button variant="ghost" size="sm">
-                                    <QrCode className="h-4 w-4" />
-                                  </Button>
-                                  <Button variant="ghost" size="sm">
+                                  <Button variant="ghost" size="sm" onClick={() => setDeleteDialog({ open: true, asset })} title="Delete">
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
                                 </div>
@@ -651,6 +802,34 @@ export default function AssetTrackerPreview() {
                       </Table>
                     </CardContent>
                   </Card>
+                  {/* Bulk Update Dialog */}
+                  <Dialog open={bulkUpdateDialog} onOpenChange={setBulkUpdateDialog}>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Update Selected Assets</DialogTitle>
+                      </DialogHeader>
+                      <div className="flex flex-col gap-2">
+                        <Input placeholder="Status" value={bulkUpdateStatus} onChange={e => setBulkUpdateStatus(e.target.value)} className="mb-2" />
+                        <Input placeholder="Category" value={bulkUpdateCategory} onChange={e => setBulkUpdateCategory(e.target.value)} className="mb-2" />
+                        <Input placeholder="Location" value={bulkUpdateLocation} onChange={e => setBulkUpdateLocation(e.target.value)} className="mb-2" />
+                      </div>
+                      <DialogFooter>
+                        <Button onClick={handleBulkUpdate}>Update All</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                  {/* Bulk Delete Dialog */}
+                  <Dialog open={bulkDeleteDialog} onOpenChange={setBulkDeleteDialog}>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Delete Selected Assets</DialogTitle>
+                      </DialogHeader>
+                      <div>Are you sure you want to delete <b>{bulkSelected.length}</b> assets?</div>
+                      <DialogFooter>
+                        <Button variant="destructive" onClick={handleBulkDelete}>Delete All</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </TabsContent>
 
                 <TabsContent value="grid">
@@ -1212,6 +1391,18 @@ export default function AssetTrackerPreview() {
           </Card>
         </div>
       )}
+
+      <Dialog open={deleteDialog.open} onOpenChange={open => setDeleteDialog({ open, asset: deleteDialog.asset })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Asset</DialogTitle>
+          </DialogHeader>
+          <div>Are you sure you want to delete <b>{deleteDialog.asset?.name}</b>?</div>
+          <DialogFooter>
+            <Button variant="destructive" onClick={() => deleteDialog.asset && handleDelete(deleteDialog.asset)}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -1,5 +1,7 @@
 import { createClient as createClientServer } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { isAuthorized } from '@/lib/rbac/utils'
+import { Permission } from '@/lib/rbac/types'
 
 export const runtime = 'nodejs'
 
@@ -33,6 +35,11 @@ export async function POST(req: Request, { params }: { params: { assetId: string
     error: userError,
   } = await supabase.auth.getUser()
   if (userError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // RBAC permission check
+  const authorized = await isAuthorized(user.id, 'update:asset' as Permission)
+  if (!authorized) {
+    return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+  }
   // Parse multipart form
   const formData = await req.formData()
   const file = formData.get('file') as File | null
@@ -76,6 +83,11 @@ export async function DELETE(req: Request, { params }: { params: { assetId: stri
     error: userError,
   } = await supabase.auth.getUser()
   if (userError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // RBAC permission check
+  const authorized = await isAuthorized(user.id, 'update:asset' as Permission)
+  if (!authorized) {
+    return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+  }
   const body = await req.json()
   const { id } = body
   if (!id) return NextResponse.json({ error: 'Missing attachment id' }, { status: 400 })

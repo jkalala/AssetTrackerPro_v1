@@ -2,7 +2,9 @@
 
 import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
-import type { User } from "@supabase/supabase-js"
+import type { User, Session } from "@supabase/supabase-js"
+import { DEFAULT_ROLE_PERMISSIONS, Role, Permission } from '@/lib/rbac/types'
+import { createClient } from '@/lib/supabase/client'
 
 type AuthContextType = {
   user: User | null
@@ -10,6 +12,8 @@ type AuthContextType = {
   error: string | null
   signOut: () => Promise<void>
   retry: () => void
+  role: Role | null
+  permissions: Permission[]
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,6 +22,8 @@ const AuthContext = createContext<AuthContextType>({
   error: null,
   signOut: async () => {},
   retry: () => {},
+  role: null,
+  permissions: [],
 })
 
 export const useAuth = () => {
@@ -28,12 +34,21 @@ export const useAuth = () => {
   return context
 }
 
+export const usePermissions = () => {
+  const { permissions, role } = useAuth()
+  const hasPermission = (perm: Permission) => permissions.includes(perm)
+  const hasAnyPermission = (perms: Permission[]) => perms.some((p) => permissions.includes(p))
+  return { permissions, role, hasPermission, hasAnyPermission }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
+  const [role, setRole] = useState<Role | null>(null)
+  const [permissions, setPermissions] = useState<Permission[]>([])
 
   useEffect(() => {
     setMounted(true)
@@ -82,15 +97,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setError(null)
         }
 
+        // Fetch user profile for role/permissions
+        if (session?.user) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', session.user.id)
+            .single()
+          if (!profileError && profile?.role) {
+            setRole(profile.role as Role)
+            setPermissions(DEFAULT_ROLE_PERMISSIONS[profile.role as Role] || [])
+          } else {
+            setRole(null)
+            setPermissions([])
+          }
+        } else {
+          setRole(null)
+          setPermissions([])
+        }
+
         // Listen for auth changes
         const {
           data: { subscription },
-        } = supabase.auth.onAuthStateChange(async (event, session) => {
+        } = supabase.auth.onAuthStateChange(async (event: string, session: Session | null) => {
           console.log("Auth state changed:", event, session?.user?.id)
           if (isMounted) {
             setUser(session?.user ?? null)
             setLoading(false)
             setError(null)
+          }
+          // Refetch profile/permissions on auth change
+          if (session?.user) {
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single()
+            if (!profileError && profile?.role) {
+              setRole(profile.role as Role)
+              setPermissions(DEFAULT_ROLE_PERMISSIONS[profile.role as Role] || [])
+            } else {
+              setRole(null)
+              setPermissions([])
+            }
+          } else {
+            setRole(null)
+            setPermissions([])
           }
         })
 
@@ -170,5 +222,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     )
   }
 
-  return <AuthContext.Provider value={{ user, loading, error, signOut, retry }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, loading, error, signOut, retry, role, permissions }}>{children}</AuthContext.Provider>
 }

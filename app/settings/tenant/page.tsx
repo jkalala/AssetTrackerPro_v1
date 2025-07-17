@@ -161,15 +161,26 @@ export default function TenantPage() {
     try {
       setSaving(true)
       const supabase = createClient()
-      
       const { error } = await supabase
         .from('tenants')
         .update({
-          ...formData,
+          name: formData.name,
           branding_logo_url: branding.logoUrl,
           branding_primary_color: branding.primaryColor,
           branding_secondary_color: branding.secondaryColor,
           branding_company_name: branding.companyName,
+          metadata: {
+            industry: formData.industry,
+            website: formData.website,
+            contact_email: formData.contact_email,
+            contact_phone: formData.contact_phone,
+            address: formData.address,
+            city: formData.city,
+            state: formData.state,
+            country: formData.country,
+            postal_code: formData.postal_code,
+            settings: formData.settings
+          },
           updated_at: new Date().toISOString()
         })
         .eq('id', tenant.id)

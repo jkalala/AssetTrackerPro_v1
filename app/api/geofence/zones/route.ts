@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { isAuthorized } from '@/lib/rbac/utils'
+import { Permission } from '@/lib/rbac/types'
 
 export const runtime = 'nodejs'
 
@@ -23,9 +25,9 @@ export async function POST(req: Request) {
     error: userError,
   } = await supabase.auth.getUser()
   if (userError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  // Role check
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (!profile || !['admin', 'manager'].includes(profile.role)) {
+  // RBAC permission check
+  const authorized = await isAuthorized(user.id, 'manage:settings' as Permission)
+  if (!authorized) {
     return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
   }
   const { data, error } = await supabase
@@ -48,9 +50,9 @@ export async function PUT(req: Request) {
     error: userError,
   } = await supabase.auth.getUser()
   if (userError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  // Role check
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (!profile || !['admin', 'manager'].includes(profile.role)) {
+  // RBAC permission check
+  const authorized = await isAuthorized(user.id, 'manage:settings' as Permission)
+  if (!authorized) {
     return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
   }
   const { data, error } = await supabase
@@ -74,9 +76,9 @@ export async function DELETE(req: Request) {
     error: userError,
   } = await supabase.auth.getUser()
   if (userError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  // Role check
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (!profile || !['admin', 'manager'].includes(profile.role)) {
+  // RBAC permission check
+  const authorized = await isAuthorized(user.id, 'manage:settings' as Permission)
+  if (!authorized) {
     return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
   }
   const { error } = await supabase

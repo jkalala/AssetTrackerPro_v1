@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import GeofenceMapEditor from '@/components/geofence-map-editor'
+import dynamic from 'next/dynamic'
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +9,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/components/auth/auth-provider'
 import { useToast } from '@/components/ui/use-toast'
 import { MapPin, Plus, Trash2, Edit, Eye, Shield, AlertTriangle } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import GeofenceRuleManager from "@/components/geofence-rule-manager"
 
 interface Geofence {
   id: string
@@ -18,29 +20,39 @@ interface Geofence {
   created_at?: string
 }
 
+const GeofenceMapEditor = dynamic(() => import('@/components/geofence-map-editor'), { ssr: false })
+
 export default function GeofenceManagementPage() {
   const { user } = useAuth()
   const { toast } = useToast()
   const [userRole, setUserRole] = useState('user')
-  const [geofences, setGeofences] = useState<Geofence[]>([])
+  const [assets, setAssets] = useState<any[]>([])
+  const [geofences, setGeofences] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedGeofence, setSelectedGeofence] = useState<Geofence | null>(null)
+  const [showMap, setShowMap] = useState(false)
 
   useEffect(() => {
     if (!user) return
     fetchUserRole()
   }, [user])
 
+  useEffect(() => { setShowMap(true) }, [])
+
   const fetchUserRole = async () => {
     try {
-      const res = await fetch(`/api/profiles/${user?.id}`)
-      const data = await res.json()
-      setUserRole(data.profile?.role || 'user')
+      const supabase = createClient();
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user?.id)
+        .single();
+      setUserRole(profile?.role || 'user');
     } catch (error) {
-      console.error('Error fetching user role:', error)
+      console.error('Error fetching user role:', error);
     }
-  }
+  };
 
   const fetchGeofences = async () => {
     setLoading(true)
@@ -65,7 +77,20 @@ export default function GeofenceManagementPage() {
   }
 
   useEffect(() => {
-    fetchGeofences()
+    async function fetchData() {
+      setLoading(true)
+      try {
+        const assetsRes = await fetch("/api/assets?fields=id,asset_id,name")
+        const geofencesRes = await fetch("/api/geofence/zones")
+        const assetsData = await assetsRes.json()
+        const geofencesData = await geofencesRes.json()
+        setAssets(assetsData.assets || [])
+        setGeofences(geofencesData.zones || [])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
   }, [])
 
   const handleGeofenceUpdate = async () => {
@@ -77,7 +102,7 @@ export default function GeofenceManagementPage() {
   }
 
   const handleDeleteGeofence = async (geofenceId: string) => {
-    if (!window.confirm('Are you sure you want to delete this geofence zone?')) {
+    if (typeof window !== 'undefined' && !window.confirm('Are you sure you want to delete this geofence zone?')) {
       return
     }
 
@@ -247,11 +272,11 @@ export default function GeofenceManagementPage() {
                     </div>
                   </div>
                 ) : (
-                  <GeofenceMapEditor 
-                    geofences={geofences} 
-                    onChange={handleGeofenceUpdate} 
-                    userRole={userRole} 
-                  />
+                  showMap && (
+                    <div key={JSON.stringify(geofences) + userRole}>
+                      <GeofenceMapEditor geofences={geofences} onChange={handleGeofenceUpdate} userRole={userRole} />
+                    </div>
+                  )
                 )}
               </CardContent>
             </Card>
@@ -354,6 +379,7 @@ export default function GeofenceManagementPage() {
             </Card>
           </div>
         </div>
+        <GeofenceRuleManager assets={assets} geofences={geofences} />
       </div>
     </div>
   )

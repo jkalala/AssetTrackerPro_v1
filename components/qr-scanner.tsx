@@ -168,6 +168,21 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
         onScanError?.(result.error)
       } else {
         setScanResult(result)
+        // Log scan event to analytics_events
+        if (user && result.asset) {
+          const supabase = (await import("@/lib/supabase/client")).createClient();
+          await supabase.from("analytics_events").insert({
+            event_type: "asset_scanned",
+            asset_id: result.asset.id,
+            user_id: user.id,
+            metadata: {
+              asset_name: result.asset.name,
+              category: result.asset.category,
+              url: result.asset.url || undefined
+            },
+            created_at: new Date().toISOString()
+          });
+        }
         onScanSuccess?.(result)
       }
     } catch (err) {

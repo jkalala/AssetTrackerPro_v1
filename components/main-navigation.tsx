@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useAuth } from "@/components/auth/auth-provider"
+import { useState, useEffect } from "react"
+import { useAuth, usePermissions } from "@/components/auth/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -47,7 +47,14 @@ interface MainNavigationProps {
 
 export default function MainNavigation({ className }: MainNavigationProps) {
   const { user } = useAuth()
+  const { hasPermission } = usePermissions()
   const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    if (!user) {
+      return
+    }
+  }, [user])
 
   const featureCategories = [
     {
@@ -383,6 +390,16 @@ export default function MainNavigation({ className }: MainNavigationProps) {
                 </Link>
               </Button>
             </div>
+            {hasPermission('manage:roles') && (
+              <div className="mt-2">
+                <Button asChild className="w-full" size="sm" variant="destructive">
+                  <Link href="/admin">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Admin Panel
+                  </Link>
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
         <div className="flex items-center space-x-4">

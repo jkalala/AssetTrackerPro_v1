@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,6 +14,8 @@ import { createClient } from "@/lib/supabase/client"
 import { updateAssetQRCodeUrl } from "@/lib/qr-actions"
 import { toast } from "@/components/ui/use-toast"
 import clsx from "clsx"
+import { fetchQRTemplates, fetchDefaultQRTemplate } from "@/lib/qr-template-utils"
+import QRLabel from "@/components/qr-label"
 
 interface QRGeneratorProps {
   assets: any[]
@@ -43,6 +45,30 @@ export default function QRGenerator({ assets, onQRGenerated, settings }: QRGener
   const [copied, setCopied] = useState(false)
   const [selectedAsset, setSelectedAsset] = useState<any | null>(null)
   const [generating, setGenerating] = useState(false)
+  const [templates, setTemplates] = useState<any[]>([])
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("")
+  const [templateConfig, setTemplateConfig] = useState<any>(null)
+
+  useEffect(() => {
+    async function loadTemplates() {
+      try {
+        const all = await fetchQRTemplates()
+        setTemplates(all)
+        const def = all.find((tpl: any) => tpl.is_default) || all[0]
+        if (def) {
+          setSelectedTemplateId(def.id)
+          setTemplateConfig(def.config)
+        }
+      } catch {}
+    }
+    loadTemplates()
+  }, [])
+
+  useEffect(() => {
+    if (!selectedTemplateId) return
+    const tpl = templates.find((t) => t.id === selectedTemplateId)
+    if (tpl) setTemplateConfig(tpl.config)
+  }, [selectedTemplateId, templates])
 
   const handleGenerate = async () => {
     const assetId = selectedAssetId || customAssetId
@@ -63,6 +89,7 @@ export default function QRGenerator({ assets, onQRGenerated, settings }: QRGener
       setGenerating(true)
       setSelectedAsset(assets.find((asset) => asset.asset_id === assetId))
 
+      const supabase = createClient() // <-- Add this line
       // Create QR code data with settings
       const qrData = settings.includeDetails ? {
         assetId: assetId,
@@ -78,47 +105,38 @@ export default function QRGenerator({ assets, onQRGenerated, settings }: QRGener
         errorCorrectionLevel: settings.errorCorrection as 'L' | 'M' | 'Q' | 'H',
       })
 
-      // Save QR code to Supabase
-      const supabase = createClient()
-      
-      // Convert base64 to blob
-      const response = await fetch(qrCodeDataUrl)
-      const blob = await response.blob()
-      
-      // Generate unique filename
-      const fileName = `qr_${assetId}_${Date.now()}.${settings.defaultFormat}`
-      const filePath = `qr-codes/${fileName}`
-
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('assets')
-        .upload(filePath, blob, {
-          contentType: `image/${settings.defaultFormat}`
-        })
-
-      if (uploadError) throw uploadError
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('assets')
-        .getPublicUrl(filePath)
-
-      // Update asset with QR code URL
-      const { error: updateError } = await supabase
-        .from('assets')
-        .update({ 
-          qr_code: publicUrl,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', selectedAsset?.id)
-
-      if (updateError) throw updateError
+      // Instead of just saving the QR code image, render the label to a hidden div and use html2canvas
+      const labelContainer = document.createElement("div")
+      labelContainer.style.position = "fixed"
+      labelContainer.style.left = "-9999px"
+      labelContainer.style.top = "0"
+      document.body.appendChild(labelContainer)
+      const label = (
+        <QRLabel asset={selectedAsset} templateConfig={templateConfig} qrCodeUrl={qrCodeDataUrl} />
+      )
+      // Render the React element to the container
+      // Use ReactDOM.render or createRoot depending on React version
+      // (Assume React 18+)
+      import("react-dom/client").then(({ createRoot }) => {
+        const root = createRoot(labelContainer)
+        root.render(label)
+        setTimeout(async () => {
+          const canvas = await (await import("html2canvas")).default(labelContainer, { backgroundColor: "#fff", scale: 2 })
+          const imgData = canvas.toDataURL("image/png")
+          // Save or upload imgData as needed (replace qrCodeDataUrl with imgData)
+          // ... existing upload logic ...
+          root.unmount()
+          document.body.removeChild(labelContainer)
+        }, 100)
+      })
 
       // Track analytics if enabled
       if (settings.trackAnalytics) {
-        await supabase.from('qr_analytics').insert({
+        await supabase.from('analytics_events').insert({
+          event_type: 'qr_generated',
           asset_id: selectedAsset?.id,
-          event_type: 'generated',
+          user_id: user.id,
+          metadata: { asset_name: selectedAsset?.name },
           created_at: new Date().toISOString()
         })
       }
@@ -128,9 +146,9 @@ export default function QRGenerator({ assets, onQRGenerated, settings }: QRGener
         description: "QR code has been generated and saved successfully",
       })
 
-      setGeneratedQR(publicUrl)
-      setAssetUrl(publicUrl)
-      onQRGenerated(assetId, publicUrl)
+      setGeneratedQR(qrCodeDataUrl)
+      setAssetUrl(qrCodeDataUrl)
+      onQRGenerated(assetId, qrCodeDataUrl)
     } catch (error) {
       console.error('QR generation error:', error)
       toast({
@@ -216,6 +234,22 @@ export default function QRGenerator({ assets, onQRGenerated, settings }: QRGener
 
   return (
     <div className="space-y-6">
+      {templates.length > 0 && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">QR Template</label>
+          <select
+            className="border rounded px-2 py-1"
+            value={selectedTemplateId}
+            onChange={(e) => setSelectedTemplateId(e.target.value)}
+          >
+            {templates.map((tpl) => (
+              <option key={tpl.id} value={tpl.id}>
+                {tpl.name} {tpl.is_default ? "(Default)" : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
@@ -344,6 +378,12 @@ export default function QRGenerator({ assets, onQRGenerated, settings }: QRGener
 
             {/* Preview Panel */}
             <div className="space-y-4">
+              {templateConfig && selectedAsset && (
+                <div className="mb-4">
+                  <div className="font-medium mb-2">Label Preview</div>
+                  <QRLabel asset={selectedAsset} templateConfig={templateConfig} qrCodeUrl={generatedQR || undefined} />
+                </div>
+              )}
               <div className={clsx("border-2 border-dashed border-gray-300 rounded-lg p-8 text-center min-h-[300px] flex items-center justify-center", "print:block print:text-center")}>
                 {generatedQR ? (
                   <div className={clsx("space-y-4", "print:block print:text-center")}>

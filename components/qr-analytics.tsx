@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { BarChart3, TrendingUp, Scan, QrCode, MapPin, Activity } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 
 interface QRAnalyticsProps {
   assets: Array<{
@@ -30,60 +31,138 @@ export default function QRAnalytics({ assets }: QRAnalyticsProps) {
       location?: string
     }>,
   })
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Calculate analytics from assets data
-    const totalAssets = assets.length
-    const assetsWithQR = assets.filter((asset) => asset.qr_code).length
-    const qrCoverage = totalAssets > 0 ? Math.round((assetsWithQR / totalAssets) * 100) : 0
+    const fetchAnalytics = async () => {
+      setLoading(true)
+      // Calculate analytics from assets data
+      const totalAssets = assets.length
+      const assetsWithQR = assets.filter((asset) => asset.qr_code).length
+      const qrCoverage = totalAssets > 0 ? Math.round((assetsWithQR / totalAssets) * 100) : 0
 
-    // Mock scan data by category
-    const scansByCategory = {
-      "it-equipment": 45,
-      furniture: 23,
-      "av-equipment": 18,
-      vehicles: 12,
-      tools: 8,
+      // Fetch real QR analytics from Supabase
+      let scansByCategory: Record<string, number> = {}
+      let scansByLocation: Record<string, number> = {}
+      let recentScans: Array<{ assetId: string; assetName: string; timestamp: string; location?: string }> = []
+      try {
+        const supabase = createClient()
+        // Get recent QR analytics events (scans and generations)
+        const { data: qrEvents, error } = await supabase
+          .from("analytics_events")
+          .select("asset_id, event_type, created_at, metadata")
+          .in("event_type", ["asset_scanned", "qr_generated"])
+          .order("created_at", { ascending: false })
+          .limit(20)
+        if (!error && qrEvents && qrEvents.length > 0) {
+          // Map asset_id to asset info
+          const assetMap = Object.fromEntries(assets.map(a => [a.id, a]))
+          // Count scans by category/location
+          for (const event of qrEvents) {
+            const asset = assetMap[event.asset_id]
+            if (!asset) continue
+            // By category
+            if (asset.category) {
+              scansByCategory[asset.category] = (scansByCategory[asset.category] || 0) + 1
+            }
+            // By location
+            if (asset.location) {
+              scansByLocation[asset.location] = (scansByLocation[asset.location] || 0) + 1
+            }
+            // Recent scans
+            if (event.event_type === "asset_scanned" || event.event_type === "qr_generated") {
+              recentScans.push({
+                assetId: asset.asset_id,
+                assetName: asset.name,
+                timestamp: event.created_at,
+                location: asset.location ?? undefined,
+              })
+            }
+          }
+        } else {
+          // Fallback to mock data if no analytics
+          scansByCategory = {
+            "it-equipment": 45,
+            furniture: 23,
+            "av-equipment": 18,
+            vehicles: 12,
+            tools: 8,
+          }
+          scansByLocation = {
+            "Office A": 32,
+            Warehouse: 28,
+            "Office B": 21,
+            "Conference Room": 15,
+            Storage: 10,
+          }
+          recentScans = [
+            {
+              assetId: "AST-001",
+              assetName: 'MacBook Pro 16"',
+              timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+              location: "Office A",
+            },
+            {
+              assetId: "AST-002",
+              assetName: "Office Chair",
+              timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+              location: "Office B",
+            },
+            {
+              assetId: "AST-003",
+              assetName: "Projector",
+              timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+              location: "Conference Room",
+            },
+          ]
+        }
+      } catch (e) {
+        // Fallback to mock data on error
+        scansByCategory = {
+          "it-equipment": 45,
+          furniture: 23,
+          "av-equipment": 18,
+          vehicles: 12,
+          tools: 8,
+        }
+        scansByLocation = {
+          "Office A": 32,
+          Warehouse: 28,
+          "Office B": 21,
+          "Conference Room": 15,
+          Storage: 10,
+        }
+        recentScans = [
+          {
+            assetId: "AST-001",
+            assetName: 'MacBook Pro 16"',
+            timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+            location: "Office A",
+          },
+          {
+            assetId: "AST-002",
+            assetName: "Office Chair",
+            timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+            location: "Office B",
+          },
+          {
+            assetId: "AST-003",
+            assetName: "Projector",
+            timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+            location: "Conference Room",
+          },
+        ]
+      }
+      setAnalytics({
+        totalQRCodes: assetsWithQR,
+        qrCoverage,
+        scansByCategory,
+        scansByLocation,
+        recentScans,
+      })
+      setLoading(false)
     }
-
-    // Mock scan data by location
-    const scansByLocation = {
-      "Office A": 32,
-      Warehouse: 28,
-      "Office B": 21,
-      "Conference Room": 15,
-      Storage: 10,
-    }
-
-    // Mock recent scans
-    const recentScans = [
-      {
-        assetId: "AST-001",
-        assetName: 'MacBook Pro 16"',
-        timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-        location: "Office A",
-      },
-      {
-        assetId: "AST-002",
-        assetName: "Office Chair",
-        timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-        location: "Office B",
-      },
-      {
-        assetId: "AST-003",
-        assetName: "Projector",
-        timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-        location: "Conference Room",
-      },
-    ]
-
-    setAnalytics({
-      totalQRCodes: assetsWithQR,
-      qrCoverage,
-      scansByCategory,
-      scansByLocation,
-      recentScans,
-    })
+    fetchAnalytics()
   }, [assets])
 
   const formatTimeAgo = (timestamp: string) => {

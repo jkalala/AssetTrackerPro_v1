@@ -1,6 +1,8 @@
 import { storeApiKey } from '@/lib/api-key';
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { isAuthorized } from '@/lib/rbac/utils'
+import { Permission } from '@/lib/rbac/types'
 
 export async function GET() {
   const supabase = await createClient();
@@ -18,6 +20,11 @@ export async function POST(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // RBAC permission check
+  const authorized = await isAuthorized(user.id, 'manage:settings' as Permission);
+  if (!authorized) {
+    return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+  }
   const { name } = await request.json();
   // Get tenant_id from user profile
   const { data: profile } = await supabase.from('profiles').select('tenant_id').eq('id', user.id).single();

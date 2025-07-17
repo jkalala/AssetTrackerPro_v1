@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Switch } from "@/components/ui/switch"
 import QRImageUpload from "@/components/qr-image-upload"
 import { toast } from "@/components/ui/use-toast"
+import QRTemplateDesigner from "@/components/qr-template-designer"
 
 export default function QRManagementPage() {
   const [assets, setAssets] = useState<any[]>([])
@@ -230,6 +231,7 @@ export default function QRManagementPage() {
             <TabsTrigger value="generate">Generate</TabsTrigger>
             <TabsTrigger value="scan">Scan</TabsTrigger>
             <TabsTrigger value="bulk">Bulk Operations</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
@@ -350,6 +352,10 @@ export default function QRManagementPage() {
 
           <TabsContent value="bulk">
             <BulkQROperations assets={assets} onBulkGenerated={handleBulkQRGenerated} />
+          </TabsContent>
+
+          <TabsContent value="templates">
+            <QRTemplateDesigner />
           </TabsContent>
 
           <TabsContent value="settings">

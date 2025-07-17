@@ -1,0 +1,18 @@
+{
+  "welcome": "Welcome",
+  "login": "Login",
+  "logout": "Logout",
+  "dashboard": "Dashboard",
+  "admin_panel": "Admin Panel",
+  "users": "Users",
+  "assets": "Assets",
+  "settings": "Settings",
+  "reports": "Reports",
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "create": "Create",
+  "search": "Search",
+  "language": "Language"
+} 

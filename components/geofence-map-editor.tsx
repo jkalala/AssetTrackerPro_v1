@@ -135,7 +135,7 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
         const id = l.options.zoneId
         const name = l.options.zoneName || 'this zone'
         
-        if (!window.confirm(`Are you sure you want to delete "${name}"?`)) {
+        if (typeof window !== 'undefined' && !window.confirm(`Are you sure you want to delete "${name}"?`)) {
           return
         }
         
@@ -176,35 +176,37 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
     geofences.forEach(zone => {
       try {
         const latlngs = zone.polygon.coordinates[0].map(([lng, lat]) => [lat, lng])
-        const polygon = (window as any).L.polygon(latlngs, { 
-          zoneId: zone.id, 
-          zoneName: zone.name, 
-          zoneDescription: zone.description,
-          color: '#3B82F6',
-          weight: 2,
-          opacity: 0.8,
-          fillColor: '#3B82F6',
-          fillOpacity: 0.2
-        })
-        
-        // Create popup content
-        const popupContent = `
-          <div style="min-width: 200px;">
-            <h3 style="margin: 0 0 8px 0; font-weight: 600; color: #1F2937;">${zone.name}</h3>
-            ${zone.description ? `<p style="margin: 0 0 8px 0; color: #6B7280; font-size: 14px;">${zone.description}</p>` : ''}
-            <div style="display: flex; gap: 8px; margin-top: 8px;">
-              <span style="background: #E5E7EB; padding: 2px 8px; border-radius: 12px; font-size: 12px; color: #374151;">
-                ${zone.polygon.coordinates[0].length} points
-              </span>
-              ${zone.created_at ? `<span style="background: #E5E7EB; padding: 2px 8px; border-radius: 12px; font-size: 12px; color: #374151;">
-                Created ${new Date(zone.created_at).toLocaleDateString()}
-              </span>` : ''}
+        if (typeof window !== 'undefined' && (window as any).L) {
+          const polygon = (window as any).L.polygon(latlngs, { 
+            zoneId: zone.id, 
+            zoneName: zone.name, 
+            zoneDescription: zone.description,
+            color: '#3B82F6',
+            weight: 2,
+            opacity: 0.8,
+            fillColor: '#3B82F6',
+            fillOpacity: 0.2
+          })
+          
+          // Create popup content
+          const popupContent = `
+            <div style="min-width: 200px;">
+              <h3 style="margin: 0 0 8px 0; font-weight: 600; color: #1F2937;">${zone.name}</h3>
+              ${zone.description ? `<p style="margin: 0 0 8px 0; color: #6B7280; font-size: 14px;">${zone.description}</p>` : ''}
+              <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <span style="background: #E5E7EB; padding: 2px 8px; border-radius: 12px; font-size: 12px; color: #374151;">
+                  ${zone.polygon.coordinates[0].length} points
+                </span>
+                ${zone.created_at ? `<span style="background: #E5E7EB; padding: 2px 8px; border-radius: 12px; font-size: 12px; color: #374151;">
+                  Created ${new Date(zone.created_at).toLocaleDateString()}
+                </span>` : ''}
+              </div>
             </div>
-          </div>
-        `
-        
-        polygon.bindPopup(popupContent)
-        featureGroupRef.current.addLayer(polygon)
+          `
+          
+          polygon.bindPopup(popupContent)
+          featureGroupRef.current.addLayer(polygon)
+        }
       } catch (error) {
         console.error('Error adding geofence to map:', error)
       }
@@ -249,17 +251,26 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
 
 export default function GeofenceMapEditor({ geofences, onChange, userRole }: GeofenceMapEditorProps) {
   const [mapKey, setMapKey] = useState(0)
+  const mapRef = useRef<any>(null);
   
   // Force map re-render when geofences change
   useEffect(() => {
     setMapKey(prev => prev + 1)
   }, [geofences.length])
 
+  useEffect(() => {
+    return () => {
+      if (mapRef.current && mapRef.current._leaflet_id) {
+        mapRef.current.remove();
+      }
+    };
+  }, []);
+
   return (
     <div className="space-y-4">
       <div style={{ height: 500, width: '100%' }} className="rounded-lg overflow-hidden border">
         <MapContainer 
-          key={mapKey}
+          ref={mapRef}
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer

@@ -1,0 +1,51 @@
+asset_id,name,description,category,status,location,purchase_value,purchase_date,manufacturer,model,serial_number,warranty_expiry,notes
+ASSET-001,Laptop Dell XPS 13,High-end ultrabook,IT,active,Main Office,1200,2023-05-10,Dell,XPS 13,12345ABC,2025-05-10,Company laptop for John Doe
+ASSET-002,Office Chair Ergonomic,Adjustable mesh chair,Furniture,active,Main Office,250,2022-11-15,Herman Miller,Aeron,CH123456,2027-11-15,Assigned to Jane
+ASSET-003,Projector Epson X200,Conference room projector,Electronics,maintenance,Conference Room,800,2021-08-01,Epson,X200,PRJ200X,2024-08-01,Lamp needs replacement
+ASSET-004,MacBook Pro 16,Developer laptop,IT,active,Remote,2200,2023-01-20,Apple,MacBook Pro 16,MBP16-2023,2026-01-20,Issued for remote work
+ASSET-005,Standing Desk Adjustable,Electric standing desk,Furniture,active,Main Office,600,2022-03-10,FlexiSpot,E7,DSK-E7,2027-03-10,Height adjustable
+ASSET-006,HP LaserJet Pro M404,Office printer,Electronics,active,Main Office,350,2022-06-18,HP,LaserJet Pro M404,PRN404,2025-06-18,Shared printer
+ASSET-007,Surface Pro 8,Tablet for meetings,IT,active,Meeting Room,1100,2023-04-05,Microsoft,Surface Pro 8,SP8-2023,2026-04-05,For presentations
+ASSET-008,Conference Table Large,Main conference table,Furniture,active,Conference Room,900,2021-09-12,Ikea,BEKANT,CTB-2021,2026-09-12,Seats 10 people
+ASSET-009,Logitech Webcam C920,HD webcam for calls,Electronics,active,Main Office,80,2023-02-14,Logitech,C920,WEB-C920,2025-02-14,For video calls
+ASSET-010,Server Dell PowerEdge,Main server,IT,maintenance,Server Room,5000,2020-12-01,Dell,PowerEdge R740,SRV-R740,2023-12-01,Scheduled maintenance
+ASSET-011,Whiteboard Magnetic,Large whiteboard,Furniture,active,Main Office,150,2022-01-10,Quartet,Magnetic,WB-2022,2027-01-10,For brainstorming
+ASSET-012,Monitor Samsung 27",Second monitor,Electronics,active,Main Office,300,2023-03-22,Samsung,27" Curved,MON-27C,2026-03-22,Dual monitor setup
+ASSET-013,Router Cisco RV340,Office router,IT,active,Server Room,400,2021-07-30,Cisco,RV340,RT-340,2024-07-30,Network backbone
+ASSET-014,Smartphone iPhone 13,Company phone,IT,active,Remote,900,2022-10-05,Apple,iPhone 13,IP13-2022,2024-10-05,Issued to Claire
+ASSET-015,Bookshelf Oak,Office bookshelf,Furniture,active,Main Office,200,2021-05-15,Ikea,BILLY,BS-2021,2026-05-15,For documentation
+ASSET-016,Label Printer Brother,Asset label printer,Electronics,active,Main Office,120,2022-04-11,Brother,QL-800,LB-800,2025-04-11,For asset tags
+ASSET-017,Desktop HP EliteDesk,Workstation,IT,active,Main Office,950,2023-06-01,HP,EliteDesk 800 G6,DT-800G6,2026-06-01,Assigned to Kevin
+ASSET-018,Projector Screen 120",Large projector screen,Furniture,active,Conference Room,180,2021-08-01,Elite Screens,120" Manual,PS-120,2026-08-01,For presentations
+ASSET-019,Smart Lock August,Main door lock,Electronics,active,Main Office,250,2022-12-20,August,Smart Lock Pro,SL-2022,2025-12-20,Main entrance
+ASSET-020,Tablet iPad Air,Design team tablet,IT,active,Design Studio,700,2023-02-28,Apple,iPad Air,IPAD-AIR,2026-02-28,For design sketches
+ASSET-021,Desk Lamp LED,Adjustable desk lamp,Furniture,active,Main Office,45,2022-09-15,Philips,LED Desk Lamp,DL-2022,2027-09-15,For late work
+ASSET-022,Switch Netgear GS308,Network switch,Electronics,active,Server Room,60,2021-11-11,Netgear,GS308,SW-308,2024-11-11,For LAN
+ASSET-023,Scanner Canon LIDE,Document scanner,Electronics,active,Main Office,130,2022-07-07,Canon,LIDE 400,SCN-400,2025-07-07,For digitizing
+ASSET-024,Fire Extinguisher,CO2 fire extinguisher,Safety,active,Main Office,90,2021-04-01,Kidde,CO2,FE-2021,2026-04-01,Annual inspection
+ASSET-025,Smart TV Samsung 55",Meeting room TV,Electronics,active,Meeting Room,1200,2023-03-10,Samsung,55" Smart TV,TV-2023,2026-03-10,For presentations
+ASSET-026,Shredder Fellowes,Paper shredder,Electronics,active,Main Office,180,2022-05-20,Fellowes,Powershred 79Ci,SH-79CI,2025-05-20,For confidential docs
+ASSET-027,Workstation Lenovo ThinkCentre,Developer workstation,IT,active,Main Office,1050,2023-07-01,Lenovo,ThinkCentre M720q,WS-720Q,2026-07-01,Assigned to dev team
+ASSET-028,Air Conditioner LG,Office AC,Electronics,active,Main Office,1500,2021-06-15,LG,DUAL Inverter,AC-2021,2026-06-15,Main office cooling
+ASSET-029,Security Camera Arlo,Entrance camera,Electronics,active,Entrance,220,2022-08-25,Arlo,Pro 4,CAM-2022,2025-08-25,Monitors entrance
+ASSET-030,3D Printer Prusa,Prototyping printer,Electronics,active,Lab,900,2023-01-18,Prusa,Mini+,3DP-2023,2026-01-18,For prototypes
+ASSET-031,Server Rack 42U,Main server rack,IT,active,Server Room,1200,2020-10-10,APC,NetShelter SX,SR-42U,2025-10-10,Holds all servers
+ASSET-032,UPS APC 1500VA,Backup power,Electronics,active,Server Room,400,2021-12-01,APC,1500VA,UPS-1500,2024-12-01,For power outages
+ASSET-033,Smart Speaker Google,Office speaker,Electronics,active,Main Office,100,2022-02-14,Google,Nest Audio,SPK-2022,2025-02-14,For announcements
+ASSET-034,Desktop Dell OptiPlex,Reception PC,IT,active,Reception,800,2023-05-01,Dell,OptiPlex 3080,DT-3080,2026-05-01,Reception computer
+ASSET-035,Monitor LG UltraWide,Wide monitor,Electronics,active,Main Office,350,2022-10-20,LG,UltraWide 34",MON-UW34,2025-10-20,For design work
+ASSET-036,Smartphone Samsung S22,Company phone,IT,active,Remote,850,2023-03-15,Samsung,Galaxy S22,SS22-2023,2025-03-15,Issued to marketing
+ASSET-037,Tablet Microsoft Go,Field tablet,IT,active,Field,600,2022-08-01,Microsoft,Surface Go 3,SGO-3,2025-08-01,For field work
+ASSET-038,Heater Dyson Hot+Cool,Office heater,Electronics,active,Main Office,400,2021-12-10,Dyson,Hot+Cool,HT-2021,2026-12-10,For winter
+ASSET-039,Label Maker Dymo,Label maker,Electronics,active,Main Office,60,2022-03-05,Dymo,LabelManager 160,LM-160,2025-03-05,For asset labels
+ASSET-040,Workstation Apple Mac Mini,Design workstation,IT,active,Design Studio,1200,2023-06-10,Apple,Mac Mini M2,MM-M2,2026-06-10,Assigned to designer
+ASSET-041,Projector BenQ MW535,Portable projector,Electronics,active,Meeting Room,500,2022-09-01,BenQ,MW535,PRJ-MW535,2025-09-01,For mobile meetings
+ASSET-042,Smart Lock Yale,Side door lock,Electronics,active,Side Entrance,180,2021-11-20,Yale,Assure Lock,SL-YALE,2024-11-20,Side entrance
+ASSET-043,Bookshelf Metal,Storage bookshelf,Furniture,active,Storage,120,2020-07-15,Steelcase,Metal,BS-METAL,2025-07-15,For storage
+ASSET-044,Monitor Dell 24",Spare monitor,Electronics,active,Main Office,200,2022-12-01,Dell,24" UltraSharp,MON-24,2025-12-01,Backup monitor
+ASSET-045,Server HP ProLiant,Backup server,IT,active,Server Room,3000,2021-03-01,HP,ProLiant DL380,SRV-DL380,2024-03-01,Backup server
+ASSET-046,Tablet Lenovo Tab M10,Spare tablet,IT,active,Main Office,250,2023-01-25,Lenovo,Tab M10,TB-M10,2026-01-25,For emergencies
+ASSET-047,Smartphone OnePlus 10,Spare phone,IT,active,Remote,700,2022-06-30,OnePlus,10 Pro,OP10-2022,2024-06-30,Backup phone
+ASSET-048,Desk Chair Steelcase,Ergonomic chair,Furniture,active,Main Office,350,2021-09-10,Steelcase,Leap,CH-LEAP,2026-09-10,For staff
+ASSET-049,Printer Canon Pixma,Color printer,Electronics,active,Main Office,220,2022-11-05,Canon,Pixma G6020,PRN-G6020,2025-11-05,For color prints
+ASSET-050,Workstation HP Z2 Mini,Compact workstation,IT,active,Main Office,1300,2023-04-15,HP,Z2 Mini G5,WS-Z2,2026-04-15,For compact spaces 

@@ -73,6 +73,67 @@ function DashboardHeader() {
   );
 }
 
+function GeofenceAlertsPanel() {
+  const [events, setEvents] = useState<any[]>([])
+  const [stats, setStats] = useState({ entries: 0, exits: 0 })
+  useEffect(() => {
+    const supabase = createClient()
+    let subscription: any
+    let polling: any
+    async function fetchEvents() {
+      const since = new Date()
+      since.setHours(0,0,0,0)
+      const { data } = await supabase
+        .from('geofence_events')
+        .select('*, asset:asset_id(name), geofence:geofence_id(name)')
+        .gte('timestamp', since.toISOString())
+        .order('timestamp', { ascending: false })
+        .limit(10)
+      setEvents(data || [])
+      setStats({
+        entries: (data || []).filter((ev: any) => ev.event_type === 'entry').length,
+        exits: (data || []).filter((ev: any) => ev.event_type === 'exit').length,
+      })
+    }
+    fetchEvents()
+    // Try to use Supabase real-time if available
+    try {
+      subscription = supabase
+        .channel('public:geofence_events')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'geofence_events' }, fetchEvents)
+        .subscribe()
+    } catch {
+      // Fallback to polling
+      polling = setInterval(fetchEvents, 10000)
+    }
+    return () => {
+      if (subscription) supabase.removeChannel(subscription)
+      if (polling) clearInterval(polling)
+    }
+  }, [])
+  return (
+    <div className="mb-6">
+      <div className="flex items-center gap-2 mb-2">
+        <AlertTriangle className="h-5 w-5 text-orange-600" />
+        <span className="font-semibold">Geofence Alerts Today</span>
+        <span className="ml-4 text-xs text-gray-500">Entries: {stats.entries} | Exits: {stats.exits}</span>
+      </div>
+      <div className="space-y-1">
+        {events.length === 0 ? (
+          <div className="text-xs text-gray-500">No geofence events today.</div>
+        ) : events.map((ev: any) => (
+          <div key={ev.id} className="flex items-center gap-2 text-xs">
+            <MapPin className="h-4 w-4 text-blue-600" />
+            <span>
+              <b>{ev.event_type === 'entry' ? 'Entered' : 'Exited'}</b> <b>{ev.geofence?.name || ev.geofence_id}</b> by <b>{ev.asset?.name || ev.asset_id}</b> at {new Date(ev.timestamp).toLocaleTimeString()}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function DashboardContent() {
   const { user, loading } = useAuth()
   const router = useRouter()
@@ -83,6 +144,7 @@ export default function DashboardContent() {
   const [activeTab, setActiveTab] = useState("overview")
   const [stats, setStats] = useState<AssetStats | null>(null)
   const { toast } = useToast()
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Ensure component is mounted before accessing browser APIs
   useEffect(() => {
@@ -168,6 +230,11 @@ export default function DashboardContent() {
       })
     }
   }
+
+  const handleRefresh = () => {
+    setRefreshKey(k => k + 1);
+    fetchStats();
+  };
 
   const getStatusColor = (status: string) => {
     const colors = {
@@ -387,6 +454,9 @@ export default function DashboardContent() {
               <Button asChild className="w-full">
                 <Link href="/add-asset">Add New Asset</Link>
               </Button>
+              <Button variant="outline" className="w-full mt-2" onClick={handleRefresh}>
+                Refresh Dashboard
+              </Button>
             </CardContent>
           </Card>
 
@@ -415,6 +485,9 @@ export default function DashboardContent() {
           </Card>
         </div>
 
+        {/* Geofence Alerts Panel */}
+        <GeofenceAlertsPanel />
+
         {/* Main Dashboard Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
@@ -424,7 +497,8 @@ export default function DashboardContent() {
 
           {/* Dashboard Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <AssetDashboard />
+            {/* Pass refreshKey as a key to analytics/child components if needed */}
+            <AssetDashboard key={refreshKey} />
           </TabsContent>
 
           {/* All Features Tab */}

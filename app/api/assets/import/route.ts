@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import Papa from 'papaparse'
 import * as XLSX from 'xlsx'
+import { isAuthorized } from '@/lib/rbac/utils'
+import { Permission } from '@/lib/rbac/types'
 
 export const runtime = 'nodejs' // Ensure Node.js runtime for file parsing
 
@@ -15,6 +17,11 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser()
     if (userError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    // RBAC permission check
+    const authorized = await isAuthorized(user.id, 'create:asset' as Permission)
+    if (!authorized) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
     // Parse multipart form data
     const formData = await request.formData()
@@ -47,10 +54,19 @@ export async function POST(request: Request) {
     let errorCount = 0
     let errorRows: any[] = []
     let importedAssetIds: string[] = []
+    const REQUIRED_COLUMNS = ["asset_id", "name"]
     for (const row of rows) {
-      if (!row.asset_id || !row.name) {
+      // Validate required columns
+      const missing = REQUIRED_COLUMNS.filter(col => !row[col])
+      if (missing.length > 0) {
         errorCount++
-        errorRows.push({ row, error: 'Missing asset_id or name' })
+        errorRows.push({ row, error: `Missing required fields: ${missing.join(", ")}` })
+        continue
+      }
+      // Optionally: validate data types (e.g., value is a number)
+      if (row.value && isNaN(Number(row.value))) {
+        errorCount++
+        errorRows.push({ row, error: 'Value must be a number' })
         continue
       }
       const { error } = await supabase

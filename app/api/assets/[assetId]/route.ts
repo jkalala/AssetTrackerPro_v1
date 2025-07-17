@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { getAsset, updateAsset, deleteAsset } from '@/lib/asset-actions'
+import { isAuthorized } from '@/lib/rbac/utils'
+import { Permission } from '@/lib/rbac/types'
 
 export const runtime = 'nodejs'
 
@@ -27,6 +29,20 @@ export async function PUT(
   { params }: { params: { assetId: string } }
 ) {
   try {
+    // Authenticate user
+    const supabase = await createClient()
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    // RBAC permission check
+    const authorized = await isAuthorized(user.id, 'update:asset' as Permission)
+    if (!authorized) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+    }
     const body = await request.json()
     const result = await updateAsset(params.assetId, body)
     
@@ -46,6 +62,20 @@ export async function DELETE(
   { params }: { params: { assetId: string } }
 ) {
   try {
+    // Authenticate user
+    const supabase = await createClient()
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    // RBAC permission check
+    const authorized = await isAuthorized(user.id, 'delete:asset' as Permission)
+    if (!authorized) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+    }
     const result = await deleteAsset(params.assetId)
     
     if (result.error) {

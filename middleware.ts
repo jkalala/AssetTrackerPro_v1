@@ -2,6 +2,8 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isAuthorized } from '@/lib/rbac/utils'
+import { Ratelimit } from "@upstash/ratelimit"
+import { Redis } from "@upstash/redis"
 
 const PUBLIC_ROUTES = [
   '/login',
@@ -19,6 +21,21 @@ const ADMIN_ROUTES = [
   '/settings/users',
   '/settings/roles',
 ]
+
+const hasRedis = !!process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_URL.startsWith("https") && !!process.env.UPSTASH_REDIS_REST_TOKEN;
+
+const ratelimit = hasRedis
+  ? new Ratelimit({
+      redis: new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL!,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+      }),
+      limiter: Ratelimit.fixedWindow(60, "1m"), // 60 requests per minute
+      analytics: true,
+    })
+  : {
+      limit: async () => ({ success: true, limit: 60, remaining: 60, reset: Date.now() + 60000 }),
+    };
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
@@ -75,6 +92,15 @@ export async function middleware(req: NextRequest) {
   res.headers.set('x-user-role', profile.role)
   res.headers.set('x-is-owner', profile.is_owner.toString())
 
+  // Optionally apply rate limiting (only if Redis is configured)
+  if (hasRedis) {
+    const ip = req.headers.get("x-forwarded-for") || "anonymous";
+    const { success } = await ratelimit.limit(ip);
+    if (!success) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+  }
+
   return res
 }
 
@@ -88,5 +114,6 @@ export const config = {
      * - public folder
      */
     '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+    '/api/:path*',
   ],
 }

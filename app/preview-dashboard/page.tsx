@@ -28,10 +28,17 @@ import {
   Smartphone,
   Laptop,
   Printer,
+  Trash2,
 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function PreviewDashboard() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; asset: any | null }>({ open: false, asset: null });
+  const { toast } = useToast();
+  const router = useRouter();
 
   // Mock data for preview
   const mockAssets = [
@@ -132,11 +139,28 @@ export default function PreviewDashboard() {
     }
   }
 
-  const filteredAssets = mockAssets.filter(
+  const [assets, setAssets] = useState<any[]>(mockAssets);
+  const filteredAssets = assets.filter(
     (asset) =>
       asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset.asset_id.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  );
+
+  const handleDelete = async (asset: any) => {
+    setDeleteDialog({ open: false, asset: null });
+    try {
+      const res = await fetch(`/api/assets/${asset.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: "Delete Failed", description: data.error || "Failed to delete asset", variant: "destructive" });
+      } else {
+        toast({ title: "Asset Deleted", description: `${asset.name} has been deleted.` });
+        setAssets((prev) => prev.filter((a) => a.id !== asset.id));
+      }
+    } catch (e) {
+      toast({ title: "Delete Failed", description: "An unexpected error occurred", variant: "destructive" });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -318,15 +342,15 @@ export default function PreviewDashboard() {
                     )}
                   </div>
                   <div className="flex space-x-1 pt-2">
-                    <Button variant="outline" size="sm" className="flex-1 text-xs">
+                    <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => router.push(`/asset/${asset.id}`)}>
                       <Eye className="h-3 w-3 mr-1" />
                       View
                     </Button>
-                    <Button variant="outline" size="sm" className="text-xs">
-                      <QrCode className="h-3 w-3" />
-                    </Button>
-                    <Button variant="outline" size="sm" className="text-xs">
+                    <Button variant="outline" size="sm" className="text-xs" onClick={() => router.push(`/asset/${asset.id}/edit`)}>
                       <Edit className="h-3 w-3" />
+                    </Button>
+                    <Button variant="destructive" size="sm" className="text-xs" onClick={() => setDeleteDialog({ open: true, asset })}>
+                      <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
                 </CardContent>
@@ -416,6 +440,17 @@ export default function PreviewDashboard() {
           </CardContent>
         </Card>
       </div>
+      <Dialog open={deleteDialog.open} onOpenChange={open => setDeleteDialog({ open, asset: deleteDialog.asset })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Asset</DialogTitle>
+          </DialogHeader>
+          <div>Are you sure you want to delete <b>{deleteDialog.asset?.name}</b>?</div>
+          <DialogFooter>
+            <Button variant="destructive" onClick={() => deleteDialog.asset && handleDelete(deleteDialog.asset)}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

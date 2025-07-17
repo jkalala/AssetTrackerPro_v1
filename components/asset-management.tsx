@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,11 +19,14 @@ import {
   QrCode,
   Loader2,
   CheckCircle,
-  Settings
+  Settings,
+  Trash2,
+  Pencil
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { Asset } from "@/lib/asset-actions"
 import Link from "next/link"
+import { ToastAction } from "@/components/ui/toast";
 
 interface AssetManagementProps {
   assets: Asset[]
@@ -34,7 +37,7 @@ interface AssetManagementProps {
 export default function AssetManagement({ assets, loading = false, onRefresh }: AssetManagementProps) {
   const [selectedAssets, setSelectedAssets] = useState<string[]>([])
   const [searchTerm, setSearchTerm] = useState("")
-  const [filters, setFilters] = useState({ status: 'all', category: '' })
+  const [filters, setFilters] = useState({ status: 'all', category: 'all' })
   const [showFilters, setShowFilters] = useState(false)
   const [bulkOperation, setBulkOperation] = useState({
     type: 'update_status' as const,
@@ -42,7 +45,62 @@ export default function AssetManagement({ assets, loading = false, onRefresh }: 
     open: false
   })
   const [processing, setProcessing] = useState(false)
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; asset: Asset | null }>({ open: false, asset: null });
+  const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);
+  const [bulkUpdateDialog, setBulkUpdateDialog] = useState(false);
+  const [bulkField, setBulkField] = useState<'status' | 'category' | 'location'>('status');
+  const [bulkValue, setBulkValue] = useState('');
+  const [undoData, setUndoData] = useState<{ asset_ids: string[], prevValues: any[] } | null>(null);
+  const [undoBulkUpdate, setUndoBulkUpdate] = useState<{ asset_ids: string[], prevValues: any[], field: string } | null>(null);
+  const [undoBulkDelete, setUndoBulkDelete] = useState<{ assets: any[] } | null>(null);
+  const [customFieldDefs, setCustomFieldDefs] = useState<any[]>([])
+  const [customFieldValues, setCustomFieldValues] = useState<{ [assetId: string]: { [fieldId: string]: string } }>({})
+  const [categories, setCategories] = useState<any[]>([])
   const { toast } = useToast()
+
+  useEffect(() => {
+    async function fetchCustomFields() {
+      const res = await fetch("/api/custom-fields")
+      const json = await res.json()
+      setCustomFieldDefs(json.data || [])
+    }
+    fetchCustomFields()
+  }, [])
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const res = await fetch("/api/categories")
+      const json = await res.json()
+      setCategories(json.data || [])
+    }
+    fetchCategories()
+  }, [])
+
+  useEffect(() => {
+    async function fetchAllCustomFieldValues() {
+      if (!assets || assets.length === 0) return
+      const all: { [assetId: string]: { [fieldId: string]: string } } = {}
+      await Promise.all(assets.map(async (asset) => {
+        const res = await fetch(`/api/assets/${asset.id}/custom-fields`)
+        const json = await res.json()
+        all[asset.id!] = {}
+        if (json.data) {
+          for (const cf of json.data) {
+            all[asset.id!][cf.field_id] = cf.value
+          }
+        }
+      }))
+      setCustomFieldValues(all)
+    }
+    fetchAllCustomFieldValues()
+  }, [assets])
+
+  // Helper to build category options (flat with indentation for subcategories)
+  const buildCategoryOptions = (list: any[], parentId: string | null = null, level = 0): any[] =>
+    list.filter(c => (c.parent_id || "") === (parentId || "")).flatMap(c => [
+      { ...c, indent: level },
+      ...buildCategoryOptions(list, c.id, level + 1)
+    ])
 
   const filteredAssets = assets.filter(asset => {
     const matchesSearch = 
@@ -53,7 +111,7 @@ export default function AssetManagement({ assets, loading = false, onRefresh }: 
       asset.asset_id.toLowerCase().includes(searchTerm.toLowerCase())
 
     const matchesStatus = filters.status === 'all' || asset.status === filters.status
-    const matchesCategory = !filters.category || asset.category === filters.category
+    const matchesCategory = filters.category === 'all' || asset.category === filters.category
 
     return matchesSearch && matchesStatus && matchesCategory
   })
@@ -124,6 +182,145 @@ export default function AssetManagement({ assets, loading = false, onRefresh }: 
       setBulkOperation(prev => ({ ...prev, open: false, value: '' }))
     }
   }
+
+  const handleDelete = async (asset: Asset) => {
+    setDeleteDialog({ open: false, asset: null });
+    try {
+      const res = await fetch(`/api/assets/${asset.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: "Delete Failed", description: data.error || "Failed to delete asset", variant: "destructive" });
+      } else {
+        toast({ title: "Asset Deleted", description: `${asset.name} has been deleted.` });
+        onRefresh?.();
+      }
+    } catch (e) {
+      toast({ title: "Delete Failed", description: "An unexpected error occurred", variant: "destructive" });
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    setBulkDeleteDialog(false);
+    // Fetch asset data for undo
+    let prevAssets: any[] = [];
+    try {
+      const resPrev = await fetch('/api/assets/bulk-fetch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ asset_ids: selectedAssets })
+      });
+      prevAssets = await resPrev.json();
+    } catch {}
+    try {
+      const res = await fetch('/api/assets/bulk', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ asset_ids: selectedAssets })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: 'Bulk Delete Failed', description: data.error || 'Failed to delete assets', variant: 'destructive' });
+      } else {
+        setUndoBulkDelete({ assets: prevAssets });
+        toast({
+          title: 'Assets Deleted',
+          description: `${selectedAssets.length} assets deleted.`,
+          action: (
+            <ToastAction altText="Undo" onClick={handleUndoBulkDelete}>
+              Undo
+            </ToastAction>
+          ),
+        });
+        setSelectedAssets([]);
+        onRefresh?.();
+      }
+    } catch (e) {
+      toast({ title: 'Bulk Delete Failed', description: 'An unexpected error occurred', variant: 'destructive' });
+    }
+  };
+
+  const handleBulkUpdate = async () => {
+    setBulkUpdateDialog(false);
+    // Fetch previous values for undo
+    let prevValues: any[] = [];
+    try {
+      const resPrev = await fetch('/api/assets/bulk-fetch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ asset_ids: selectedAssets, field: bulkField })
+      });
+      prevValues = await resPrev.json();
+    } catch {}
+    try {
+      const res = await fetch('/api/assets/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          asset_ids: selectedAssets,
+          operation: `update_${bulkField}`,
+          value: bulkValue
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: 'Bulk Update Failed', description: data.error || 'Failed to update assets', variant: 'destructive' });
+      } else {
+        setUndoBulkUpdate({ asset_ids: selectedAssets, prevValues, field: bulkField });
+        toast({
+          title: 'Assets Updated',
+          description: `${selectedAssets.length} assets updated.`,
+          action: (
+            <ToastAction altText="Undo" onClick={handleUndoBulkUpdate}>
+              Undo
+            </ToastAction>
+          ),
+        });
+        setSelectedAssets([]);
+        onRefresh?.();
+      }
+    } catch (e) {
+      toast({ title: 'Bulk Update Failed', description: 'An unexpected error occurred', variant: 'destructive' });
+    }
+  };
+
+  const handleUndoBulkUpdate = async () => {
+    if (!undoBulkUpdate) return;
+    try {
+      await fetch('/api/assets/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          asset_ids: undoBulkUpdate.asset_ids,
+          operation: `update_${undoBulkUpdate.field}`,
+          value: null, // Will be set per asset below
+          prevValues: undoBulkUpdate.prevValues
+        })
+      });
+      toast({ title: 'Undo Successful', description: 'Bulk update has been undone.' });
+      onRefresh?.();
+    } catch {
+      toast({ title: 'Undo Failed', description: 'Could not undo bulk update.', variant: 'destructive' });
+    } finally {
+      setUndoBulkUpdate(null);
+    }
+  };
+
+  const handleUndoBulkDelete = async () => {
+    if (!undoBulkDelete) return;
+    try {
+      await fetch('/api/assets/bulk-restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assets: undoBulkDelete.assets })
+      });
+      toast({ title: 'Undo Successful', description: 'Bulk delete has been undone.' });
+      onRefresh?.();
+    } catch {
+      toast({ title: 'Undo Failed', description: 'Could not undo bulk delete.', variant: 'destructive' });
+    } finally {
+      setUndoBulkDelete(null);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -240,13 +437,12 @@ export default function AssetManagement({ assets, loading = false, onRefresh }: 
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
-                    <SelectItem value="it-equipment">IT Equipment</SelectItem>
-                    <SelectItem value="furniture">Furniture</SelectItem>
-                    <SelectItem value="av-equipment">AV Equipment</SelectItem>
-                    <SelectItem value="vehicles">Vehicles</SelectItem>
-                    <SelectItem value="tools">Tools</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {buildCategoryOptions(categories).map(cat => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {"\u00A0".repeat(cat.indent * 4)}{cat.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -254,7 +450,7 @@ export default function AssetManagement({ assets, loading = false, onRefresh }: 
               <div className="flex items-end space-x-2">
                 <Button
                   variant="outline"
-                  onClick={() => setFilters({ status: 'all', category: '' })}
+                  onClick={() => setFilters({ status: 'all', category: 'all' })}
                   size="sm"
                 >
                   Clear Filters
@@ -354,6 +550,17 @@ export default function AssetManagement({ assets, loading = false, onRefresh }: 
         </Card>
       )}
 
+      {selectedAssets.length > 0 && (
+        <div className="flex items-center mb-2 space-x-2">
+          <Button variant="destructive" size="sm" onClick={() => setBulkDeleteDialog(true)}>
+            <Trash2 className="h-4 w-4 mr-1" /> Delete Selected ({selectedAssets.length})
+          </Button>
+          <Button variant="secondary" size="sm" onClick={() => setBulkUpdateDialog(true)}>
+            <Pencil className="h-4 w-4 mr-1" /> Bulk Update
+          </Button>
+        </div>
+      )}
+
       {/* Assets Table */}
       <Card>
         <CardHeader>
@@ -408,6 +615,10 @@ export default function AssetManagement({ assets, loading = false, onRefresh }: 
                     <TableHead>Status</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead>Value</TableHead>
+                    {/* Custom Field Columns */}
+                    {customFieldDefs.slice(0, 2).map(field => (
+                      <TableHead key={field.id}>{field.label}</TableHead>
+                    ))}
                     <TableHead>Created</TableHead>
                     <TableHead className="w-32">Actions</TableHead>
                   </TableRow>
@@ -435,40 +646,30 @@ export default function AssetManagement({ assets, loading = false, onRefresh }: 
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{asset.category}</Badge>
+                        <Badge variant="outline">{categories.find(c => c.id === asset.category)?.name || asset.category}</Badge>
                       </TableCell>
+                      <TableCell>{getStatusBadge(asset.status)}</TableCell>
+                      <TableCell>{asset.location}</TableCell>
+                      <TableCell>{formatCurrency(asset.purchase_value)}</TableCell>
+                      {/* Custom Field Values */}
+                      {customFieldDefs.slice(0, 2).map(field => (
+                        <TableCell key={field.id}>
+                          {customFieldValues[asset.id!] && customFieldValues[asset.id!][field.id]
+                            ? customFieldValues[asset.id!][field.id]
+                            : <span className="text-gray-400">-</span>}
+                        </TableCell>
+                      ))}
+                      <TableCell>{formatDate(asset.created_at)}</TableCell>
                       <TableCell>
-                        {getStatusBadge(asset.status)}
-                      </TableCell>
-                      <TableCell>
-                        {asset.location || "N/A"}
-                      </TableCell>
-                      <TableCell>
-                        {formatCurrency(asset.purchase_value)}
-                      </TableCell>
-                      <TableCell>
-                        {formatDate(asset.created_at)}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-1">
-                          <Button asChild size="sm" variant="outline">
-                            <Link href={`/asset/${asset.id}`}>
-                              <Eye className="h-3 w-3" />
-                            </Link>
-                          </Button>
-                          <Button asChild size="sm" variant="outline">
-                            <Link href={`/asset/${asset.id}/edit`}>
-                              <Edit className="h-3 w-3" />
-                            </Link>
-                          </Button>
-                          {asset.qr_code && (
-                            <Button asChild size="sm" variant="outline">
-                              <Link href={`/qr-test?asset=${asset.id}`}>
-                                <QrCode className="h-3 w-3" />
-                              </Link>
-                            </Button>
-                          )}
-                        </div>
+                        <Button asChild size="sm" variant="outline">
+                          <Link href={`/asset/${asset.id}`}>View</Link>
+                        </Button>
+                        <Button asChild size="sm" variant="outline" className="ml-2">
+                          <Link href={`/asset/${asset.id}/edit`}>Edit</Link>
+                        </Button>
+                        <Button size="sm" variant="destructive" className="ml-2" onClick={() => handleDelete(asset)}>
+                          Delete
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -478,6 +679,57 @@ export default function AssetManagement({ assets, loading = false, onRefresh }: 
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialog.open} onOpenChange={open => setDeleteDialog({ open, asset: deleteDialog.asset })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Asset</DialogTitle>
+          </DialogHeader>
+          <div>Are you sure you want to delete <b>{deleteDialog.asset?.name}</b>?</div>
+          <DialogFooter>
+            <Button variant="destructive" onClick={() => deleteDialog.asset && handleDelete(deleteDialog.asset)}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <Dialog open={bulkDeleteDialog} onOpenChange={setBulkDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Selected Assets</DialogTitle>
+          </DialogHeader>
+          <div>Are you sure you want to delete <b>{selectedAssets.length}</b> selected assets? This action cannot be undone.</div>
+          <DialogFooter>
+            <Button variant="destructive" onClick={handleBulkDelete}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={bulkUpdateDialog} onOpenChange={setBulkUpdateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Bulk Update Assets</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Field to Update</label>
+              <select className="w-full border rounded p-2" value={bulkField} onChange={e => setBulkField(e.target.value as any)}>
+                <option value="status">Status</option>
+                <option value="category">Category</option>
+                <option value="location">Location</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">New Value</label>
+              <input className="w-full border rounded p-2" value={bulkValue} onChange={e => setBulkValue(e.target.value)} placeholder={`Enter new ${bulkField}`} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleBulkUpdate}>Update</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 } 

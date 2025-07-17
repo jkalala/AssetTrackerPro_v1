@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -9,6 +9,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { QrCode, Download, Upload, CheckCircle, AlertTriangle, FileText } from "lucide-react"
 import { generateBulkQRCodes } from "@/lib/qr-actions"
+import { fetchQRTemplates, fetchDefaultQRTemplate } from "@/lib/qr-template-utils"
+import jsPDF from "jspdf"
+import html2canvas from "html2canvas"
+import QRLabel from "@/components/qr-label"
 
 interface Asset {
   id: string
@@ -30,6 +34,30 @@ export default function BulkQROperations({ assets, onBulkGenerated }: BulkQROper
   const [progress, setProgress] = useState(0)
   const [results, setResults] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [templates, setTemplates] = useState<any[]>([])
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("")
+  const [templateConfig, setTemplateConfig] = useState<any>(null)
+
+  useEffect(() => {
+    async function loadTemplates() {
+      try {
+        const all = await fetchQRTemplates()
+        setTemplates(all)
+        const def = all.find((tpl: any) => tpl.is_default) || all[0]
+        if (def) {
+          setSelectedTemplateId(def.id)
+          setTemplateConfig(def.config)
+        }
+      } catch {}
+    }
+    loadTemplates()
+  }, [])
+
+  useEffect(() => {
+    if (!selectedTemplateId) return
+    const tpl = templates.find((t) => t.id === selectedTemplateId)
+    if (tpl) setTemplateConfig(tpl.config)
+  }, [selectedTemplateId, templates])
 
   const assetsWithoutQR = assets.filter((asset) => !asset.qr_code)
   const allSelected = selectedAssets.length === assetsWithoutQR.length
@@ -98,6 +126,57 @@ export default function BulkQROperations({ assets, onBulkGenerated }: BulkQROper
     })
   }
 
+  // Add this function to generate a PDF with all QR codes and asset info
+  const handleDownloadPDF = async () => {
+    const successfulResults = results.filter((r) => r.success)
+    if (successfulResults.length === 0) return
+
+    const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: [800, 1120] })
+    const itemsPerRow = 3
+    const itemWidth = (templateConfig?.qrSize || 120) + 40
+    const itemHeight = (templateConfig?.qrSize || 120) + 80
+    let x = 0, y = 0, row = 0, col = 0
+
+    for (let i = 0; i < successfulResults.length; i++) {
+      const result = successfulResults[i]
+      const asset = assets.find((a) => a.asset_id === result.assetId)
+      if (!asset) continue
+      // Render QRLabel to hidden container
+      const container = document.createElement("div")
+      container.style.position = "fixed"
+      container.style.left = "-9999px"
+      container.style.top = "0"
+      document.body.appendChild(container)
+      const label = (
+        <QRLabel asset={asset} templateConfig={templateConfig} qrCodeUrl={result.qrCode} />
+      )
+      await new Promise((resolve) => {
+        import("react-dom/client").then(({ createRoot }) => {
+          const root = createRoot(container)
+          root.render(label)
+          setTimeout(async () => {
+            const canvas = await (await import("html2canvas")).default(container, { backgroundColor: "#fff", scale: 2 })
+            const imgData = canvas.toDataURL("image/png")
+            pdf.addImage(imgData, "PNG", x, y, itemWidth, itemHeight)
+            root.unmount()
+            document.body.removeChild(container)
+            col++
+            if (col >= itemsPerRow) {
+              col = 0
+              row++
+              x = 0
+              y += itemHeight + 16
+            } else {
+              x += itemWidth + 16
+            }
+            resolve(null)
+          }, 100)
+        })
+      })
+    }
+    pdf.save("qr-codes-batch.pdf")
+  }
+
   const generateCSVTemplate = () => {
     const csvContent = [
       "asset_id,name,category,location,value",
@@ -117,6 +196,22 @@ export default function BulkQROperations({ assets, onBulkGenerated }: BulkQROper
 
   return (
     <div className="space-y-6">
+      {templates.length > 0 && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">QR Template</label>
+          <select
+            className="border rounded px-2 py-1"
+            value={selectedTemplateId}
+            onChange={(e) => setSelectedTemplateId(e.target.value)}
+          >
+            {templates.map((tpl) => (
+              <option key={tpl.id} value={tpl.id}>
+                {tpl.name} {tpl.is_default ? "(Default)" : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
@@ -149,10 +244,16 @@ export default function BulkQROperations({ assets, onBulkGenerated }: BulkQROper
               <AlertDescription className="text-green-800">
                 <div className="flex items-center justify-between">
                   <span>Generated {results.filter((r) => r.success).length} QR codes successfully</span>
-                  <Button size="sm" onClick={handleDownloadAll}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Download All
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={handleDownloadAll}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download All
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={handleDownloadPDF}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Download PDF
+                    </Button>
+                  </div>
                 </div>
               </AlertDescription>
             </Alert>

@@ -47,6 +47,10 @@ export default function AddAssetForm() {
     notes: "",
   })
 
+  const [customFieldDefs, setCustomFieldDefs] = useState<any[]>([])
+  const [customFields, setCustomFields] = useState<{ [fieldId: string]: string }>({})
+  const [categories, setCategories] = useState<any[]>([])
+
   useEffect(() => {
     async function checkProfile() {
       if (!user) return
@@ -77,10 +81,108 @@ export default function AddAssetForm() {
     checkProfile()
   }, [user])
 
+  useEffect(() => {
+    async function fetchCustomFields() {
+      const res = await fetch("/api/custom-fields")
+      const json = await res.json()
+      setCustomFieldDefs(json.data || [])
+    }
+    fetchCustomFields()
+  }, [])
+
+  useEffect(() => {
+    async function fetchCategories() {
+      const res = await fetch("/api/categories")
+      const json = await res.json()
+      setCategories(json.data || [])
+    }
+    fetchCategories()
+  }, [])
+
+  // Helper to build category options (flat with indentation for subcategories)
+  const buildCategoryOptions = (list: any[], parentId: string | null = null, level = 0): any[] =>
+    list.filter(c => (c.parent_id || "") === (parentId || "")).flatMap(c => [
+      { ...c, indent: level },
+      ...buildCategoryOptions(list, c.id, level + 1)
+    ])
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleCustomFieldChange = (fieldId: string, value: string) => {
+    setCustomFields(prev => ({ ...prev, [fieldId]: value }))
+  }
+
+  const handleGenerateAssetId = async () => {
+    setGeneratingId(true)
+    try {
+      const newId = await generateAssetId(formData.category)
+      setFormData(prev => ({ ...prev, asset_id: newId }))
+      toast({
+        title: "Asset ID Generated",
+        description: "A unique asset ID has been generated for you."
+      })
+    } catch (error) {
+      toast({
+        title: "Error Generating ID",
+        description: "Failed to generate asset ID. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setGeneratingId(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError("")
+
+    // Validate custom fields
+    for (const field of customFieldDefs) {
+      const value = customFields[field.id] ?? ""
+      if (field.required && !value) {
+        setError(`Custom field "${field.label}" is required.`)
+        setLoading(false)
+        return
+      }
+      if (field.validation) {
+        try {
+          const rules = typeof field.validation === "string" ? JSON.parse(field.validation) : field.validation
+          if (field.type === "text" || field.type === "dropdown") {
+            if (rules.min !== undefined && value.length < rules.min) {
+              setError(`Custom field "${field.label}" must be at least ${rules.min} characters.`)
+              setLoading(false)
+              return
+            }
+            if (rules.max !== undefined && value.length > rules.max) {
+              setError(`Custom field "${field.label}" must be at most ${rules.max} characters.`)
+              setLoading(false)
+              return
+            }
+          } else if (field.type === "number") {
+            const num = Number(value)
+            if (isNaN(num)) {
+              setError(`Custom field "${field.label}" must be a number.`)
+              setLoading(false)
+              return
+            }
+            if (rules.min !== undefined && num < rules.min) {
+              setError(`Custom field "${field.label}" must be at least ${rules.min}.`)
+              setLoading(false)
+              return
+            }
+            if (rules.max !== undefined && num > rules.max) {
+              setError(`Custom field "${field.label}" must be at most ${rules.max}.`)
+              setLoading(false)
+              return
+            }
+          }
+          // Add more type-specific validation as needed
+        } catch {}
+      }
+    }
 
     try {
       const result = await addAsset({
@@ -109,6 +211,14 @@ export default function AddAssetForm() {
           variant: "destructive"
         })
       } else {
+        // Save custom field values
+        if (Object.keys(customFields).length > 0) {
+          await fetch(`/api/assets/${result.data.id}/custom-fields`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ values: Object.entries(customFields).map(([field_id, value]) => ({ field_id, value })) })
+          })
+        }
         setSuccess(true)
         toast({
           title: "Asset Added Successfully",
@@ -133,6 +243,7 @@ export default function AddAssetForm() {
           tags: "",
           notes: "",
         })
+        setCustomFields({})
         
         // Redirect to dashboard after a short delay
         setTimeout(() => {
@@ -148,30 +259,6 @@ export default function AddAssetForm() {
       })
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const handleGenerateAssetId = async () => {
-    setGeneratingId(true)
-    try {
-      const newId = await generateAssetId(formData.category)
-      setFormData(prev => ({ ...prev, asset_id: newId }))
-      toast({
-        title: "Asset ID Generated",
-        description: "A unique asset ID has been generated for you."
-      })
-    } catch (error) {
-      toast({
-        title: "Error Generating ID",
-        description: "Failed to generate asset ID. Please try again.",
-        variant: "destructive"
-      })
-    } finally {
-      setGeneratingId(false)
     }
   }
 
@@ -333,13 +420,11 @@ export default function AddAssetForm() {
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="it-equipment">IT Equipment</SelectItem>
-                        <SelectItem value="furniture">Furniture</SelectItem>
-                        <SelectItem value="av-equipment">AV Equipment</SelectItem>
-                        <SelectItem value="vehicles">Vehicles</SelectItem>
-                        <SelectItem value="tools">Tools</SelectItem>
-                        <SelectItem value="office-supplies">Office Supplies</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
+                        {buildCategoryOptions(categories).map(cat => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {"\u00A0".repeat(cat.indent * 4)}{cat.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -477,6 +562,62 @@ export default function AddAssetForm() {
                     rows={4}
                   />
                 </div>
+                {/* --- Custom Fields Section --- */}
+                {customFieldDefs.length > 0 && (
+                  <div className="pt-6 border-t">
+                    <h3 className="font-semibold mb-2">Custom Fields</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {customFieldDefs.map(field => (
+                        <div key={field.id} className="space-y-2">
+                          <Label htmlFor={`custom-${field.id}`}>{field.label}{field.required && " *"}</Label>
+                          {field.type === "text" && (
+                            <Input
+                              id={`custom-${field.id}`}
+                              value={customFields[field.id] || ""}
+                              onChange={e => handleCustomFieldChange(field.id, e.target.value)}
+                              required={field.required}
+                            />
+                          )}
+                          {field.type === "number" && (
+                            <Input
+                              id={`custom-${field.id}`}
+                              type="number"
+                              value={customFields[field.id] || ""}
+                              onChange={e => handleCustomFieldChange(field.id, e.target.value)}
+                              required={field.required}
+                            />
+                          )}
+                          {field.type === "date" && (
+                            <Input
+                              id={`custom-${field.id}`}
+                              type="date"
+                              value={customFields[field.id] || ""}
+                              onChange={e => handleCustomFieldChange(field.id, e.target.value)}
+                              required={field.required}
+                            />
+                          )}
+                          {field.type === "dropdown" && Array.isArray(field.options) && (
+                            <Select
+                              value={customFields[field.id] || ""}
+                              onValueChange={val => handleCustomFieldChange(field.id, val)}
+                              required={field.required}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select option" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {field.options.map((opt: string) => (
+                                  <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {/* --- End Custom Fields Section --- */}
               </TabsContent>
             </Tabs>
 

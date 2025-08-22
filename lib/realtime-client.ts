@@ -50,7 +50,7 @@ class RealtimeAnalytics {
           table: table,
           filter: `${filter.column}=eq.${filter.value}`,
         },
-        (payload) => {
+        (payload: any) => {
           const event: RealtimeEvent = {
             type: payload.eventType as any,
             table: table,
@@ -72,7 +72,7 @@ class RealtimeAnalytics {
           schema: "public",
           table: table,
         },
-        (payload) => {
+        (payload: any) => {
           const event: RealtimeEvent = {
             type: payload.eventType as any,
             table: table,
@@ -184,10 +184,10 @@ class RealtimeAnalytics {
 
       return {
         totalAssets: assetsResult.data?.length || 0,
-        activeAssets: assetsResult.data?.filter((a) => a.status === "active").length || 0,
-        assetsCreatedToday: assetsResult.data?.filter((a) => new Date(a.created_at) >= today).length || 0,
+        activeAssets: assetsResult.data?.filter((a: any) => a.status === "active").length || 0,
+        assetsCreatedToday: assetsResult.data?.filter((a: any) => new Date(a.created_at) >= today).length || 0,
         totalUsers: usersResult.data?.length || 0,
-        scansThisWeek: scansResult.data?.filter((s) => new Date(s.created_at) >= thisWeek).length || 0,
+        scansThisWeek: scansResult.data?.filter((s: any) => new Date(s.created_at) >= thisWeek).length || 0,
         recentScans: scansResult.data?.slice(0, 10) || [],
       }
     } catch (error) {

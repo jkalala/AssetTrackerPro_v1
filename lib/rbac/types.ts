@@ -10,7 +10,8 @@ export type Permission =
   | 'manage:tenants'
   | 'view:analytics'
   | 'manage:billing'
-  | 'manage:settings';
+  | 'manage:settings'
+  | 'read:users';
 
 export interface RolePermissions {
   role: Role;
@@ -61,7 +62,8 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'manage:tenants',
     'view:analytics',
     'manage:billing',
-    'manage:settings'
+    'manage:settings',
+    'read:users',
   ],
   admin: [
     'create:asset',
@@ -70,17 +72,20 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'delete:asset',
     'manage:users',
     'view:analytics',
-    'manage:settings'
+    'manage:settings',
+    'read:users',
   ],
   manager: [
     'create:asset',
     'read:asset',
     'update:asset',
-    'view:analytics'
+    'view:analytics',
+    'read:users',
   ],
   user: [
     'read:asset',
-    'create:asset'
+    'create:asset',
+    'read:users',
   ],
   guest: [
     'read:asset'

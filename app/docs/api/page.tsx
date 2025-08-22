@@ -1,12 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import dynamic from 'next/dynamic';
+import type SwaggerUIType from 'swagger-ui-react';
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Code, Key, Globe, Shield, Copy, CheckCircle, AlertTriangle, ExternalLink, Zap } from "lucide-react"
+
+const SwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false }) as any;
 
 const apiEndpoints = [
   {
@@ -212,6 +216,26 @@ curl -X POST https://your-domain.com/api/assets \\
 export default function APIDocumentationPage() {
   const [selectedLanguage, setSelectedLanguage] = useState("javascript")
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
+  const [openApiSpec, setOpenApiSpec] = useState<any>(null);
+  const [loadingSpec, setLoadingSpec] = useState(false);
+  const [specError, setSpecError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchSpec() {
+      setLoadingSpec(true);
+      setSpecError(null);
+      try {
+        const res = await fetch('/api/external/docs');
+        const data = await res.json();
+        setOpenApiSpec(data);
+      } catch (err) {
+        setSpecError('Failed to load OpenAPI spec');
+      } finally {
+        setLoadingSpec(false);
+      }
+    }
+    fetchSpec();
+  }, []);
 
   const copyToClipboard = (code: string, id: string) => {
     navigator.clipboard.writeText(code)
@@ -249,12 +273,13 @@ export default function APIDocumentationPage() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="authentication">Authentication</TabsTrigger>
             <TabsTrigger value="endpoints">Endpoints</TabsTrigger>
             <TabsTrigger value="examples">Examples</TabsTrigger>
             <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+            <TabsTrigger value="openapi">OpenAPI</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -657,6 +682,38 @@ Authorization: Bearer YOUR_TOKEN
                       ensure authenticity.
                     </AlertDescription>
                   </Alert>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="openapi">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>OpenAPI / Swagger Reference</CardTitle>
+                  <CardDescription>Interactive API reference generated from the OpenAPI spec</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-4">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      disabled={loadingSpec || !openApiSpec}
+                    >
+                      <a href="/api/external/docs" download="openapi.json">
+                        Download OpenAPI JSON
+                      </a>
+                    </Button>
+                  </div>
+                  {loadingSpec && <div>Loading OpenAPI spec...</div>}
+                  {specError && <div className="text-red-600">{specError}</div>}
+                  {openApiSpec && (
+                    <div className="bg-white rounded shadow p-2">
+                      <SwaggerUI spec={openApiSpec} />
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

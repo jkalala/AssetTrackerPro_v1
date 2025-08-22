@@ -16,6 +16,9 @@ export default function ApiKeysPage() {
   const [creating, setCreating] = useState(false);
   const [newKey, setNewKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [editingKeyId, setEditingKeyId] = useState<string | null>(null);
+  const [editingKeyName, setEditingKeyName] = useState('');
+  const [renaming, setRenaming] = useState(false);
 
   async function fetchKeys() {
     const res = await fetch('/api/settings/api-keys');
@@ -48,6 +51,20 @@ export default function ApiKeysPage() {
 
   async function handleRevoke(id: string) {
     await fetch(`/api/settings/api-keys/${id}`, { method: 'DELETE' });
+    fetchKeys();
+  }
+
+  async function handleRename(id: string) {
+    setRenaming(true);
+    setError(null);
+    const res = await fetch(`/api/settings/api-keys/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: editingKeyName }),
+    });
+    setRenaming(false);
+    setEditingKeyId(null);
+    setEditingKeyName('');
     fetchKeys();
   }
 
@@ -93,12 +110,45 @@ export default function ApiKeysPage() {
               <td className="p-2">{key.revoked ? 'Revoked' : 'Active'}</td>
               <td className="p-2">
                 {!key.revoked && (
-                  <button
-                    className="text-red-600 underline"
-                    onClick={() => handleRevoke(key.id)}
-                  >
-                    Revoke
-                  </button>
+                  <>
+                    <button
+                      className="text-red-600 underline mr-2"
+                      onClick={() => handleRevoke(key.id)}
+                    >
+                      Revoke
+                    </button>
+                    {editingKeyId === key.id ? (
+                      <>
+                        <input
+                          className="border px-1 py-0.5 mr-1 text-sm"
+                          value={editingKeyName}
+                          onChange={e => setEditingKeyName(e.target.value)}
+                          disabled={renaming}
+                        />
+                        <button
+                          className="text-blue-600 underline mr-1"
+                          onClick={() => handleRename(key.id)}
+                          disabled={renaming || !editingKeyName.trim()}
+                        >
+                          Save
+                        </button>
+                        <button
+                          className="text-gray-600 underline"
+                          onClick={() => { setEditingKeyId(null); setEditingKeyName(''); }}
+                          disabled={renaming}
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        className="text-blue-600 underline"
+                        onClick={() => { setEditingKeyId(key.id); setEditingKeyName(key.name); }}
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </>
                 )}
               </td>
             </tr>

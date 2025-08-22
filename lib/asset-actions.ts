@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { logAuditEvent } from './audit-log'
+import { deliverWebhooks } from './webhook-utils';
+import { sendIntegrationNotification } from './integration-utils';
 
 export interface Asset {
   id?: string
@@ -96,7 +98,13 @@ export async function addAsset(assetData: Omit<Asset, 'id' | 'created_at' | 'upd
       entity_id: data.id,
       details: { asset_id: data.asset_id, name: data.name },
       tenant_id: data.tenant_id || undefined,
+      // ip_address, user_agent can be added from API context
     })
+    // Trigger webhooks
+    if (data.tenant_id) {
+      await deliverWebhooks({ tenant_id: data.tenant_id, event: 'asset.created', payload: data });
+      await sendIntegrationNotification({ tenant_id: data.tenant_id, message: `Asset created: ${data.name}` });
+    }
     
     return { data }
   } catch (error) {
@@ -121,7 +129,7 @@ export async function updateAsset(assetId: string, updates: Partial<Asset>) {
     // Check if user owns the asset or is admin
     const { data: existingAsset } = await supabase
       .from('assets')
-      .select('created_by')
+      .select('created_by, tenant_id')
       .eq('id', assetId)
       .single()
 
@@ -160,7 +168,15 @@ export async function updateAsset(assetId: string, updates: Partial<Asset>) {
       entity_id: assetId,
       details: { updates },
       tenant_id: data?.tenant_id || undefined,
+      before: existingAsset,
+      after: data,
+      // ip_address, user_agent can be added from API context
     })
+    // Trigger webhooks
+    if (data?.tenant_id) {
+      await deliverWebhooks({ tenant_id: data.tenant_id, event: 'asset.updated', payload: data });
+      await sendIntegrationNotification({ tenant_id: data.tenant_id, message: `Asset updated: ${data.name}` });
+    }
     
     return { data }
   } catch (error) {
@@ -185,7 +201,7 @@ export async function deleteAsset(assetId: string) {
     // Check if user owns the asset
     const { data: existingAsset } = await supabase
       .from('assets')
-      .select('created_by')
+      .select('created_by, tenant_id')
       .eq('id', assetId)
       .single()
 
@@ -217,8 +233,15 @@ export async function deleteAsset(assetId: string) {
       entity: 'asset',
       entity_id: assetId,
       details: {},
-      // tenant_id: can be added if asset/tenant info is available
+      tenant_id: existingAsset.tenant_id || undefined,
+      before: existingAsset,
+      // ip_address, user_agent can be added from API context
     })
+    // Trigger webhooks
+    if (existingAsset.tenant_id) {
+      await deliverWebhooks({ tenant_id: existingAsset.tenant_id, event: 'asset.deleted', payload: { assetId } });
+      await sendIntegrationNotification({ tenant_id: existingAsset.tenant_id, message: `Asset deleted: ${assetId}` });
+    }
     
     return { success: true }
   } catch (error) {

@@ -27,17 +27,19 @@ export async function storeApiKey({ tenant_id, user_id, name }: { tenant_id: str
     entity_id: data.id,
     details: { name },
     tenant_id,
+    after: data,
+    // ip_address, user_agent can be added from API context
   });
   // Return the plain key (only shown once)
   return { apiKey: key, record: data };
 }
 
-export async function validateApiKey(key: string): Promise<{ valid: boolean, tenant_id?: string, user_id?: string }> {
+export async function validateApiKey(key: string): Promise<{ valid: boolean, tenant_id?: string, user_id?: string, api_key_id?: string }> {
   const supabase = await createClient();
   const keyHash = createHash('sha256').update(key).digest('hex');
   const { data, error } = await supabase.from('api_keys').select('*').eq('key', keyHash).eq('revoked', false).single();
   if (error || !data) return { valid: false };
-  return { valid: true, tenant_id: data.tenant_id, user_id: data.user_id };
+  return { valid: true, tenant_id: data.tenant_id, user_id: data.user_id, api_key_id: data.id };
 }
 
 export async function revokeApiKey({ id, tenant_id, user_id }: { id: string, tenant_id: string, user_id: string }) {
@@ -52,5 +54,7 @@ export async function revokeApiKey({ id, tenant_id, user_id }: { id: string, ten
     entity_id: id,
     details: {},
     tenant_id,
+    before: { id },
+    // ip_address, user_agent can be added from API context
   });
 } 

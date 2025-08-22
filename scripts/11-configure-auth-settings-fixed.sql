@@ -36,6 +36,30 @@ SET value = EXCLUDED.value,
     description = EXCLUDED.description,
     updated_at = NOW();
 
+-- Add audit log retention period to app_config
+INSERT INTO public.app_config (key, value, description)
+VALUES (
+  'audit_log_retention_days',
+  '365',
+  'Number of days to retain audit logs before deletion'
+)
+ON CONFLICT (key) DO UPDATE
+SET value = EXCLUDED.value,
+    description = EXCLUDED.description,
+    updated_at = NOW();
+
+-- Add asset history retention period to app_config
+INSERT INTO public.app_config (key, value, description)
+VALUES (
+  'asset_history_retention_days',
+  '365',
+  'Number of days to retain asset history before deletion'
+)
+ON CONFLICT (key) DO UPDATE
+SET value = EXCLUDED.value,
+    description = EXCLUDED.description,
+    updated_at = NOW();
+
 -- Create a function to check if GitHub OAuth is configured in our app
 CREATE OR REPLACE FUNCTION check_github_oauth_config()
 RETURNS TABLE (

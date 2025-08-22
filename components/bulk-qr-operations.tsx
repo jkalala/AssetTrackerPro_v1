@@ -7,12 +7,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { QrCode, Download, Upload, CheckCircle, AlertTriangle, FileText } from "lucide-react"
+import { QrCode, Download, Upload, CheckCircle, AlertTriangle, FileText, Printer } from "lucide-react"
 import { generateBulkQRCodes } from "@/lib/qr-actions"
 import { fetchQRTemplates, fetchDefaultQRTemplate } from "@/lib/qr-template-utils"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 import QRLabel from "@/components/qr-label"
+import { useToast } from "@/hooks/use-toast"
 
 interface Asset {
   id: string
@@ -37,6 +38,8 @@ export default function BulkQROperations({ assets, onBulkGenerated }: BulkQROper
   const [templates, setTemplates] = useState<any[]>([])
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("")
   const [templateConfig, setTemplateConfig] = useState<any>(null)
+  const { toast } = useToast();
+  const [printLabels, setPrintLabels] = useState(false);
 
   useEffect(() => {
     async function loadTemplates() {
@@ -129,53 +132,71 @@ export default function BulkQROperations({ assets, onBulkGenerated }: BulkQROper
   // Add this function to generate a PDF with all QR codes and asset info
   const handleDownloadPDF = async () => {
     const successfulResults = results.filter((r) => r.success)
-    if (successfulResults.length === 0) return
-
-    const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: [800, 1120] })
-    const itemsPerRow = 3
-    const itemWidth = (templateConfig?.qrSize || 120) + 40
-    const itemHeight = (templateConfig?.qrSize || 120) + 80
-    let x = 0, y = 0, row = 0, col = 0
-
-    for (let i = 0; i < successfulResults.length; i++) {
-      const result = successfulResults[i]
-      const asset = assets.find((a) => a.asset_id === result.assetId)
-      if (!asset) continue
-      // Render QRLabel to hidden container
-      const container = document.createElement("div")
-      container.style.position = "fixed"
-      container.style.left = "-9999px"
-      container.style.top = "0"
-      document.body.appendChild(container)
-      const label = (
-        <QRLabel asset={asset} templateConfig={templateConfig} qrCodeUrl={result.qrCode} />
-      )
-      await new Promise((resolve) => {
-        import("react-dom/client").then(({ createRoot }) => {
-          const root = createRoot(container)
-          root.render(label)
-          setTimeout(async () => {
-            const canvas = await (await import("html2canvas")).default(container, { backgroundColor: "#fff", scale: 2 })
-            const imgData = canvas.toDataURL("image/png")
-            pdf.addImage(imgData, "PNG", x, y, itemWidth, itemHeight)
-            root.unmount()
-            document.body.removeChild(container)
-            col++
-            if (col >= itemsPerRow) {
-              col = 0
-              row++
-              x = 0
-              y += itemHeight + 16
-            } else {
-              x += itemWidth + 16
-            }
-            resolve(null)
-          }, 100)
-        })
-      })
+    if (successfulResults.length === 0) {
+      toast({ title: "Nothing to export", description: "No QR codes to export.", variant: "destructive" });
+      return;
     }
-    pdf.save("qr-codes-batch.pdf")
+    try {
+      const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: [800, 1120] })
+      const itemsPerRow = 3
+      const itemWidth = (templateConfig?.qrSize || 120) + 40
+      const itemHeight = (templateConfig?.qrSize || 120) + 80
+      let x = 0, y = 0, row = 0, col = 0
+      for (let i = 0; i < successfulResults.length; i++) {
+        const result = successfulResults[i]
+        const asset = assets.find((a) => a.asset_id === result.assetId)
+        if (!asset) continue
+        const container = document.createElement("div")
+        container.style.position = "fixed"
+        container.style.left = "-9999px"
+        container.style.top = "0"
+        document.body.appendChild(container)
+        const label = (
+          <QRLabel asset={asset} templateConfig={templateConfig} qrCodeUrl={result.qrCode} />
+        )
+        await new Promise((resolve) => {
+          import("react-dom/client").then(({ createRoot }) => {
+            const root = createRoot(container)
+            root.render(label)
+            setTimeout(async () => {
+              const canvas = await (await import("html2canvas")).default(container, { backgroundColor: "#fff", scale: 2 })
+              const imgData = canvas.toDataURL("image/png")
+              pdf.addImage(imgData, "PNG", x, y, itemWidth, itemHeight)
+              root.unmount()
+              document.body.removeChild(container)
+              col++
+              if (col >= itemsPerRow) {
+                col = 0
+                row++
+                x = 0
+                y += itemHeight + 16
+              } else {
+                x += itemWidth + 16
+              }
+              resolve(null)
+            }, 100)
+          })
+        })
+      }
+      pdf.save("qr-codes-batch.pdf")
+      toast({ title: "Exported PDF", description: "QR report exported as PDF." })
+    } catch (err) {
+      toast({ title: "Export Failed", description: "Failed to export PDF.", variant: "destructive" })
+    }
   }
+
+  // Print all QR labels
+  const handlePrintAll = () => {
+    if (results.filter((r) => r.success).length === 0) {
+      toast({ title: "Nothing to print", description: "No QR codes to print.", variant: "destructive" });
+      return;
+    }
+    setPrintLabels(true);
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => setPrintLabels(false), 1000);
+    }, 100);
+  };
 
   const generateCSVTemplate = () => {
     const csvContent = [
@@ -196,6 +217,20 @@ export default function BulkQROperations({ assets, onBulkGenerated }: BulkQROper
 
   return (
     <div className="space-y-6">
+      {/* Print container for all QR labels */}
+      {printLabels && (
+        <div className="print:block hidden">
+          {results.filter((r) => r.success).map((result) => {
+            const asset = assets.find((a) => a.asset_id === result.assetId)
+            if (!asset) return null
+            return (
+              <div key={result.assetId} className="mb-4">
+                <QRLabel asset={asset} templateConfig={templateConfig} qrCodeUrl={result.qrCode} />
+              </div>
+            )
+          })}
+        </div>
+      )}
       {templates.length > 0 && (
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">QR Template</label>
@@ -249,9 +284,13 @@ export default function BulkQROperations({ assets, onBulkGenerated }: BulkQROper
                       <Download className="h-4 w-4 mr-2" />
                       Download All
                     </Button>
-                    <Button size="sm" variant="outline" onClick={handleDownloadPDF}>
+                    <Button size="sm" variant="outline" onClick={handleDownloadPDF} disabled={results.filter((r) => r.success).length === 0}>
                       <FileText className="h-4 w-4 mr-2" />
                       Download PDF
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={handlePrintAll} disabled={results.filter((r) => r.success).length === 0}>
+                      <Printer className="h-4 w-4 mr-2" />
+                      Print All QR Labels
                     </Button>
                   </div>
                 </div>

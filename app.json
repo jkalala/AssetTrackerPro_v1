@@ -1,0 +1,79 @@
+{
+  "expo": {
+    "name": "AssetTracker Mobile",
+    "slug": "assettracker-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#2563eb"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.assettracker.mobile",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs camera access to scan QR codes and capture asset photos.",
+        "NSLocationWhenInUseUsageDescription": "This app needs location access to track asset locations.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs location access to track asset locations and provide geofencing alerts.",
+        "NSMicrophoneUsageDescription": "This app needs microphone access to record voice notes for assets."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2563eb"
+      },
+      "package": "com.assettracker.mobile",
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "RECORD_AUDIO",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow AssetTracker Mobile to access your camera to scan QR codes and capture asset photos."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow AssetTracker Mobile to access your location for asset tracking and geofencing."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#2563eb"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow AssetTracker Mobile to access your photo library to select asset images."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    },
+    "owner": "assettracker"
+  }
+}

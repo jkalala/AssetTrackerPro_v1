@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   return NextResponse.json({ success: true });
 }
 
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   const supabase = await createClient();
   // Get current user and tenant
   const { data: { user } } = await supabase.auth.getUser();

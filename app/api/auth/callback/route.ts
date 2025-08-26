@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         user_agent: request.headers.get('user-agent') || '',
       });
     }
-  } catch (err) {
+  } catch {
     // Ignore audit log errors
   }
 

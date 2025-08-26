@@ -8,14 +8,13 @@ export async function GET(request: Request, { params }: { params: { assetId: str
   const authHeader = request.headers.get('authorization') || '';
   const apiKey = authHeader.replace('Bearer ', '').trim();
   // Rate limit by API key or IP
-  const rateLimitKey = apiKey || request.headers.get('x-forwarded-for') || 'anonymous';
   const rateLimitError = await withRateLimit(request, { limit: 60, window: '1m' });
   if (rateLimitError) return rateLimitError;
   if (!apiKey) {
     await logApiUsage({ api_key_id: '', endpoint: '/api/external/assets/[assetId]', status: 401 });
     return NextResponse.json({ error: 'Missing API key' }, { status: 401 });
   }
-  const { valid, tenant_id, user_id, api_key_id } = await validateApiKey(apiKey);
+  const { valid, tenant_id, api_key_id } = await validateApiKey(apiKey);
   if (!valid || !tenant_id) {
     await logApiUsage({ api_key_id: api_key_id || '', endpoint: '/api/external/assets/[assetId]', status: 401 });
     return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });

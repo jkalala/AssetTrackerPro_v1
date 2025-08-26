@@ -41,7 +41,7 @@ export class AnalyticsService {
       `)
       .eq('tenant_id', tenantId)
 
-    const assetsByCategory = categoryData?.reduce((acc: any[], asset) => {
+    const assetsByCategory = categoryData?.reduce((acc: any[], asset: any) => {
       const categoryName = asset.asset_categories?.name || 'Uncategorized'
       const existing = acc.find(item => item.category.name === categoryName)
       if (existing) {

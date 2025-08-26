@@ -43,7 +43,7 @@ import { EditRoleDialog } from './edit-role-dialog'
 import { AssignRoleDialog } from './assign-role-dialog'
 import { PermissionMatrix } from './permission-matrix'
 import { RoleAnalytics } from './role-analytics'
-import { Role, RoleWithPermissions, RoleHierarchyNode } from '@/lib/types/rbac'
+import { Role, RoleWithPermissions, RoleHierarchyNode, CreateRoleRequest } from '@/lib/types/rbac'
 
 interface RoleManagementDashboardProps {
   tenantId: string
@@ -432,7 +432,6 @@ export function RoleManagementDashboard({
         open={showCreateDialog}
         onOpenChange={setShowCreateDialog}
         onCreateRole={handleCreateRole}
-        tenantId={tenantId}
         existingRoles={roles}
       />
 

@@ -16,7 +16,6 @@ import { GraphQLError } from 'graphql'
 
 // Rate limiting
 const rateLimiter = new RateLimiterMemory({
-  keyGenerator: (root, args, context) => context.user?.id || context.req.ip,
   points: 1000, // Number of requests
   duration: 60, // Per 60 seconds
 })
@@ -94,13 +93,14 @@ const permissions = shield(
 // Rate limiting middleware
 const rateLimitMiddleware = async (resolve: any, root: any, args: any, context: any, info: any) => {
   try {
-    await rateLimiter.consume(context.user?.id || context.req.ip)
+    const key = context.user?.id || context.req?.ip || 'anonymous'
+    await rateLimiter.consume(key)
     return resolve(root, args, context, info)
-  } catch (rejRes) {
+  } catch (rejRes: any) {
     throw new GraphQLError('Rate limit exceeded', {
       extensions: {
         code: 'RATE_LIMITED',
-        retryAfter: Math.round(rejRes.msBeforeNext / 1000),
+        retryAfter: Math.round((rejRes?.msBeforeNext || 60000) / 1000),
       },
     })
   }
@@ -123,12 +123,12 @@ const server = new ApolloServer({
   plugins: [
     // Request logging
     {
-      requestDidStart() {
+      async requestDidStart() {
         return {
-          didResolveOperation(requestContext) {
+          async didResolveOperation(requestContext: any) {
             console.log(`GraphQL Operation: ${requestContext.request.operationName}`)
           },
-          didEncounterErrors(requestContext) {
+          async didEncounterErrors(requestContext: any) {
             console.error('GraphQL Errors:', requestContext.errors)
           },
         }
@@ -136,10 +136,11 @@ const server = new ApolloServer({
     },
     // Performance monitoring
     {
-      requestDidStart() {
+      async requestDidStart() {
         return {
-          willSendResponse(requestContext) {
-            const duration = Date.now() - requestContext.request.http?.startTime
+          async willSendResponse(requestContext: any) {
+            const startTime = requestContext.request.http?.startTime || Date.now()
+            const duration = Date.now() - startTime
             if (duration > 1000) {
               console.warn(`Slow GraphQL query: ${duration}ms`, {
                 operation: requestContext.request.operationName,
@@ -176,7 +177,7 @@ const server = new ApolloServer({
 
 // Create Next.js handler
 export const handler = startServerAndCreateNextHandler(server, {
-  context: async (req) => {
+  context: async (req: any) => {
     const baseContext = await createContext(req)
     
     try {

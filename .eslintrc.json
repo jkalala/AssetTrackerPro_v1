@@ -11,7 +11,8 @@
     "@next/next/no-html-link-for-pages": "warn",
     "react-hooks/exhaustive-deps": "warn",
     "@typescript-eslint/ban-ts-comment": "warn",
-    "prefer-const": "warn"
+    "prefer-const": "warn",
+    "@typescript-eslint/no-unused-expressions": ["warn", { "allowShortCircuit": true, "allowTernary": true }]
   },
   "ignorePatterns": [
     "node_modules/",

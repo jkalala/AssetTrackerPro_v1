@@ -87,7 +87,11 @@ export function PermissionGuard({
           permissionService.checkPermission(
             currentUserId,
             resourceId || 'default',
-            permission
+            {
+              permission_name: permission,
+              resource_id: resourceId || 'default',
+              context: { action: 'read' }
+            }
           )
         )
       )
@@ -120,7 +124,7 @@ export function PermissionGuard({
   }, [userContext, tenantId, userId, checkPermissions])
 
   if (isLoading) {
-    return loading || <div className="animate-pulse bg-gray-200 rounded h-4 w-16"></div>
+    return (loading as React.ReactElement) || <div className="animate-pulse bg-gray-200 rounded h-4 w-16"></div>
   }
 
   if (hasPermission === false) {

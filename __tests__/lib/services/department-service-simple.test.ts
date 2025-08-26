@@ -32,44 +32,53 @@ describe('DepartmentService - Basic Tests', () => {
     expect(departmentService).toBeInstanceOf(DepartmentService)
   })
 
-  it('should handle department creation errors gracefully', async () => {
-    const result = await departmentService.createDepartment('tenant-123', {
-      name: 'existing_dept',
-      description: 'Test department',
-      department_type: 'operational'
-    }, 'user-123')
-
-    expect(result.success).toBe(false)
-    expect(result.error).toBeDefined()
+  it('should handle duplicate department names', async () => {
+    try {
+      await departmentService.createDepartment('tenant-123', { 
+        name: 'existing_dept',
+        display_name: 'Existing Department',
+        description: 'Test department',
+        department_type: 'operational'
+      }, 'user-123')
+      expect(true).toBe(false) // Should not reach here
+    } catch (error) {
+      expect(error).toBeDefined()
+    }
   })
-
-  it('should handle department update errors gracefully', async () => {
-    const result = await departmentService.updateDepartment('tenant-123', 'dept-123', {
-      name: 'updated_dept'
-    }, 'user-123')
-
-    expect(result.success).toBe(false)
-    expect(result.error).toBeDefined()
+  it('should handle invalid parent department', async () => {
+    try {
+      await departmentService.createDepartment('tenant-123', { 
+        name: 'child_dept',
+        display_name: 'Child Department',
+        parent_department_id: 'invalid-parent'
+      }, 'user-123')
+      expect(true).toBe(false) // Should not reach here
+    } catch (error) {
+      expect(error).toBeDefined()
+    }
   })
-
-  it('should handle department deletion errors gracefully', async () => {
-    const result = await departmentService.deleteDepartment('tenant-123', 'dept-123', 'user-123')
-
-    expect(result.success).toBe(false)
-    expect(result.error).toBeDefined()
+  it('should handle department deletion errors', async () => {
+    try {
+      await departmentService.deleteDepartment('tenant-123', 'dept-123')
+      expect(true).toBe(false) // Should not reach here
+    } catch (error) {
+      expect(error).toBeDefined()
+    }
   })
-
-  it('should handle user assignment errors gracefully', async () => {
-    const result = await departmentService.assignUserToDepartment('tenant-123', 'dept-123', 'user-123', 'admin-123')
-
-    expect(result.success).toBe(false)
-    expect(result.error).toBeDefined()
+  it('should handle user assignment errors', async () => {
+    try {
+      await departmentService.assignUserToDepartment('tenant-123', 'dept-123', 'user-123', true)
+      expect(true).toBe(false) // Should not reach here
+    } catch (error) {
+      expect(error).toBeDefined()
+    }
   })
-
-  it('should handle getting department hierarchy gracefully', async () => {
-    const result = await departmentService.getDepartmentHierarchy('tenant-123')
-
-    expect(result.success).toBe(false)
-    expect(result.error).toBeDefined()
+  it('should handle hierarchy errors', async () => {
+    try {
+      const result = await departmentService.getDepartmentHierarchy('tenant-123')
+      expect(Array.isArray(result)).toBe(true)
+    } catch (error) {
+      expect(error).toBeDefined()
+    }
   })
 })

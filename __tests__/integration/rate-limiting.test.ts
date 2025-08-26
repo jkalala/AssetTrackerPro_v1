@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { GET, POST } from '@/app/api/test-rate-limit/route';
 import { withRateLimit } from '@/lib/with-rate-limit';
 
@@ -50,7 +50,7 @@ describe('Rate Limiting Integration', () => {
         }
       );
 
-      (withRateLimit as jest.MockedFunction<typeof withRateLimit>).mockResolvedValue(rateLimitResponse);
+      (withRateLimit as jest.MockedFunction<typeof withRateLimit>).mockResolvedValue(NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 }));
 
       const request = new NextRequest('http://localhost:3000/api/test-rate-limit');
       const response = await GET(request);

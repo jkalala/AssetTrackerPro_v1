@@ -1,0 +1,27 @@
+# Global code owners
+* @jkalala
+
+# API routes require backend team review
+/app/api/ @jkalala
+
+# Database migrations require DBA review
+/scripts/ @jkalala
+
+# Security-related files require security team review
+/lib/security/ @jkalala
+/lib/middleware/ @jkalala
+/components/auth/ @jkalala
+
+# CI/CD workflows require DevOps review
+/.github/workflows/ @jkalala
+
+# Configuration files require senior review
+/next.config.mjs @jkalala
+/package.json @jkalala
+/tsconfig.json @jkalala
+/.eslintrc.json @jkalala
+
+# RBAC system requires security review
+/lib/services/role-service.ts @jkalala
+/lib/services/permission-service.ts @jkalala
+/components/rbac/ @jkalala

@@ -1,0 +1,106 @@
+name: Branch Protection
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # Enforce conventional commits
+  conventional-commits:
+    name: Conventional Commits
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check conventional commits
+        uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: '.commitlintrc.json'
+
+  # Enforce PR requirements
+  pr-requirements:
+    name: PR Requirements Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR title
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+
+      - name: Check PR size
+        uses: noqcks/pull-request-size-limit-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          max_lines_changed: 1000
+
+  # Require approval from code owners
+  code-owners:
+    name: Code Owners Review
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: Check for required reviews
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            
+            const approvedReviews = reviews.filter(review => review.state === 'APPROVED');
+            
+            if (approvedReviews.length === 0) {
+              core.setFailed('This PR requires at least one approval from a code owner.');
+            }
+
+  # Check for breaking changes
+  breaking-changes:
+    name: Breaking Changes Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: '8'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for breaking changes
+        run: |
+          # Check if package.json major version changed
+          git diff origin/main HEAD -- package.json | grep -q '"version"' && echo "Version change detected"
+          
+          # Check for API breaking changes (simplified check)
+          if git diff origin/main HEAD --name-only | grep -q "app/api/"; then
+            echo "API changes detected - manual review required"
+          fi

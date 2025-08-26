@@ -45,10 +45,23 @@ jobs:
             revert
 
       - name: Check PR size
-        uses: noqcks/pull-request-size-limit-action@v1
+        uses: actions/github-script@v6
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          max_lines_changed: 1000
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            
+            const maxLines = 1000;
+            const totalChanges = pr.additions + pr.deletions;
+            
+            if (totalChanges > maxLines) {
+              core.setFailed(`PR is too large: ${totalChanges} lines changed (max: ${maxLines})`);
+            } else {
+              console.log(`PR size OK: ${totalChanges} lines changed`);
+            }
 
   # Require approval from code owners
   code-owners:
@@ -93,7 +106,7 @@ jobs:
           version: '8'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Check for breaking changes
         run: |

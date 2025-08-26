@@ -32,18 +32,14 @@ const customJestConfig = {
   coverageReporters: ['text', 'lcov', 'html'],
   coverageDirectory: 'coverage',
   testMatch: [
-    '**/__tests__/**/*.(test|spec).(js|jsx|ts|tsx)',
-    '**/*.(test|spec).(js|jsx|ts|tsx)',
-  ],
-  testTimeout: 10000,
-  testMatch: [
     '**/__tests__/basic-coverage.test.ts',
     '**/__tests__/simple.test.ts',
     '**/__tests__/components/basic-component.test.tsx',
     '**/__tests__/lib/services/service-imports.test.ts',
     '**/__tests__/lib/middleware/permission-enforcement.test.ts',
-    '**/__tests__/components/auth/mfa-setup-modal.test.ts'
+    '**/__tests__/components/auth/mfa-setup-modal.test.tsx'
   ],
+  testTimeout: 10000,
   testPathIgnorePatterns: [
     "<rootDir>/.next/", 
     "<rootDir>/node_modules/", 

@@ -104,23 +104,6 @@ export function DelegationManagement({
     loadGuestAccess()
   }, [tenantId, currentUserId, loadDelegations, loadGuestAccess])
 
-
-
-  const loadGuestAccess = async () => {
-    try {
-      const response = await fetch(`/api/guest-access?tenant_id=${tenantId}`)
-      const data = await response.json()
-      
-      if (data.error) {
-        throw new Error(data.error)
-      }
-      
-      setGuestAccess(data.guestAccess || [])
-    } catch (err: unknown) {
-      console.error('Error loading guest access:', err instanceof Error ? err.message : 'Unknown error')
-    }
-  }
-
   const _handleCreateDelegation = async (delegationData: Record<string, unknown>) => {
     try {
       const response = await fetch('/api/delegations', {

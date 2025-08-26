@@ -16,22 +16,22 @@ describe('Basic Component Tests', () => {
     render(<TestComponent title="Test Title" />)
     
     const element = screen.getByTestId('test-component')
-    expect(element).toBeInTheDocument()
-    expect(element).toHaveTextContent('Test Title')
+    expect(element).toBeDefined()
+    expect(element.textContent).toBe('Test Title')
   })
 
   it('should render with different props', () => {
     render(<TestComponent title="Different Title" />)
     
     const element = screen.getByTestId('test-component')
-    expect(element).toHaveTextContent('Different Title')
+    expect(element.textContent).toBe('Different Title')
   })
 
   it('should handle empty title', () => {
     render(<TestComponent title="" />)
     
     const element = screen.getByTestId('test-component')
-    expect(element).toBeInTheDocument()
-    expect(element).toHaveTextContent('')
+    expect(element).toBeDefined()
+    expect(element.textContent).toBe('')
   })
 })

@@ -61,8 +61,8 @@ export function DelegationManagement({
   const [activeTab, setActiveTab] = useState('delegations')
   
   // Dialog states
-  const [_showCreateDelegationDialog, _setShowCreateDelegationDialog] = useState(false)
-  const [_showCreateGuestDialog, _setShowCreateGuestDialog] = useState(false)
+  const [showCreateDelegationDialog, setShowCreateDelegationDialog] = useState(false)
+  const [showCreateGuestDialog, setShowCreateGuestDialog] = useState(false)
   const [showRevokeConfirm, setShowRevokeConfirm] = useState(false)
   const [selectedItem, setSelectedItem] = useState<PermissionDelegationWithProfiles | GuestAccessWithRole | null>(null)
 

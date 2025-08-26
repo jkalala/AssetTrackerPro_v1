@@ -34,7 +34,7 @@ export function PermissionGuard({
   onUnauthorized,
   tenantId,
   userId
-}: PermissionGuardProps): JSX.Element {
+}: PermissionGuardProps): React.ReactElement {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [userContext, setUserContext] = useState<{ tenantId: string; userId: string } | null>(null)

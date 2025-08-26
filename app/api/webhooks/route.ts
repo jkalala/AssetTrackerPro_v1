@@ -1,38 +1,107 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+/**
+ * Webhooks API
+ * REST endpoints for managing webhooks
+ */
 
-export async function POST(request: Request) {
-  const supabase = await createClient();
-  const { url, events, secret } = await request.json();
-  if (!url || !events || !Array.isArray(events) || events.length === 0) {
-    return NextResponse.json({ error: 'Missing url or events' }, { status: 400 });
-  }
-  // Get current user and tenant
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: profile } = await supabase.from('profiles').select('tenant_id').eq('id', user.id).single();
-  if (!profile?.tenant_id) return NextResponse.json({ error: 'No tenant' }, { status: 400 });
-  // Insert webhook
-  const { error } = await supabase.from('webhooks').insert({
-    tenant_id: profile.tenant_id,
-    url,
-    events,
-    secret,
-    status: 'active',
-  });
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true });
+import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { WebhookService } from '../../../lib/services/webhook-service'
+import { withAuth } from '../../../lib/middleware/auth'
+import { withRateLimit } from '../../../lib/middleware/rate-limit'
+
+export async function GET(request: NextRequest) {
+  return withAuth(
+    withRateLimit(async (req: NextRequest, context: any) => {
+      try {
+        const supabase = createServerClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          {
+            cookies: {
+              get(name: string) {
+                return req.cookies.get(name)?.value
+              },
+              set() {},
+              remove() {},
+            },
+          }
+        )
+
+        const webhookService = new WebhookService(supabase)
+        const webhooks = await webhookService.getWebhooks(context.user.tenantId)
+
+        return NextResponse.json({
+          success: true,
+          data: webhooks,
+        })
+      } catch (error) {
+        console.error('Error fetching webhooks:', error)
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Failed to fetch webhooks',
+          },
+          { status: 500 }
+        )
+      }
+    })
+  )(request)
 }
 
-export async function GET(request: Request) {
-  const supabase = await createClient();
-  // Get current user and tenant
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: profile } = await supabase.from('profiles').select('tenant_id').eq('id', user.id).single();
-  if (!profile?.tenant_id) return NextResponse.json({ error: 'No tenant' }, { status: 400 });
-  // List webhooks
-  const { data, error } = await supabase.from('webhooks').select('*').eq('tenant_id', profile.tenant_id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ webhooks: data });
-} 
+export async function POST(request: NextRequest) {
+  return withAuth(
+    withRateLimit(async (req: NextRequest, context: any) => {
+      try {
+        const body = await req.json()
+        const { name, url, events, secret, retryPolicy } = body
+
+        if (!name || !url || !events || !Array.isArray(events)) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: 'Missing required fields: name, url, events (array)',
+            },
+            { status: 400 }
+          )
+        }
+
+        const supabase = createServerClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          {
+            cookies: {
+              get(name: string) {
+                return req.cookies.get(name)?.value
+              },
+              set() {},
+              remove() {},
+            },
+          }
+        )
+
+        const webhookService = new WebhookService(supabase)
+        const webhook = await webhookService.createWebhook(context.user.tenantId, {
+          name,
+          url,
+          events,
+          secret,
+          retryPolicy,
+        })
+
+        return NextResponse.json({
+          success: true,
+          data: webhook,
+        })
+      } catch (error) {
+        console.error('Error creating webhook:', error)
+        return NextResponse.json(
+          {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to create webhook',
+          },
+          { status: 500 }
+        )
+      }
+    })
+  )(request)
+}

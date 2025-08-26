@@ -1,37 +1,105 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+/**
+ * Enterprise Integrations API
+ * REST endpoints for managing enterprise system integrations
+ */
 
-export async function POST(request: Request) {
-  const supabase = await createClient();
-  const { type, webhook_url } = await request.json();
-  if (!type || !webhook_url || !['slack', 'teams', 'custom'].includes(type)) {
-    return NextResponse.json({ error: 'Missing or invalid type/webhook_url' }, { status: 400 });
-  }
-  // Get current user and tenant
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: profile } = await supabase.from('profiles').select('tenant_id').eq('id', user.id).single();
-  if (!profile?.tenant_id) return NextResponse.json({ error: 'No tenant' }, { status: 400 });
-  // Insert integration
-  const { error } = await supabase.from('integrations').insert({
-    tenant_id: profile.tenant_id,
-    type,
-    webhook_url,
-    status: 'active',
-  });
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true });
+import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { IntegrationService } from '../../../lib/services/integration-service'
+import { withAuth } from '../../../lib/middleware/auth'
+import { withRateLimit } from '../../../lib/middleware/rate-limit'
+
+export async function GET(request: NextRequest) {
+  return withAuth(
+    withRateLimit(async (req: NextRequest, context: any) => {
+      try {
+        const supabase = createServerClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          {
+            cookies: {
+              get(name: string) {
+                return req.cookies.get(name)?.value
+              },
+              set() {},
+              remove() {},
+            },
+          }
+        )
+
+        const integrationService = new IntegrationService(supabase)
+        const integrations = await integrationService.getIntegrations(context.user.tenantId)
+
+        return NextResponse.json({
+          success: true,
+          data: integrations,
+        })
+      } catch (error) {
+        console.error('Error fetching integrations:', error)
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Failed to fetch integrations',
+          },
+          { status: 500 }
+        )
+      }
+    })
+  )(request)
 }
 
-export async function GET(_request: Request) {
-  const supabase = await createClient();
-  // Get current user and tenant
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { data: profile } = await supabase.from('profiles').select('tenant_id').eq('id', user.id).single();
-  if (!profile?.tenant_id) return NextResponse.json({ error: 'No tenant' }, { status: 400 });
-  // List integrations
-  const { data, error } = await supabase.from('integrations').select('*').eq('tenant_id', profile.tenant_id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ integrations: data });
-} 
+export async function POST(request: NextRequest) {
+  return withAuth(
+    withRateLimit(async (req: NextRequest, context: any) => {
+      try {
+        const body = await req.json()
+        const { name, type, configuration } = body
+
+        if (!name || !type || !configuration) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: 'Missing required fields: name, type, configuration',
+            },
+            { status: 400 }
+          )
+        }
+
+        const supabase = createServerClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          {
+            cookies: {
+              get(name: string) {
+                return req.cookies.get(name)?.value
+              },
+              set() {},
+              remove() {},
+            },
+          }
+        )
+
+        const integrationService = new IntegrationService(supabase)
+        const integration = await integrationService.createIntegration(context.user.tenantId, {
+          name,
+          type,
+          configuration,
+        })
+
+        return NextResponse.json({
+          success: true,
+          data: integration,
+        })
+      } catch (error) {
+        console.error('Error creating integration:', error)
+        return NextResponse.json(
+          {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to create integration',
+          },
+          { status: 500 }
+        )
+      }
+    })
+  )(request)
+}

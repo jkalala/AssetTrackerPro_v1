@@ -121,7 +121,7 @@ export function RoleManagementDashboard({
     }
   }
 
-  const handleCreateRole = async (roleData: Record<string, unknown>) => {
+  const handleCreateRole = async (roleData: CreateRoleRequest) => {
     try {
       const response = await fetch('/api/roles', {
         method: 'POST',

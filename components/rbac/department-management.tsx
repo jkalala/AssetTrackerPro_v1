@@ -57,10 +57,10 @@ export function DepartmentManagement({
   const [viewMode, setViewMode] = useState<'list' | 'hierarchy'>('list')
   
   // Dialog states
-  const [_showCreateDialog, _setShowCreateDialog] = useState(false)
-  const [_showEditDialog, _setShowEditDialog] = useState(false)
+  const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [showEditDialog, setShowEditDialog] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [_showAssignUsersDialog, _setShowAssignUsersDialog] = useState(false)
+  const [showAssignUsersDialog, setShowAssignUsersDialog] = useState(false)
 
   const loadDepartments = async () => {
     try {

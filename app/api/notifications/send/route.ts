@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   if (error || !data?.token) return NextResponse.json({ error: "No push token for user" }, { status: 404 });
 
   // Dynamically import firebase-admin
-  // @ts-expect-error: firebase-admin types are only available in Node.js
+
   const admin = await import("firebase-admin");
   if (!admin.apps.length) {
     const serviceAccount = JSON.parse(readFileSync(path.resolve(process.cwd(), "serviceAccountKey.json"), "utf8"));

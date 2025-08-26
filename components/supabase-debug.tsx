@@ -26,10 +26,13 @@ export function SupabaseDebug() {
   const runDiagnostics = async () => {
     setLoading(true)
     try {
-      const { createClient, getConfig, checkSupabaseConnection } = await import("@/lib/supabase/client")
+      const { createClient, checkSupabaseConnection } = await import("@/lib/supabase/client")
       const { ENV, validateEnvironment } = await import("@/lib/env")
 
-      const config = getConfig()
+      const config = {
+        url: ENV.SUPABASE_URL,
+        anonKey: ENV.SUPABASE_ANON_KEY
+      }
       const validation = validateEnvironment()
 
       let connectionTest = { success: false, error: "Not tested" }
@@ -38,7 +41,11 @@ export function SupabaseDebug() {
       try {
         const client = createClient()
         clientCreated = true
-        connectionTest = await checkSupabaseConnection()
+        const result = await checkSupabaseConnection()
+        connectionTest = {
+          success: result.connected,
+          error: result.connected ? undefined : result.error
+        }
       } catch (error) {
         connectionTest = {
           success: false,

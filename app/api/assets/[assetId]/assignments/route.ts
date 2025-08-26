@@ -17,7 +17,7 @@ export async function GET(request: Request, { params }: { params: { assetId: str
       return NextResponse.json({ error: 'Failed to fetch assignment history: ' + error.message }, { status: 500 })
     }
     return NextResponse.json({ success: true, assignments: data })
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 } 

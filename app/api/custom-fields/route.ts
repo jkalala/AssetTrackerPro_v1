@@ -4,7 +4,8 @@ import { isAuthorized } from '@/lib/rbac/utils'
 import { Permission } from '@/lib/rbac/types'
 
 // Helper to get tenant_id from user profile
-async function getTenantId(supabase: ReturnType<typeof createClient>, userId: string): Promise<string | null> {
+async function getTenantId(userId: string): Promise<string | null> {
+  const supabase = await createClient()
   const { data, error } = await supabase
     .from("profiles")
     .select("tenant_id")
@@ -21,7 +22,7 @@ export async function GET(_req: NextRequest) {
     error: userError,
   } = await supabase.auth.getUser()
   if (userError || !user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  const tenant_id = await getTenantId(supabase, user.id)
+  const tenant_id = await getTenantId(user.id)
   if (!tenant_id) return NextResponse.json({ error: "No tenant" }, { status: 403 })
   const { data, error } = await supabase
     .from("asset_field_definitions")
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
   if (!authorized) {
     return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
   }
-  const tenant_id = await getTenantId(supabase, user.id)
+  const tenant_id = await getTenantId(user.id)
   if (!tenant_id) return NextResponse.json({ error: "No tenant" }, { status: 403 })
   const { name, label, type, options, required, validation } = await req.json()
   const { data, error } = await supabase
@@ -68,7 +69,7 @@ export async function PUT(req: NextRequest) {
   if (!authorized) {
     return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
   }
-  const tenant_id = await getTenantId(supabase, user.id)
+  const tenant_id = await getTenantId(user.id)
   if (!tenant_id) return NextResponse.json({ error: "No tenant" }, { status: 403 })
   const { id, name, label, type, options, required, validation } = await req.json()
   const { data, error } = await supabase
@@ -94,7 +95,7 @@ export async function DELETE(req: NextRequest) {
   if (!authorized) {
     return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
   }
-  const tenant_id = await getTenantId(supabase, user.id)
+  const tenant_id = await getTenantId(user.id)
   if (!tenant_id) return NextResponse.json({ error: "No tenant" }, { status: 403 })
   const { id } = await req.json()
   const { error } = await supabase
@@ -104,4 +105,4 @@ export async function DELETE(req: NextRequest) {
     .eq("tenant_id", tenant_id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ success: true })
-} 
+}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createClient as createClientServer } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { isAuthorized } from '@/lib/rbac/utils'

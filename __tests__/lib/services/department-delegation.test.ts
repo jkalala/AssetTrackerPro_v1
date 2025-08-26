@@ -34,6 +34,8 @@ describe('DepartmentService', () => {
       delete: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
       neq: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      in: jest.fn().mockReturnThis(),
       single: jest.fn().mockReturnThis(),
       order: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),

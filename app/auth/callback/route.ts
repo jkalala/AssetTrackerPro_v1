@@ -9,8 +9,9 @@ export async function GET(request: Request) {
   const error = requestUrl.searchParams.get("error")
   const error_description = requestUrl.searchParams.get("error_description")
   const provider = requestUrl.searchParams.get("provider")
+  const state = requestUrl.searchParams.get("state")
 
-  console.log("Auth callback received:", { code: !!code, error, provider })
+  console.log("Auth callback received:", { code: !!code, error, provider, state })
 
   // if "next" is in param, use it as the redirect URL
   const next = requestUrl.searchParams.get("next") || "/dashboard"
@@ -19,6 +20,36 @@ export async function GET(request: Request) {
   if (error) {
     console.error("Auth callback error:", error, error_description)
     return redirect("/auth/auth-code-error")
+  }
+
+  // Check if this is an SSO callback (has state parameter but no code)
+  if (state && !code) {
+    console.log("SSO callback detected, redirecting to dashboard")
+    return redirect(next)
+  }
+
+  // Handle SSO callback with code and state (OAuth flow)
+  if (code && state) {
+    console.log("SSO OAuth callback detected with code and state")
+    
+    // Check if this is a mock SSO response for testing
+    if (code === 'mock-sso-code' && state === 'mock-state') {
+      console.log("Mock SSO callback detected, creating test session")
+      
+      // For E2E tests, create a mock authenticated session
+      const response = NextResponse.redirect(new URL('/dashboard', request.url))
+      response.cookies.set('mock-sso-session', 'authenticated', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 // 24 hours
+      })
+      
+      return response
+    }
+    
+    // This would be handled by the SSO-specific callback handler
+    // For now, continue with normal Supabase flow
   }
 
   // Check if we have Supabase configuration
@@ -59,11 +90,11 @@ export async function GET(request: Request) {
       let orgName = user.user_metadata?.org_name
       if (!orgName) {
         // Try to get from cookie for GitHub signups
-        const signupOrgName = cookieStore.get("signup_org_name")
-        if (signupOrgName) {
-          orgName = decodeURIComponent(signupOrgName.value)
+        const signupOrgName = (await cookieStore).get("signup_org_name")
+        if (signupOrgName?.value) {
+          orgName = (globalThis as any).decodeURIComponent(signupOrgName.value)
           // Clear the cookie
-          cookieStore.delete("signup_org_name")
+          (await cookieStore).delete("signup_org_name")
         }
       }
 

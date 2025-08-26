@@ -320,7 +320,19 @@ export default function PreviewPage() {
                 <CardDescription>Generate QR codes for individual assets with customizable options</CardDescription>
               </CardHeader>
               <CardContent>
-                <QRGenerator assets={mockAssets} />
+                <QRGenerator 
+                  assets={mockAssets} 
+                  onQRGenerated={() => {}}
+                  settings={{
+                    autoGenerate: false,
+                    includeDetails: true,
+                    trackAnalytics: true,
+                    mobileNotifications: false,
+                    defaultSize: '256',
+                    errorCorrection: 'M',
+                    defaultFormat: 'PNG'
+                  }}
+                />
               </CardContent>
             </Card>
           </TabsContent>

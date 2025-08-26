@@ -17,11 +17,7 @@ import {
   Zap, 
   RefreshCw,
   AlertCircle,
-  FileText,
-  DollarSign,
-  Package,
-  MapPin,
-  Clock
+  FileText
 } from "lucide-react"
 import { useAnalytics } from "@/hooks/use-analytics"
 import { useAnalyticsExport } from "@/hooks/use-analytics-export"
@@ -69,7 +65,7 @@ export default function AnalyticsPage() {
           variant: "destructive",
         })
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Export Failed",
         description: "An unexpected error occurred",

@@ -50,6 +50,7 @@ import { Progress } from "@/components/ui/progress"
 import SignOutButton from "@/components/auth/sign-out-button"
 import NotificationsBell from "@/components/notifications-bell"
 import { useBranding } from "@/components/branding-provider"
+import { useTenant } from "@/components/providers/tenant-provider"
 
 interface AssetStats {
   total: number
@@ -136,6 +137,7 @@ function GeofenceAlertsPanel() {
 
 export default function DashboardContent() {
   const { user, loading } = useAuth()
+  const { tenant, loading: tenantLoading } = useTenant()
   const router = useRouter()
   const [profile, setProfile] = useState<any>(null)
   const [profileLoading, setProfileLoading] = useState(true)
@@ -144,7 +146,7 @@ export default function DashboardContent() {
   const [activeTab, setActiveTab] = useState("overview")
   const [stats, setStats] = useState<AssetStats | null>(null)
   const { toast } = useToast()
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0)
 
   // Ensure component is mounted before accessing browser APIs
   useEffect(() => {
@@ -268,7 +270,7 @@ export default function DashboardContent() {
     )
   }
 
-  if (loading || profileLoading) {
+  if (loading || profileLoading || tenantLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -425,6 +427,14 @@ export default function DashboardContent() {
             </div>
             <div className="flex items-center space-x-4">
               <NotificationsBell />
+              {tenant && (
+                <div className="flex items-center space-x-2">
+                  <Building2 className="h-4 w-4 text-gray-500" />
+                  <span className="text-sm text-gray-600" data-testid="tenant-name">
+                    {tenant.name}
+                  </span>
+                </div>
+              )}
               <span className="text-sm text-gray-600">Welcome, {profile.full_name || user.email}</span>
               <Link href="/settings/profile" className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
                 <User className="h-4 w-4" />

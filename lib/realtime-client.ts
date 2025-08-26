@@ -26,6 +26,11 @@ class RealtimeAnalytics {
   private eventListeners: Map<string, Set<(event: RealtimeEvent) => void>> = new Map()
   private analyticsListeners: Set<(event: AnalyticsEvent) => void> = new Set()
 
+  // Public method to get the supabase client
+  getClient() {
+    return this.supabase
+  }
+
   // Subscribe to real-time table changes
   subscribeToTable(table: string, callback: (event: RealtimeEvent) => void, filter?: { column: string; value: any }) {
     const channelName = filter ? `${table}_${filter.column}_${filter.value}` : table

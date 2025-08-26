@@ -2,17 +2,16 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
-import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import ErrorBoundary from "@/components/error-boundary";
 import { SessionSync } from "@/components/session-sync";
 import { BrandingProvider, useBranding } from "@/components/branding-provider";
+import { RateLimitProvider } from "@/components/providers/rate-limit-provider";
+import { TenantProvider } from "@/components/providers/tenant-provider";
 import HelpdeskWidget from "@/components/helpdesk-widget";
-import "@/app/globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
+import UserMenu from "@/components/auth/user-menu";
 
 function BrandingStyle() {
   const branding = useBranding();
@@ -42,6 +41,14 @@ function LanguageSwitcher() {
   );
 }
 
+function UserMenuWrapper() {
+  return (
+    <div className="ml-4">
+      <UserMenu />
+    </div>
+  );
+}
+
 export default function ClientLayoutShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window !== "undefined" && "serviceWorker" in navigator) {
@@ -52,16 +59,21 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
     <ErrorBoundary>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <AuthProvider>
-          <BrandingProvider>
-            <SessionSync />
-            <BrandingStyle />
-            <header className="flex items-center justify-end p-2">
-              <LanguageSwitcher />
-            </header>
-            {children}
-            <Toaster />
-            <HelpdeskWidget />
-          </BrandingProvider>
+          <TenantProvider>
+            <BrandingProvider>
+              <RateLimitProvider>
+                <SessionSync />
+                <BrandingStyle />
+                <header className="flex items-center justify-end p-2">
+                  <LanguageSwitcher />
+                  <UserMenuWrapper />
+                </header>
+                {children}
+                <Toaster />
+                <HelpdeskWidget />
+              </RateLimitProvider>
+            </BrandingProvider>
+          </TenantProvider>
         </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>

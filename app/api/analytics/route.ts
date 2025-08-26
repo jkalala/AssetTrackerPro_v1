@@ -1,21 +1,20 @@
-import { createClient } from '@/lib/supabase/server'
-import { NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+import { 
+  withTenantIsolation, 
+  TenantIsolationManager,
+  createTenantResponse 
+} from "@/lib/middleware/tenant-isolation";
+import { TenantContext } from "@/lib/types/database";
 
 export const runtime = 'nodejs'
 
-export async function GET() {
-  const supabase = await createClient()
-  
+export const GET = withTenantIsolation(async (context: TenantContext, req: NextRequest) => {
   try {
-    // Get user for authentication
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser()
+    // Validate user has analytics access
+    await TenantIsolationManager.validateRole(['owner', 'admin', 'manager']);
     
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    // Create tenant-scoped query
+    const query = await TenantIsolationManager.createTenantQuery("assets", context);
 
     // Get current date and calculate date ranges
     const now = new Date()
@@ -23,7 +22,7 @@ export async function GET() {
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
     const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
 
-    // Fetch comprehensive analytics data
+    // Fetch comprehensive analytics data with tenant isolation
     const [
       totalAssets,
       activeAssets,
@@ -38,46 +37,47 @@ export async function GET() {
       locationStats,
       valueStats
     ] = await Promise.all([
-      // Total assets
-      supabase.from('assets').select('id', { count: 'exact' }),
+      // Total assets (tenant-scoped)
+      query.select('id', { count: 'exact' }),
       
-      // Active assets
-      supabase.from('assets').select('id', { count: 'exact' }).eq('status', 'active'),
+      // Active assets (tenant-scoped)
+      query.select('id', { count: 'exact' }).eq('status', 'active'),
       
-      // Assets created today
-      supabase.from('assets').select('id', { count: 'exact' })
+      // Assets created today (tenant-scoped)
+      query.select('id', { count: 'exact' })
         .gte('created_at', today.toISOString()),
       
-      // Assets created this week
-      supabase.from('assets').select('id', { count: 'exact' })
+      // Assets created this week (tenant-scoped)
+      query.select('id', { count: 'exact' })
         .gte('created_at', weekAgo.toISOString()),
       
-      // Assets created this month
-      supabase.from('assets').select('id', { count: 'exact' })
+      // Assets created this month (tenant-scoped)
+      query.select('id', { count: 'exact' })
         .gte('created_at', monthAgo.toISOString()),
       
-      // Assets by category
-      supabase.from('assets').select('category, id').not('category', 'is', null),
+      // Assets by category (tenant-scoped)
+      query.select('category, id').not('category', 'is', null),
       
-      // Assets by status
-      supabase.from('assets').select('status, id'),
+      // Assets by status (tenant-scoped)
+      query.select('status, id'),
       
-      // Recent activity (last 50 activities)
-      supabase.from('assets').select('id, name, created_at, updated_at, status')
+      // Recent activity (last 50 activities, tenant-scoped)
+      query.select('id, name, created_at, updated_at, status')
         .order('updated_at', { ascending: false })
         .limit(50),
       
-      // QR code statistics
-      supabase.from('assets').select('id, qr_code').not('qr_code', 'is', null),
+      // QR code statistics (tenant-scoped)
+      query.select('id, qr_code').not('qr_code', 'is', null),
       
-      // User activity (profiles)
-      supabase.from('profiles').select('id, full_name, created_at, last_sign_in_at'),
+      // User activity (tenant-scoped profiles)
+      (await TenantIsolationManager.createTenantQuery("profiles", context))
+        .select('id, full_name, created_at, last_sign_in_at'),
       
-      // Location statistics
-      supabase.from('assets').select('location').not('location', 'is', null),
+      // Location statistics (tenant-scoped)
+      query.select('location').not('location', 'is', null),
       
-      // Value statistics
-      supabase.from('assets').select('purchase_value').not('purchase_value', 'is', null)
+      // Value statistics (tenant-scoped)
+      query.select('purchase_value').not('purchase_value', 'is', null)
     ])
 
     // Process category data
@@ -164,12 +164,22 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({ analytics })
+    // Log analytics access
+    await TenantIsolationManager.logSecurityEvent(
+      'analytics_accessed',
+      { 
+        totalAssets: totalAssets.count || 0,
+        activeAssets: activeAssets.count || 0
+      },
+      req
+    );
+
+    return createTenantResponse({ analytics }, context);
   } catch (error) {
     console.error('Analytics API error:', error)
-    return NextResponse.json({ error: 'Failed to fetch analytics data' }, { status: 500 })
+    return createTenantResponse({ error: 'Failed to fetch analytics data' }, context, 500);
   }
-}
+});
 
 function generateTimeSeriesData(weeklyAssets: number) {
   const data = []

@@ -87,7 +87,7 @@ export default function CategoriesPage() {
       children: buildTree(list, c.id)
     }))
 
-  const renderTree = (nodes: any[], level = 0): JSX.Element[] => (
+  const renderTree = (nodes: any[], level = 0): React.ReactElement[] => (
     nodes.map((node: any) => (
       <div key={node.id} style={{ marginLeft: level * 24 }} className="flex items-center py-1">
         {node.children.length > 0 ? (

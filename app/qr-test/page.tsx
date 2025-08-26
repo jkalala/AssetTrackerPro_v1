@@ -128,7 +128,19 @@ export default function QRTestPage() {
           {/* QR Generator Testing */}
           <div>
             <h2 className="text-xl font-semibold mb-4">QR Code Generator</h2>
-            <QRGenerator assets={mockAssets} />
+            <QRGenerator 
+              assets={mockAssets} 
+              onQRGenerated={() => {}}
+              settings={{
+                autoGenerate: false,
+                includeDetails: true,
+                trackAnalytics: true,
+                mobileNotifications: false,
+                defaultSize: '256',
+                errorCorrection: 'M',
+                defaultFormat: 'PNG'
+              }}
+            />
           </div>
 
           {/* QR Scanner Testing */}

@@ -158,12 +158,12 @@ export function useRealtimeAssetStatus(assetId?: string) {
     })
 
     // Load initial status
-    realtimeAnalytics.supabase
+    realtimeAnalytics.getClient()
       .from("assets")
       .select("*")
       .eq("asset_id", assetId)
       .single()
-      .then(({ data }) => {
+      .then(({ data }: { data: any }) => {
         setAssetStatus(data)
         setLoading(false)
       })

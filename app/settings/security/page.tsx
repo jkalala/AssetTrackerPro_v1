@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/components/auth/auth-provider";
+import MFASetupModal from "@/components/auth/mfa-setup-modal";
 
 export default function SecuritySettingsPage() {
   const { user, signOut } = useAuth();
@@ -13,6 +14,8 @@ export default function SecuritySettingsPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [showMFAModal, setShowMFAModal] = useState(false);
+  const [mfaEnabled, setMfaEnabled] = useState(false);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +53,27 @@ export default function SecuritySettingsPage() {
       setLoading(false);
     }
   };
+
+  const checkMFAStatus = async () => {
+    try {
+      const response = await fetch('/api/auth/mfa/status');
+      const data = await response.json();
+      setMfaEnabled(data.enabled || false);
+    } catch (error) {
+      console.error('Failed to check MFA status:', error);
+    }
+  };
+
+  const handleMFAComplete = () => {
+    setMfaEnabled(true);
+    setSuccess("Two-factor authentication has been enabled successfully!");
+  };
+
+  useEffect(() => {
+    if (user) {
+      checkMFAStatus();
+    }
+  }, [user]);
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-8">
@@ -91,7 +115,29 @@ export default function SecuritySettingsPage() {
           <CardTitle>Two-Factor Authentication (2FA)</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-gray-600">2FA setup and management coming soon.</div>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">
+                  Add an extra layer of security to your account
+                </p>
+                <div className="mt-2">
+                  <span className="text-sm font-medium">Status: </span>
+                  <span 
+                    className={`text-sm ${mfaEnabled ? 'text-green-600' : 'text-gray-500'}`}
+                    data-testid="mfa-status"
+                  >
+                    {mfaEnabled ? 'Enabled' : 'Disabled'}
+                  </span>
+                </div>
+              </div>
+              {!mfaEnabled && (
+                <Button onClick={() => setShowMFAModal(true)}>
+                  Enable Two-Factor Authentication
+                </Button>
+              )}
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -111,6 +157,13 @@ export default function SecuritySettingsPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* MFA Setup Modal */}
+      <MFASetupModal
+        isOpen={showMFAModal}
+        onClose={() => setShowMFAModal(false)}
+        onComplete={handleMFAComplete}
+      />
     </div>
   );
 } 

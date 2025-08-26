@@ -1,10 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
+interface AuditLog {
+  id: string
+  action: string
+  user_id: string
+  entity: string
+  entity_id: string
+  created_at: string
+  timestamp: string
+  details?: Record<string, any>
+}
+
 export default function ActivityFeedPage() {
-  const [logs, setLogs] = useState<any[]>([])
+  const [logs, setLogs] = useState<AuditLog[]>([])
   useEffect(() => {
     fetch("/api/audit-logs")
       .then(res => res.json())

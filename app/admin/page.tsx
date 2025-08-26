@@ -605,7 +605,8 @@ export default function AdminPanelPage() {
             depreciation_method: asset.depreciation_method || "straight_line",
             depreciation_period_years: Number(asset.depreciation_period_years),
             salvage_value: Number(asset.salvage_value) || 0,
-          }, i),
+            current_date: date.toISOString(),
+          }),
         })
       }
       return data

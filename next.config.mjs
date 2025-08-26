@@ -1,23 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    clientTraceMetadata: ['traceparent', 'tracestate'],
-  },
+  // Basic configuration for development
   images: {
     unoptimized: true,
   },
-  // Ensure static export works with Amplify
-  trailingSlash: true,
-  // Handle environment variables
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-  },
-  // Ignore TypeScript errors during build for deployment
+  
+  // Development optimizations
   typescript: {
     ignoreBuildErrors: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  
+  // Webpack configuration to suppress warnings
+  webpack: (config, { dev, isServer }) => {
+    // Suppress warnings that don't affect functionality
+    config.ignoreWarnings = [
+      /Critical dependency/,
+      /require function is used in a way/,
+    ]
+    
+    return config
   },
 };
 

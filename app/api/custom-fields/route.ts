@@ -4,7 +4,7 @@ import { isAuthorized } from '@/lib/rbac/utils'
 import { Permission } from '@/lib/rbac/types'
 
 // Helper to get tenant_id from user profile
-async function getTenantId(supabase: any, userId: string): Promise<string | null> {
+async function getTenantId(supabase: ReturnType<typeof createClient>, userId: string): Promise<string | null> {
   const { data, error } = await supabase
     .from("profiles")
     .select("tenant_id")
@@ -14,7 +14,7 @@ async function getTenantId(supabase: any, userId: string): Promise<string | null
   return data.tenant_id
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   const supabase = await createClient()
   const {
     data: { user },

@@ -48,6 +48,13 @@ describe('RoleService', () => {
         description: 'A test role',
         permission_names: ['read:asset', 'create:asset']
       }
+
+      // Mock successful responses
+      mockSupabase.single.mockResolvedValueOnce({ data: null, error: null })
+      mockSupabase.single.mockResolvedValueOnce({ 
+        data: { id: 'role-123', ...roleData, tenant_id: tenantId }, 
+        error: null 
+      })
       const createdBy = 'user-123'
 
       // Mock existing role check (no existing role)

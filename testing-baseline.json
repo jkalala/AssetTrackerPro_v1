@@ -1,0 +1,46 @@
+{
+  "timestamp": "2025-08-27T09:06:58.949Z",
+  "testResults": {
+    "unit": {
+      "passed": 0,
+      "failed": 0,
+      "total": 0,
+      "duration": 0
+    },
+    "integration": {
+      "passed": 0,
+      "failed": 0,
+      "total": 0,
+      "duration": 0
+    },
+    "e2e": {
+      "passed": 0,
+      "failed": 0,
+      "total": 0,
+      "duration": 0
+    },
+    "overall": {
+      "success": true,
+      "coverage": 0
+    }
+  },
+  "buildResults": {
+    "success": false,
+    "duration": 52241,
+    "bundleSize": 0,
+    "errors": [
+      "Command failed: npm run build\n<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (128kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)\n<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (108kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)\nFailed to compile.\n\n./components/reporting/report-builder.tsx\nModule not found: Can't resolve '@hello-pangea/dnd'\n\nhttps://nextjs.org/docs/messages/module-not-found\n\nImport trace for requested module:\n./app/analytics/reports/reports-client.tsx\n\n./lib/supabase/server.ts\nError:   \u001b[31mx\u001b[0m You're importing a component that needs \"next/headers\". That only works in a Server Component which is not supported in the pages/ directory. Read more: https://nextjs.org/docs/app/building-your-application/rendering/server-components\n  \u001b[31m|\u001b[0m\n\n   ,-[\u001b[36;1;4mC:\\Users\\joaqu\\Desktop\\AssetTrackerPro_v1\\lib\\supabase\\server.ts\u001b[0m:2:1]\n \u001b[2m1\u001b[0m | import { createServerClient } from \"@supabase/ssr\"\n \u001b[2m2\u001b[0m | import { cookies } from \"next/headers\"\n   : \u001b[35;1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\u001b[0m\n \u001b[2m3\u001b[0m | import { ENV } from \"@/lib/env\"\n \u001b[2m4\u001b[0m | \n \u001b[2m4\u001b[0m | export async function createClient() {\r\n   `----\n\nImport trace for requested module:\n./lib/supabase/server.ts\n./lib/services/dashboard-service.ts\n./components/analytics/dashboard-list.tsx\n\n\n> Build failed because of webpack errors\n"
+    ],
+    "warnings": []
+  },
+  "performanceMetrics": {
+    "nodeModulesSize": 8212456460,
+    "sourceCodeSize": 2895071,
+    "typeScriptCompileTime": 10939
+  },
+  "lintResults": {
+    "totalWarnings": 1071,
+    "totalErrors": 1,
+    "success": false
+  }
+}

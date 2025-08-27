@@ -17,7 +17,7 @@
 
 # Configuration files require senior review
 /next.config.mjs @jkalala
-# /package.json @jkalala  # Temporarily disabled for hotfix
+/package.json @jkalala
 /tsconfig.json @jkalala
 /.eslintrc.json @jkalala
 

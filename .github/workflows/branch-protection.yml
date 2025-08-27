@@ -63,11 +63,11 @@ jobs:
               console.log(`PR size OK: ${totalChanges} lines changed`);
             }
 
-  # Require approval from code owners (temporarily disabled for hotfix)
+  # Require approval from code owners
   code-owners:
     name: Code Owners Review
     runs-on: ubuntu-latest
-    if: false  # Temporarily disabled for hotfix PR
+    if: github.event.pull_request.draft == false
     steps:
       - name: Check for required reviews
         uses: actions/github-script@v6

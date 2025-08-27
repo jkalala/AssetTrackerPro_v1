@@ -11,7 +11,7 @@ import { withRateLimit } from '../../../lib/middleware/rate-limit'
 
 export async function GET(request: NextRequest) {
   return withAuth(
-    withRateLimit(async (req: NextRequest, context: any) => {
+    withRateLimit(async (req: NextRequest, context?: any) => {
       try {
         const supabase = createServerClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   return withAuth(
-    withRateLimit(async (req: NextRequest, context: any) => {
+    withRateLimit(async (req: NextRequest, context?: any) => {
       try {
         const body = await req.json()
         const { name, url, events, secret, retryPolicy } = body

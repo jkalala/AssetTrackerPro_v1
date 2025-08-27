@@ -57,7 +57,7 @@ export function createRateLimitedHandler(
   },
   options?: ApiRateLimitOptions
 ) {
-  const rateLimitedHandlers: any = {};
+  const rateLimitedHandlers: Record<string, unknown> = {};
 
   for (const [method, handler] of Object.entries(handlers)) {
     if (handler) {

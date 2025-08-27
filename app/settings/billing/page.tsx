@@ -229,7 +229,7 @@ export default function BillingPage() {
             <div className="grid md:grid-cols-3 gap-6">
               <div>
                 <h3 className="font-medium text-lg mb-2">
-                  {tenant?.plan ? tenant.plan.charAt(0).toUpperCase() + tenant.plan.slice(1) : 'Free'} Plan
+                  {tenant?.plan ? tenant?.plan.charAt(0).toUpperCase() + tenant?.plan.slice(1) : 'Free'} Plan
                 </h3>
                 <p className="text-3xl font-bold">
                   ${planPrices[tenant?.plan as keyof typeof planPrices]}/mo
@@ -496,8 +496,8 @@ export default function BillingPage() {
                     </div>
                     <div className="text-right">
                       <p className="font-medium">${item.amount}</p>
-                      <Badge variant={item.status === 'paid' ? 'default' : 'destructive'}>
-                        {item.status}
+                      <Badge variant={(item as any).status === 'paid' ? 'default' : 'destructive'}>
+                        {(item as any).status}
                       </Badge>
                     </div>
                   </div>

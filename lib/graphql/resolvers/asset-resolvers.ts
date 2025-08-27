@@ -4,10 +4,10 @@
 
 export const assetResolvers = {
   // Asset field resolvers
-  category: async (parent: any, _: any, context: any) => {
+  category: async (parent: Record<string, unknown>, _: Record<string, unknown>, context: Record<string, unknown>) => {
     if (!parent.category_id) return null
     
-    const { data } = await context.supabase
+    const { data } = await (context as any).supabase
       .from('asset_categories')
       .select('*')
       .eq('id', parent.category_id)
@@ -16,10 +16,10 @@ export const assetResolvers = {
     return data
   },
 
-  assignee: async (parent: any, _: any, context: any) => {
+  assignee: async (parent: Record<string, unknown>, _: Record<string, unknown>, context: Record<string, unknown>) => {
     if (!parent.assignee_id) return null
     
-    const { data } = await context.supabase
+    const { data } = await (context as any).supabase
       .from('profiles')
       .select('*')
       .eq('id', parent.assignee_id)
@@ -28,10 +28,10 @@ export const assetResolvers = {
     return data
   },
 
-  parentAsset: async (parent: any, _: any, context: any) => {
+  parentAsset: async (parent: Record<string, unknown>, _: Record<string, unknown>, context: Record<string, unknown>) => {
     if (!parent.parent_asset_id) return null
     
-    const { data } = await context.supabase
+    const { data } = await (context as any).supabase
       .from('assets')
       .select('*')
       .eq('id', parent.parent_asset_id)
@@ -40,8 +40,8 @@ export const assetResolvers = {
     return data
   },
 
-  childAssets: async (parent: any, _: any, context: any) => {
-    const { data } = await context.supabase
+  childAssets: async (parent: Record<string, unknown>, _: Record<string, unknown>, context: Record<string, unknown>) => {
+    const { data } = await (context as any).supabase
       .from('assets')
       .select('*')
       .eq('parent_asset_id', parent.id)
@@ -49,8 +49,8 @@ export const assetResolvers = {
     return data || []
   },
 
-  createdBy: async (parent: any, _: any, context: any) => {
-    const { data } = await context.supabase
+  createdBy: async (parent: Record<string, unknown>, _: Record<string, unknown>, context: Record<string, unknown>) => {
+    const { data } = await (context as any).supabase
       .from('profiles')
       .select('*')
       .eq('id', parent.created_by)

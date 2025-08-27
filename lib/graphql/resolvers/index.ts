@@ -9,7 +9,7 @@ import { assetResolvers } from './asset-resolvers'
 import { userResolvers } from './user-resolvers'
 import { integrationResolvers } from './integration-resolvers'
 import { webhookResolvers } from './webhook-resolvers'
-import { analyticsResolvers } from './analytics-resolvers'
+// import { analyticsResolvers } from './analytics-resolvers'
 import { subscriptionResolvers } from './subscription-resolvers'
 import { scalarResolvers } from './scalar-resolvers'
 
@@ -25,10 +25,10 @@ export const resolvers = {
   Query: {
     // Tenant Operations
     tenant: async (
-      _: any,
-      __: any,
+      _: Record<string, unknown>,
+      __: Record<string, unknown>,
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ____info: GraphQLResolveInfo
     ) => {
       const { tenantService } = context
       return await tenantService.getTenant(context.tenantId)
@@ -36,25 +36,25 @@ export const resolvers = {
 
     // Asset Operations
     asset: async (
-      _: any,
+      _: Record<string, unknown>,
       { id }: { id: string },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ____info: GraphQLResolveInfo
     ) => {
       const { assetService } = context
       return await assetService.getAsset(context.tenantId, id)
     },
 
     assets: async (
-      _: any,
+      _: Record<string, unknown>,
       args: {
         first?: number
         after?: string
-        filter?: any
-        sort?: any
+        filter?: Record<string, unknown>
+        sort?: Record<string, unknown>
       },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { assetService } = context
       return await assetService.getAssets(context.tenantId, args)
@@ -62,24 +62,24 @@ export const resolvers = {
 
     // User Operations
     user: async (
-      _: any,
+      _: Record<string, unknown>,
       { id }: { id: string },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { userService } = context
       return await userService.getUser(context.tenantId, id)
     },
 
     users: async (
-      _: any,
+      _: Record<string, unknown>,
       args: {
         first?: number
         after?: string
-        filter?: any
+        filter?: Record<string, unknown>
       },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { userService } = context
       return await userService.getUsers(context.tenantId, args)
@@ -87,20 +87,20 @@ export const resolvers = {
 
     // Integration Operations
     integration: async (
-      _: any,
+      _: Record<string, unknown>,
       { id }: { id: string },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { integrationService } = context
       return await integrationService.getIntegration(context.tenantId, id)
     },
 
     integrations: async (
-      _: any,
-      __: any,
+      _: Record<string, unknown>,
+      __: Record<string, unknown>,
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { integrationService } = context
       return await integrationService.getIntegrations(context.tenantId)
@@ -108,20 +108,20 @@ export const resolvers = {
 
     // Webhook Operations
     webhook: async (
-      _: any,
+      _: Record<string, unknown>,
       { id }: { id: string },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { webhookService } = context
       return await webhookService.getWebhook(context.tenantId, id)
     },
 
     webhooks: async (
-      _: any,
-      __: any,
+      _: Record<string, unknown>,
+      __: Record<string, unknown>,
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { webhookService } = context
       return await webhookService.getWebhooks(context.tenantId)
@@ -129,10 +129,10 @@ export const resolvers = {
 
     // Analytics
     assetAnalytics: async (
-      _: any,
-      args: { filter?: any; period: string },
+      _: Record<string, unknown>,
+      args: { filter?: Record<string, unknown>; period: string },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { analyticsService } = context
       return await analyticsService.getAssetAnalytics(context.tenantId, args)
@@ -140,14 +140,14 @@ export const resolvers = {
 
     // Search
     search: async (
-      _: any,
+      _: Record<string, unknown>,
       args: {
         query: string
         types?: string[]
         limit?: number
       },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { searchService } = context
       return await searchService.search(context.tenantId, args)
@@ -157,10 +157,10 @@ export const resolvers = {
   Mutation: {
     // Asset Operations
     createAsset: async (
-      _: any,
-      { input }: { input: any },
+      _: Record<string, unknown>,
+      { input }: { input: Record<string, unknown> },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { assetService } = context
       return await assetService.createAsset(context.tenantId, {
@@ -170,20 +170,20 @@ export const resolvers = {
     },
 
     updateAsset: async (
-      _: any,
-      { id, input }: { id: string; input: any },
+      _: Record<string, unknown>,
+      { id, input }: { id: string; input: Record<string, unknown> },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { assetService } = context
       return await assetService.updateAsset(context.tenantId, id, input)
     },
 
     deleteAsset: async (
-      _: any,
+      _: Record<string, unknown>,
       { id }: { id: string },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { assetService } = context
       await assetService.deleteAsset(context.tenantId, id)
@@ -192,30 +192,30 @@ export const resolvers = {
 
     // Integration Operations
     createIntegration: async (
-      _: any,
-      { input }: { input: any },
+      _: Record<string, unknown>,
+      { input }: { input: Record<string, unknown> },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { integrationService } = context
-      return await integrationService.createIntegration(context.tenantId, input)
+      return await integrationService.createIntegration(context.tenantId, input as any)
     },
 
     updateIntegration: async (
-      _: any,
-      { id, input }: { id: string; input: any },
+      _: Record<string, unknown>,
+      { id, input }: { id: string; input: Record<string, unknown> },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { integrationService } = context
       return await integrationService.updateIntegration(context.tenantId, id, input)
     },
 
     deleteIntegration: async (
-      _: any,
+      _: Record<string, unknown>,
       { id }: { id: string },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { integrationService } = context
       await integrationService.deleteIntegration(context.tenantId, id)
@@ -223,10 +223,10 @@ export const resolvers = {
     },
 
     triggerSync: async (
-      _: any,
+      _: Record<string, unknown>,
       { integrationId }: { integrationId: string },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { integrationService } = context
       return await integrationService.triggerSync(context.tenantId, integrationId)
@@ -234,30 +234,30 @@ export const resolvers = {
 
     // Webhook Operations
     createWebhook: async (
-      _: any,
-      { input }: { input: any },
+      _: Record<string, unknown>,
+      { input }: { input: Record<string, unknown> },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { webhookService } = context
-      return await webhookService.createWebhook(context.tenantId, input)
+      return await webhookService.createWebhook(context.tenantId, input as any)
     },
 
     updateWebhook: async (
-      _: any,
-      { id, input }: { id: string; input: any },
+      _: Record<string, unknown>,
+      { id, input }: { id: string; input: Record<string, unknown> },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { webhookService } = context
       return await webhookService.updateWebhook(context.tenantId, id, input)
     },
 
     deleteWebhook: async (
-      _: any,
+      _: Record<string, unknown>,
       { id }: { id: string },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { webhookService } = context
       await webhookService.deleteWebhook(context.tenantId, id)
@@ -265,10 +265,10 @@ export const resolvers = {
     },
 
     testWebhook: async (
-      _: any,
+      _: Record<string, unknown>,
       { id }: { id: string },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { webhookService } = context
       return await webhookService.testWebhook(context.tenantId, id)
@@ -276,30 +276,30 @@ export const resolvers = {
 
     // Bulk Operations
     bulkCreateAssets: async (
-      _: any,
-      { input }: { input: any[] },
+      _: Record<string, unknown>,
+      { input }: { input: Record<string, unknown>[] },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { assetService } = context
       return await assetService.bulkCreateAssets(context.tenantId, input, context.userId)
     },
 
     bulkUpdateAssets: async (
-      _: any,
-      { input }: { input: any[] },
+      _: Record<string, unknown>,
+      { input }: { input: Record<string, unknown>[] },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { assetService } = context
       return await assetService.bulkUpdateAssets(context.tenantId, input)
     },
 
     bulkDeleteAssets: async (
-      _: any,
+      _: Record<string, unknown>,
       { ids }: { ids: string[] },
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { assetService } = context
       return await assetService.bulkDeleteAssets(context.tenantId, ids)
@@ -311,43 +311,43 @@ export const resolvers = {
   // Type Resolvers
   Tenant: {
     assets: async (
-      parent: any,
-      args: any,
+      parent: Record<string, unknown>,
+      args: Record<string, unknown>,
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { assetService } = context
-      return await assetService.getAssets(parent.id, args)
+      return await assetService.getAssets(parent.id as string, args)
     },
 
     users: async (
-      parent: any,
-      args: any,
+      parent: Record<string, unknown>,
+      args: Record<string, unknown>,
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { userService } = context
-      return await userService.getUsers(parent.id, args)
+      return await userService.getUsers(parent.id as string, args)
     },
 
     integrations: async (
-      parent: any,
-      args: any,
+      parent: Record<string, unknown>,
+      args: Record<string, unknown>,
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { integrationService } = context
-      return await integrationService.getIntegrations(parent.id)
+      return await integrationService.getIntegrations(parent.id as string)
     },
 
     webhooks: async (
-      parent: any,
-      args: any,
+      parent: Record<string, unknown>,
+      args: Record<string, unknown>,
       context: ResolverContext,
-      info: GraphQLResolveInfo
+      ___info: GraphQLResolveInfo
     ) => {
       const { webhookService } = context
-      return await webhookService.getWebhooks(parent.id)
+      return await webhookService.getWebhooks(parent.id as string)
     },
   },
 

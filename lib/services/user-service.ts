@@ -21,26 +21,26 @@ export class UserService {
     return data
   }
 
-  async getUsers(tenantId: string, args: any) {
+  async getUsers(tenantId: string, _args: Record<string, unknown>) {
     let query = this.supabase
       .from('profiles')
       .select('*')
       .eq('tenant_id', tenantId)
 
-    if (args.filter) {
-      if (args.filter.role) {
-        query = query.in('role', args.filter.role)
+    if ((_args as any).filter) {
+      if ((_args as any).filter.role) {
+        query = query.in('role', (_args as any).filter.role)
       }
-      if (args.filter.isActive !== undefined) {
-        query = query.eq('is_active', args.filter.isActive)
+      if ((_args as any).filter.isActive !== undefined) {
+        query = query.eq('is_active', (_args as any).filter.isActive)
       }
-      if (args.filter.search) {
-        query = query.or(`first_name.ilike.%${args.filter.search}%,last_name.ilike.%${args.filter.search}%,email.ilike.%${args.filter.search}%`)
+      if ((_args as any).filter.search) {
+        query = query.or(`first_name.ilike.%${(_args as any).filter.search}%,last_name.ilike.%${(_args as any).filter.search}%,email.ilike.%${(_args as any).filter.search}%`)
       }
     }
 
-    const limit = args.first || 20
-    const offset = args.after ? parseInt(args.after) : 0
+    const limit = (_args as any).first || 20
+    const offset = (_args as any).after ? parseInt((_args as any).after) : 0
 
     query = query.range(offset, offset + limit - 1)
 

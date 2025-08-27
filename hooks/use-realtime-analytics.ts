@@ -154,7 +154,7 @@ export function useRealtimeAssetStatus(assetId?: string) {
 
     const channelId = realtimeAnalytics.subscribeToTable("assets", handleAssetUpdate, {
       column: "asset_id",
-      value: assetId,
+      value: assetId as any,
     })
 
     // Load initial status

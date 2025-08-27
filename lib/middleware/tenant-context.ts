@@ -93,7 +93,7 @@ export class TenantContextManager {
    * Create tenant-aware response with context headers
    */
   static createTenantResponse(
-    data: any,
+    data: Record<string, unknown>,
     context: TenantContext,
     status: number = 200
   ): NextResponse {
@@ -128,7 +128,7 @@ export class TenantFeatureManager {
 
       const hasFeature = tenantConfig.isFeatureEnabled(tenant, feature as any)
       if (!hasFeature) {
-        return { allowed: false, reason: `Feature ${feature} not available for plan ${tenant.plan}` }
+        return { allowed: false, reason: `Feature ${feature} not available for plan ${tenant?.plan}` }
       }
 
       return { allowed: true }
@@ -225,7 +225,7 @@ export class TenantSecurityManager {
         return { allowed: false, reason: 'Tenant not found' }
       }
 
-      const settings = tenant.settings as any || {}
+      const settings = tenant?.settings as any || {}
       const ipRestrictions = settings.ip_restrictions || []
 
       if (ipRestrictions.length === 0) {
@@ -233,12 +233,12 @@ export class TenantSecurityManager {
       }
 
       // Check if client IP is in allowed list
-      const isAllowed = ipRestrictions.some((restriction: any) => {
+      const isAllowed = ipRestrictions.some((restriction: Record<string, unknown>) => {
         if (restriction.type === 'single') {
           return clientIP === restriction.ip
         } else if (restriction.type === 'range') {
           // Simple range check (would need proper CIDR validation in production)
-          return clientIP.startsWith(restriction.prefix)
+          return clientIP.startsWith((restriction as any).prefix)
         }
         return false
       })
@@ -266,7 +266,7 @@ export class TenantSecurityManager {
         return { allowed: false, reason: 'Tenant not found' }
       }
 
-      const settings = tenant.settings as any || {}
+      const settings = tenant?.settings as any || {}
       const _maxSessions = settings.max_concurrent_sessions || 5
 
       // In production, this would check active sessions from Redis/database

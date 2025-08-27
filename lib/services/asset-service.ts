@@ -21,28 +21,28 @@ export class AssetService {
     return data
   }
 
-  async getAssets(tenantId: string, args: any) {
+  async getAssets(tenantId: string, _args: Record<string, unknown>) {
     let query = this.supabase
       .from('assets')
       .select('*')
       .eq('tenant_id', tenantId)
 
-    if (args.filter) {
+    if ((_args as any).filter) {
       // Apply filters
-      if (args.filter.status) {
-        query = query.in('status', args.filter.status)
+      if ((_args as any).filter.status) {
+        query = query.in('status', (_args as any).filter.status)
       }
-      if (args.filter.search) {
-        query = query.or(`name.ilike.%${args.filter.search}%,asset_id.ilike.%${args.filter.search}%`)
+      if ((_args as any).filter.search) {
+        query = query.or(`name.ilike.%${(_args as any).filter.search}%,asset_id.ilike.%${(_args as any).filter.search}%`)
       }
     }
 
-    if (args.sort) {
-      query = query.order(args.sort.field, { ascending: args.sort.direction === 'ASC' })
+    if ((_args as any).sort) {
+      query = query.order((_args as any).sort.field, { ascending: (_args as any).sort.direction === 'ASC' })
     }
 
-    const limit = args.first || 20
-    const offset = args.after ? parseInt(args.after) : 0
+    const limit = (_args as any).first || 20
+    const offset = (_args as any).after ? parseInt((_args as any).after) : 0
 
     query = query.range(offset, offset + limit - 1)
 
@@ -65,7 +65,7 @@ export class AssetService {
     }
   }
 
-  async createAsset(tenantId: string, input: any) {
+  async createAsset(tenantId: string, input: Record<string, unknown>) {
     const { data, error } = await this.supabase
       .from('assets')
       .insert({
@@ -79,7 +79,7 @@ export class AssetService {
     return data
   }
 
-  async updateAsset(tenantId: string, assetId: string, input: any) {
+  async updateAsset(tenantId: string, assetId: string, input: Record<string, unknown>) {
     const { data, error } = await this.supabase
       .from('assets')
       .update(input)
@@ -102,11 +102,11 @@ export class AssetService {
     if (error) throw error
   }
 
-  async bulkCreateAssets(tenantId: string, assets: any[], userId: string) {
+  async bulkCreateAssets(tenantId: string, assets: unknown[], userId: string) {
     const assetsWithTenant = assets.map(asset => ({
       tenant_id: tenantId,
       created_by: userId,
-      ...asset,
+      ...(asset as any),
     }))
 
     const { data, error } = await this.supabase
@@ -131,10 +131,10 @@ export class AssetService {
     }
   }
 
-  async bulkUpdateAssets(tenantId: string, updates: any[]) {
+  async bulkUpdateAssets(tenantId: string, updates: unknown[]) {
     const results = await Promise.allSettled(
       updates.map(update => 
-        this.updateAsset(tenantId, update.id, update.updates)
+        this.updateAsset(tenantId, (update as any).id, (update as any).updates)
       )
     )
 

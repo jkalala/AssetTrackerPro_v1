@@ -683,9 +683,9 @@ export class DelegationService {
         .gte('created_at', since)
 
       const totalDelegations = delegations?.length || 0
-      const activeDelegations = delegations?.filter((d: any) => d.status === 'active').length || 0
-      const expiredDelegations = delegations?.filter((d: any) => d.status === 'expired').length || 0
-      const revokedDelegations = delegations?.filter((d: any) => d.status === 'revoked').length || 0
+      const activeDelegations = delegations?.filter((d: Record<string, unknown>) => d.status === 'active').length || 0
+      const expiredDelegations = delegations?.filter((d: Record<string, unknown>) => d.status === 'expired').length || 0
+      const revokedDelegations = delegations?.filter((d: Record<string, unknown>) => d.status === 'revoked').length || 0
 
       // Get guest access count
       const { data: guestAccess } = await supabase

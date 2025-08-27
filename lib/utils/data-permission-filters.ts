@@ -321,7 +321,7 @@ export class DataPermissionFilter {
   // =====================================================
 
   async buildAssetQuery(
-    baseQuery: any,
+    baseQuery: Record<string, unknown>,
     options: DataFilterOptions
   ): Promise<any> {
     const userPermissions = await this.permissionService.getUserPermissions(
@@ -335,7 +335,7 @@ export class DataPermissionFilter {
 
     if (assetPermissions.length === 0) {
       // No permission - return query that returns no results
-      return baseQuery.eq('id', 'no-access')
+      return (baseQuery as any).eq('id', 'no-access')
     }
 
     // Check if user has global permission
@@ -369,14 +369,14 @@ export class DataPermissionFilter {
 
     if (conditions.length > 0) {
       // Apply OR conditions
-      return baseQuery.or(conditions.join(','))
+      return (baseQuery as any).or(conditions.join(','))
     }
 
     return baseQuery
   }
 
   async buildUserQuery(
-    baseQuery: any,
+    baseQuery: Record<string, unknown>,
     options: DataFilterOptions
   ): Promise<any> {
     const userPermissions = await this.permissionService.getUserPermissions(
@@ -389,7 +389,7 @@ export class DataPermissionFilter {
     )
 
     if (userManagePermissions.length === 0) {
-      return baseQuery.eq('id', 'no-access')
+      return (baseQuery as any).eq('id', 'no-access')
     }
 
     const globalPermission = userManagePermissions.find(p => 
@@ -418,7 +418,7 @@ export class DataPermissionFilter {
     }
 
     if (conditions.length > 0) {
-      return baseQuery.or(conditions.join(','))
+      return (baseQuery as any).or(conditions.join(','))
     }
 
     return baseQuery
@@ -555,7 +555,7 @@ export async function filterUsersByPermissions<T extends { id: string; tenant_id
 }
 
 export async function buildPermissionFilteredQuery(
-  baseQuery: any,
+  baseQuery: Record<string, unknown>,
   resourceType: string,
   action: string,
   tenantId: string,

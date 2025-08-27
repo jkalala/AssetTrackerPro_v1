@@ -32,7 +32,7 @@ class RealtimeAnalytics {
   }
 
   // Subscribe to real-time table changes
-  subscribeToTable(table: string, callback: (event: RealtimeEvent) => void, filter?: { column: string; value: any }) {
+  subscribeToTable(table: string, callback: (event: RealtimeEvent) => void, filter?: { column: string; value: Record<string, unknown> }) {
     const channelName = filter ? `${table}_${filter.column}_${filter.value}` : table
 
     if (this.channels.has(channelName)) {
@@ -55,7 +55,7 @@ class RealtimeAnalytics {
           table: table,
           filter: `${filter.column}=eq.${filter.value}`,
         },
-        (payload: any) => {
+        (payload: Record<string, unknown>) => {
           const event: RealtimeEvent = {
             type: payload.eventType as any,
             table: table,
@@ -77,7 +77,7 @@ class RealtimeAnalytics {
           schema: "public",
           table: table,
         },
-        (payload: any) => {
+        (payload: Record<string, unknown>) => {
           const event: RealtimeEvent = {
             type: payload.eventType as any,
             table: table,
@@ -189,10 +189,10 @@ class RealtimeAnalytics {
 
       return {
         totalAssets: assetsResult.data?.length || 0,
-        activeAssets: assetsResult.data?.filter((a: any) => a.status === "active").length || 0,
-        assetsCreatedToday: assetsResult.data?.filter((a: any) => new Date(a.created_at) >= today).length || 0,
+        activeAssets: assetsResult.data?.filter((a: Record<string, unknown>) => a.status === "active").length || 0,
+        assetsCreatedToday: assetsResult.data?.filter((a: Record<string, unknown>) => new Date((a as any).created_at) >= today).length || 0,
         totalUsers: usersResult.data?.length || 0,
-        scansThisWeek: scansResult.data?.filter((s: any) => new Date(s.created_at) >= thisWeek).length || 0,
+        scansThisWeek: scansResult.data?.filter((s: Record<string, unknown>) => new Date((s as any).created_at) >= thisWeek).length || 0,
         recentScans: scansResult.data?.slice(0, 10) || [],
       }
     } catch (error) {

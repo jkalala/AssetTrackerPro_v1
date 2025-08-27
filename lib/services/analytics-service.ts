@@ -22,10 +22,10 @@ export class AnalyticsService {
       .select('status')
       .eq('tenant_id', tenantId)
 
-    const assetsByStatus = statusData?.reduce((acc: any[], asset) => {
-      const existing = acc.find(item => item.status === asset.status)
+    const assetsByStatus = statusData?.reduce((acc: unknown[], asset) => {
+      const existing = acc.find(item => (item as any).status === asset.status)
       if (existing) {
-        existing.count++
+        (existing as any).count++
       } else {
         acc.push({ status: asset.status, count: 1 })
       }
@@ -41,11 +41,11 @@ export class AnalyticsService {
       `)
       .eq('tenant_id', tenantId)
 
-    const assetsByCategory = categoryData?.reduce((acc: any[], asset: any) => {
-      const categoryName = asset.asset_categories?.name || 'Uncategorized'
-      const existing = acc.find(item => item.category.name === categoryName)
+    const assetsByCategory = categoryData?.reduce((acc: unknown[], asset: Record<string, unknown>) => {
+      const categoryName = (asset.asset_categories as any)?.name || 'Uncategorized'
+      const existing = acc.find(item => (item as any).category.name === categoryName)
       if (existing) {
-        existing.count++
+        (existing as any).count++
       } else {
         acc.push({ 
           category: { name: categoryName }, 

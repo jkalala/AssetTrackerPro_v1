@@ -60,12 +60,12 @@ const TENANT_API_ROUTES = [
 ]
 
 // Rate limiting configuration per route type
-const RATE_LIMITS = {
-  api: { requests: 100, window: 60000 }, // 100 requests per minute
-  auth: { requests: 10, window: 60000 }, // 10 auth attempts per minute
-  upload: { requests: 20, window: 60000 }, // 20 uploads per minute
-  export: { requests: 5, window: 300000 } // 5 exports per 5 minutes
-}
+// const RATE_LIMITS = {
+//   api: { requests: 100, window: 60000 }, // 100 requests per minute
+//   auth: { requests: 10, window: 60000 }, // 10 auth attempts per minute
+//   upload: { requests: 20, window: 60000 }, // 20 uploads per minute
+//   export: { requests: 5, window: 300000 } // 5 exports per 5 minutes
+// }
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
@@ -185,7 +185,7 @@ export async function middleware(req: NextRequest) {
         
         // Set additional API-specific headers
         res.headers.set('x-api-version', '1.0')
-        res.headers.set('x-tenant-plan', tenant.plan)
+        res.headers.set('x-tenant-plan', tenant?.plan)
         res.headers.set('x-rate-limit-remaining', rateLimitResult.remaining.toString())
         res.headers.set('x-rate-limit-reset', rateLimitResult.resetTime.toISOString())
         
@@ -289,7 +289,7 @@ async function checkRateLimit(req: NextRequest, userId: string): Promise<{
     
     if (rateLimitResponse) {
       // Rate limit exceeded
-      const retryAfter = rateLimitResponse.headers.get('Retry-After')
+      const _retryAfter = rateLimitResponse.headers.get('Retry-After')
       const limit = rateLimitResponse.headers.get('X-RateLimit-Limit')
       const remaining = rateLimitResponse.headers.get('X-RateLimit-Remaining')
       const reset = rateLimitResponse.headers.get('X-RateLimit-Reset')
@@ -344,7 +344,7 @@ async function validateTenantStatus(tenant: any, req: NextRequest): Promise<{
   return {}
 }
 
-async function validateRouteAccess(pathname: string, role: string, permissions: any): Promise<{
+async function validateRouteAccess(pathname: string, role: string, permissions: Record<string, unknown>): Promise<{
   allowed: boolean
   reason?: string
 }> {
@@ -370,7 +370,7 @@ async function validateRouteAccess(pathname: string, role: string, permissions: 
   return { allowed: true }
 }
 
-async function validateApiAccess(pathname: string, role: string, _permissions: any): Promise<{
+async function validateApiAccess(pathname: string, role: string, _permissions: Record<string, unknown>): Promise<{
   allowed: boolean
   reason?: string
 }> {
@@ -419,7 +419,7 @@ function createTenantContextHeaders(profile: any, tenant: any, session: any, req
     
     // Tenant information
     'x-tenant-status': tenant.status,
-    'x-tenant-plan': tenant.plan,
+    'x-tenant-plan': tenant?.plan,
     'x-tenant-slug': tenant.slug,
     
     // Security context
@@ -431,7 +431,7 @@ function createTenantContextHeaders(profile: any, tenant: any, session: any, req
     'x-request-timestamp': new Date().toISOString(),
     
     // Feature flags (basic)
-    'x-features-enabled': JSON.stringify(tenant.feature_flags || {})
+    'x-features-enabled': JSON.stringify(tenant?.feature_flags || {})
   }
 }
 
@@ -461,7 +461,7 @@ function addSecurityHeaders(res: NextResponse): NextResponse {
   return res
 }
 
-async function logSecurityEvent(event: string, details: any, req: NextRequest): Promise<void> {
+async function logSecurityEvent(event: string, details: Record<string, unknown>, req: NextRequest): Promise<void> {
   try {
     // In production, this would log to your security monitoring system
     console.warn(`Security Event: ${event}`, {

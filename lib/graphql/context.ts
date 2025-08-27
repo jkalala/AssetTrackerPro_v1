@@ -118,7 +118,7 @@ export async function authenticateContext(context: Context): Promise<Authenticat
   }
 
   // Extract permissions
-  const permissions = profile.permissions?.map((p: any) => p.permission.name) || []
+  const permissions = profile.permissions?.map((p: Record<string, unknown>) => (p.permission as any)?.name) || []
 
   return {
     ...context,

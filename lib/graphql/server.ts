@@ -91,11 +91,11 @@ const permissions = shield(
 )
 
 // Rate limiting middleware
-const rateLimitMiddleware = async (resolve: any, root: any, args: any, context: any, info: any) => {
+const rateLimitMiddleware = async (resolve: Record<string, unknown>, root: Record<string, unknown>, args: Record<string, unknown>, context: Record<string, unknown>, info: Record<string, unknown>) => {
   try {
-    const key = context.user?.id || context.req?.ip || 'anonymous'
+    const key = (context as any).user?.id || (context as any).req?.ip || 'anonymous'
     await rateLimiter.consume(key)
-    return resolve(root, args, context, info)
+    return (resolve as any)(root, args, context, info)
   } catch (rejRes: any) {
     throw new GraphQLError('Rate limit exceeded', {
       extensions: {
@@ -113,7 +113,7 @@ const schema = applyMiddleware(
     resolvers,
   }),
   permissions,
-  rateLimitMiddleware
+  rateLimitMiddleware as any
 )
 
 // Apollo Server configuration

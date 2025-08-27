@@ -4,12 +4,12 @@ import { Tenant } from '@/lib/rbac/types';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
-const PLAN_PRICES = {
-  free: 'price_free', // Free plan - no Stripe price ID needed
-  basic: process.env.STRIPE_BASIC_PRICE_ID || 'price_basic',
-  pro: process.env.STRIPE_PRO_PRICE_ID || 'price_pro',
-  enterprise: process.env.STRIPE_ENTERPRISE_PRICE_ID || 'price_enterprise',
-};
+// const PLAN_PRICES = {
+//   free: 'price_free', // Free plan - no Stripe price ID needed
+//   basic: process.env.STRIPE_BASIC_PRICE_ID || 'price_basic',
+//   pro: process.env.STRIPE_PRO_PRICE_ID || 'price_pro',
+//   enterprise: process.env.STRIPE_ENTERPRISE_PRICE_ID || 'price_enterprise',
+// };
 
 export async function createCustomer(email: string, tenantId: string): Promise<string> {
   try {

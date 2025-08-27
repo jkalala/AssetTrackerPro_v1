@@ -397,7 +397,7 @@ export class PermissionService {
   }
 
   private async evaluateCustomCondition(
-    condition: any,
+    condition: Record<string, unknown>,
     context?: Record<string, any>,
     tenantId?: string,
     userId?: string
@@ -561,12 +561,12 @@ export class PermissionService {
       }
 
       const totalChecks = usage?.length || 0
-      const grantedChecks = usage?.filter((u: any) => u.was_granted).length || 0
+      const grantedChecks = usage?.filter((u: Record<string, unknown>) => u.was_granted).length || 0
       const deniedChecks = totalChecks - grantedChecks
-      const avgResponseTime = usage?.reduce((sum: number, u: any) => sum + (u.response_time_ms || 0), 0) / totalChecks || 0
+      const avgResponseTime = usage?.reduce((sum: number, u: Record<string, unknown>) => sum + ((u as any).response_time_ms || 0), 0) / totalChecks || 0
 
       // Top permissions
-      const permissionCounts = usage?.reduce((acc: Record<string, number>, u: any) => {
+      const permissionCounts = usage?.reduce((acc: Record<string, number>, u: Record<string, unknown>) => {
         const permName = (u.permissions as any)?.name || 'Unknown'
         acc[permName] = (acc[permName] || 0) + 1
         return acc
@@ -578,9 +578,9 @@ export class PermissionService {
         .map(([permission_name, usage_count]) => ({ permission_name, usage_count: usage_count as number }))
 
       // Denial reasons
-      const denialCounts = usage?.filter((u: any) => !u.was_granted && u.denial_reason)
-        .reduce((acc: Record<string, number>, u: any) => {
-          acc[u.denial_reason!] = (acc[u.denial_reason!] || 0) + 1
+      const denialCounts = usage?.filter((u: Record<string, unknown>) => !u.was_granted && u.denial_reason)
+        .reduce((acc: Record<string, number>, u: Record<string, unknown>) => {
+          acc[(u as any).denial_reason!] = (acc[(u as any).denial_reason!] || 0) + 1
           return acc
         }, {} as Record<string, number>) || {}
 

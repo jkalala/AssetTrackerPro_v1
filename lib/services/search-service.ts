@@ -12,7 +12,7 @@ export class SearchService {
   async search(tenantId: string, args: { query: string; types?: string[]; limit?: number }) {
     const { query, types = ['assets', 'users', 'locations'], limit = 10 } = args
 
-    const results: any = {
+    const results: Record<string, unknown> = {
       assets: [],
       users: [],
       locations: [],
@@ -48,7 +48,7 @@ export class SearchService {
       results.locations = []
     }
 
-    results.totalResults = results.assets.length + results.users.length + results.locations.length
+    results.totalResults = (results.assets as any[])?.length || 0 + (results.users as any[])?.length || 0 + (results.locations as any[])?.length || 0
 
     return results
   }

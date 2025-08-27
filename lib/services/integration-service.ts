@@ -173,7 +173,7 @@ export class IntegrationService {
     }>
   ): Promise<Integration> {
     try {
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         updated_at: new Date().toISOString(),
       }
 
@@ -467,9 +467,9 @@ export class IntegrationService {
     }
   }
 
-  private mapSAPAsset(sapAsset: any, fieldMappings: Record<string, string>): any {
+  private mapSAPAsset(sapAsset: Record<string, unknown>, fieldMappings: Record<string, string>): any {
     // Map SAP asset fields to our asset model using field mappings
-    const mapped: any = {}
+    const mapped: Record<string, unknown> = {}
     
     for (const [ourField, sapField] of Object.entries(fieldMappings)) {
       if (sapAsset[sapField] !== undefined) {
@@ -480,7 +480,7 @@ export class IntegrationService {
     return mapped
   }
 
-  private async upsertAsset(tenantId: string, assetData: any): Promise<void> {
+  private async upsertAsset(tenantId: string, assetData: Record<string, unknown>): Promise<void> {
     // Upsert asset in our database
     const { error } = await this.supabase
       .from('assets')
@@ -493,18 +493,18 @@ export class IntegrationService {
     if (error) throw error
   }
 
-  private mapIntegrationFromDb(dbIntegration: any): Integration {
+  private mapIntegrationFromDb(dbIntegration: Record<string, unknown>): Integration {
     return {
-      id: dbIntegration.id,
-      tenantId: dbIntegration.tenant_id,
-      name: dbIntegration.name,
-      type: dbIntegration.type,
-      configuration: dbIntegration.configuration,
-      status: dbIntegration.status,
-      lastSyncAt: dbIntegration.last_sync_at ? new Date(dbIntegration.last_sync_at) : undefined,
-      nextSyncAt: dbIntegration.next_sync_at ? new Date(dbIntegration.next_sync_at) : undefined,
-      createdAt: new Date(dbIntegration.created_at),
-      updatedAt: new Date(dbIntegration.updated_at),
+      id: dbIntegration.id as string,
+      tenantId: dbIntegration.tenant_id as string,
+      name: dbIntegration.name as string,
+      type: dbIntegration.type as IntegrationType,
+      configuration: dbIntegration.configuration as IntegrationConfiguration,
+      status: dbIntegration.status as IntegrationStatus,
+      lastSyncAt: dbIntegration.last_sync_at ? new Date(dbIntegration.last_sync_at as string) : undefined,
+      nextSyncAt: dbIntegration.next_sync_at ? new Date(dbIntegration.next_sync_at as string) : undefined,
+      createdAt: new Date(dbIntegration.created_at as string),
+      updatedAt: new Date(dbIntegration.updated_at as string),
     }
   }
 }

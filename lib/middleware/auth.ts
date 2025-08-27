@@ -79,7 +79,7 @@ export function withAuth<T extends any[]>(
       }
 
       // Extract permissions
-      const permissions = profile.permissions?.map((p: any) => p.permission.name) || []
+      const permissions = profile.permissions?.map((p: Record<string, unknown>) => (p.permission as any)?.name) || []
 
       const context: AuthContext = {
         user: {

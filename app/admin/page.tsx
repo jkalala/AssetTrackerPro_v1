@@ -249,7 +249,7 @@ export default function AdminPanelPage() {
   // Analytics widgets
   const assetsThisMonth = data.assets.filter((a: any) => {
     if (!a.created_at) return false
-    const d = new Date(a.created_at)
+    const d = new Date((a as any).created_at)
     const now = new Date()
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
   }).length

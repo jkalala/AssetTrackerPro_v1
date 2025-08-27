@@ -1,10 +1,10 @@
 // Notification utility for geofence events
 import { createClient } from './supabase/server'
-import nodemailer from 'nodemailer';
+// import nodemailer from 'nodemailer';
 // Add a type-only import for nodemailer to avoid runtime issues in edge/serverless environments
 import type nodemailerType from 'nodemailer';
 
-export async function sendGeofenceEventNotification(userId: string, asset: any, geofence: any, eventType: 'entry' | 'exit') {
+export async function sendGeofenceEventNotification(userId: string, asset: Record<string, unknown>, geofence: Record<string, unknown>, eventType: 'entry' | 'exit') {
   const supabase = await createClient()
   // In-app notification (insert into notifications table)
   await supabase.from('notifications').insert({

@@ -160,7 +160,7 @@ export class WebhookService {
     }>
   ): Promise<Webhook> {
     try {
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         updated_at: new Date().toISOString(),
       }
 
@@ -518,34 +518,34 @@ export class WebhookService {
     return `sha256=${hmac.digest('hex')}`
   }
 
-  private mapWebhookFromDb(dbWebhook: any): Webhook {
+  private mapWebhookFromDb(dbWebhook: Record<string, unknown>): Webhook {
     return {
-      id: dbWebhook.id,
-      tenantId: dbWebhook.tenant_id,
-      name: dbWebhook.name,
-      url: dbWebhook.url,
-      events: dbWebhook.events,
-      secret: dbWebhook.secret,
-      isActive: dbWebhook.is_active,
-      retryPolicy: dbWebhook.retry_policy,
-      createdAt: new Date(dbWebhook.created_at),
-      updatedAt: new Date(dbWebhook.updated_at),
+      id: dbWebhook.id as string,
+      tenantId: dbWebhook.tenant_id as string,
+      name: dbWebhook.name as string,
+      url: dbWebhook.url as string,
+      events: dbWebhook.events as string[],
+      secret: dbWebhook.secret as string,
+      isActive: dbWebhook.is_active as boolean,
+      retryPolicy: dbWebhook.retry_policy as RetryPolicy,
+      createdAt: new Date(dbWebhook.created_at as string),
+      updatedAt: new Date(dbWebhook.updated_at as string),
     }
   }
 
-  private mapWebhookDeliveryFromDb(dbDelivery: any): WebhookDelivery {
+  private mapWebhookDeliveryFromDb(dbDelivery: Record<string, unknown>): WebhookDelivery {
     return {
-      id: dbDelivery.id,
-      webhookId: dbDelivery.webhook_id,
-      eventType: dbDelivery.event_type,
+      id: dbDelivery.id as string,
+      webhookId: dbDelivery.webhook_id as string,
+      eventType: dbDelivery.event_type as string,
       payload: dbDelivery.payload,
-      status: dbDelivery.status,
-      responseCode: dbDelivery.response_code,
-      responseBody: dbDelivery.response_body,
-      attemptNumber: dbDelivery.attempt_number,
-      deliveredAt: dbDelivery.delivered_at ? new Date(dbDelivery.delivered_at) : undefined,
-      nextRetryAt: dbDelivery.next_retry_at ? new Date(dbDelivery.next_retry_at) : undefined,
-      createdAt: new Date(dbDelivery.created_at),
+      status: dbDelivery.status as WebhookDeliveryStatus,
+      responseCode: dbDelivery.response_code as number,
+      responseBody: dbDelivery.response_body as string,
+      attemptNumber: dbDelivery.attempt_number as number,
+      deliveredAt: dbDelivery.delivered_at ? new Date(dbDelivery.delivered_at as string) : undefined,
+      nextRetryAt: dbDelivery.next_retry_at ? new Date(dbDelivery.next_retry_at as string) : undefined,
+      createdAt: new Date(dbDelivery.created_at as string),
     }
   }
 }

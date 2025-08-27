@@ -230,7 +230,7 @@ export function createApiErrorResponse(
   status: number = 400,
   details?: Record<string, any>
 ): NextResponse {
-  const body: any = { error }
+  const body: Record<string, unknown> = { error }
   
   if (details) {
     body.details = details
@@ -243,7 +243,7 @@ export function createApiErrorResponse(
  * Create a standardized API success response
  */
 export function createApiSuccessResponse(
-  data: any,
+  data: Record<string, unknown>,
   status: number = 200
 ): NextResponse {
   return NextResponse.json({

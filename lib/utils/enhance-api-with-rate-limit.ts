@@ -4,11 +4,11 @@ import { withRateLimit, RateLimitOptions } from "../with-rate-limit";
 /**
  * Enhances an existing API handler with rate limiting
  */
-export function enhanceWithRateLimit<T extends (...args: any[]) => Promise<NextResponse>>(
+export function enhanceWithRateLimit<T extends (...args: unknown[]) => Promise<NextResponse>>(
   handler: T,
   options?: RateLimitOptions
 ): T {
-  return (async (req: NextRequest, ...args: any[]) => {
+  return (async (req: NextRequest, ...args: unknown[]) => {
     // Apply rate limiting first
     const rateLimitResponse = await withRateLimit(req, options);
     if (rateLimitResponse) {
@@ -45,15 +45,15 @@ export function enhanceWithRateLimit<T extends (...args: any[]) => Promise<NextR
  */
 export function createRateLimitedHandlers(
   handlers: {
-    GET?: (req: NextRequest, context?: any) => Promise<NextResponse>;
-    POST?: (req: NextRequest, context?: any) => Promise<NextResponse>;
-    PUT?: (req: NextRequest, context?: any) => Promise<NextResponse>;
-    DELETE?: (req: NextRequest, context?: any) => Promise<NextResponse>;
-    PATCH?: (req: NextRequest, context?: any) => Promise<NextResponse>;
+    GET?: (req: NextRequest, context?: Record<string, unknown>) => Promise<NextResponse>;
+    POST?: (req: NextRequest, context?: Record<string, unknown>) => Promise<NextResponse>;
+    PUT?: (req: NextRequest, context?: Record<string, unknown>) => Promise<NextResponse>;
+    DELETE?: (req: NextRequest, context?: Record<string, unknown>) => Promise<NextResponse>;
+    PATCH?: (req: NextRequest, context?: Record<string, unknown>) => Promise<NextResponse>;
   },
   options?: RateLimitOptions | Record<string, RateLimitOptions>
 ) {
-  const result: any = {};
+  const result: Record<string, unknown> = {};
   
   for (const [method, handler] of Object.entries(handlers)) {
     if (handler) {
@@ -61,7 +61,7 @@ export function createRateLimitedHandlers(
         ? options 
         : (options as Record<string, RateLimitOptions>)?.[method] || options;
       
-      result[method] = enhanceWithRateLimit(handler, methodOptions as RateLimitOptions);
+      result[method] = enhanceWithRateLimit(handler as any, methodOptions as RateLimitOptions);
     }
   }
   

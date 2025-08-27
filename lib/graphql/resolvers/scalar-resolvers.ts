@@ -63,10 +63,10 @@ export const scalarResolvers = {
     name: 'Decimal',
     description: 'Decimal number scalar type',
     serialize(value: any) {
-      return parseFloat(value)
+      return parseFloat(value as string)
     },
     parseValue(value: any) {
-      return parseFloat(value)
+      return parseFloat(value as string)
     },
     parseLiteral(ast) {
       if (ast.kind === Kind.FLOAT || ast.kind === Kind.INT) {

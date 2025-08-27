@@ -663,10 +663,10 @@ export class SsoService {
     }
   }
 
-  private mapUserAttributes(userInfo: any, attributeMapping: Record<string, any>): any {
+  private mapUserAttributes(userInfo: Record<string, unknown>, attributeMapping: Record<string, any>): any {
     if (!attributeMapping || !userInfo) return userInfo
 
-    const mapped: any = {}
+    const mapped: Record<string, unknown> = {}
 
     if (attributeMapping.email) {
       mapped.email = userInfo[attributeMapping.email] || userInfo.email

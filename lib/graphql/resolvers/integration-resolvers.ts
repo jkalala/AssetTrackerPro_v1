@@ -3,8 +3,8 @@
  */
 
 export const integrationResolvers = {
-  syncResults: async (parent: any, _: any, context: any) => {
-    const { data } = await context.supabase
+  syncResults: async (parent: Record<string, unknown>, _: Record<string, unknown>, context: Record<string, unknown>) => {
+    const { data } = await (context as any).supabase
       .from('integration_sync_results')
       .select('*')
       .eq('integration_id', parent.id)

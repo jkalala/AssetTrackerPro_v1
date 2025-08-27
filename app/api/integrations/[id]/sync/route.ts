@@ -14,7 +14,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   return withAuth(
-    withRateLimit(async (req: NextRequest, context: any) => {
+    withRateLimit(async (req: NextRequest, context?: any) => {
       try {
         const supabase = createServerClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,

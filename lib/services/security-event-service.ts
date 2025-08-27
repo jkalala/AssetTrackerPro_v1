@@ -314,7 +314,7 @@ export class SecurityEventService {
 
       // Get recent events (last 10)
       const recentEvents = events
-        ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        ?.sort((a, b) => new Date(b.created_at).getTime() - new Date((a as any).created_at).getTime())
         .slice(0, 10) || []
 
       return {

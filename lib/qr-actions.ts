@@ -138,7 +138,7 @@ export async function generateBulkQRCodes(assetIds: string[]) {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cloudeleavepro.vercel.app"
 
     // Generate QR codes for all assets
-    const assetQRData = assets.map((asset: any) => ({
+    const assetQRData = assets.map((asset: Record<string, unknown>) => ({
       assetId: asset.asset_id,
       name: asset.name,
       category: asset.category,
@@ -147,15 +147,15 @@ export async function generateBulkQRCodes(assetIds: string[]) {
 
     console.log("Bulk QR Generation: Generating QR codes for", assetQRData.length, "assets")
 
-    const qrResults = await QRCodeGenerator.generateBulkQRCodes(assetQRData)
+    const qrResults = await QRCodeGenerator.generateBulkQRCodes(assetQRData as any)
 
     console.log("Bulk QR Generation: QR codes generated, updating database")
 
     // Update assets with QR codes
     const updatePromises = qrResults
       .filter((result) => result.success)
-      .map((result: any) => {
-        const asset = assets.find((a: any) => a.asset_id === result.assetId)
+      .map((result: Record<string, unknown>) => {
+        const asset = assets.find((a: Record<string, unknown>) => a.asset_id === result.assetId)
         if (asset) {
           return supabase.from("assets").update({ qr_code: result.qrCode }).eq("id", asset.id).eq("created_by", user.id) // Ensure user owns the asset
         }

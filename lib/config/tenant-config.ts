@@ -284,8 +284,8 @@ export class TenantConfigManager {
    * Get merged feature flags for tenant
    */
   static getFeatureFlags(tenant: Tenant): FeatureFlags {
-    const planFlags = PLAN_FEATURE_FLAGS[tenant.plan] || {}
-    const customFlags = (tenant.feature_flags as Partial<FeatureFlags>) || {}
+    const planFlags = PLAN_FEATURE_FLAGS[tenant?.plan] || {}
+    const customFlags = (tenant?.feature_flags as Partial<FeatureFlags>) || {}
     
     return {
       ...DEFAULT_FEATURE_FLAGS,
@@ -298,7 +298,7 @@ export class TenantConfigManager {
    * Get merged branding configuration for tenant
    */
   static getBrandingConfig(tenant: Tenant): BrandingConfig {
-    const customBranding = (tenant.branding as Partial<BrandingConfig>) || {}
+    const customBranding = (tenant?.branding as Partial<BrandingConfig>) || {}
     
     return {
       ...DEFAULT_BRANDING,
@@ -310,7 +310,7 @@ export class TenantConfigManager {
    * Get merged settings for tenant
    */
   static getTenantSettings(tenant: Tenant): TenantSettings {
-    const customSettings = (tenant.settings as Partial<TenantSettings>) || {}
+    const customSettings = (tenant?.settings as Partial<TenantSettings>) || {}
     
     return {
       ...DEFAULT_TENANT_SETTINGS,
@@ -505,8 +505,8 @@ export class TenantConfigManager {
    * Check if tenant can access feature based on plan
    */
   static canAccessFeature(tenant: Tenant, feature: keyof FeatureFlags): boolean {
-    const planFlags = PLAN_FEATURE_FLAGS[tenant.plan] || {}
-    const customFlags = (tenant.feature_flags as Partial<FeatureFlags>) || {}
+    const planFlags = PLAN_FEATURE_FLAGS[tenant?.plan] || {}
+    const customFlags = (tenant?.feature_flags as Partial<FeatureFlags>) || {}
     
     // Check if explicitly enabled in custom flags
     if (customFlags[feature] === true) return true

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 
-export async function deliverWebhooks({ tenant_id, event, payload }: { tenant_id: string, event: string, payload: any }) {
+export async function deliverWebhooks({ tenant_id, event, payload }: { tenant_id: string, event: string, payload: Record<string, unknown> }) {
   const supabase = await createClient();
   // Fetch active webhooks for this tenant and event
   const { data: webhooks, error } = await supabase

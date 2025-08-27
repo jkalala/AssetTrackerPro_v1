@@ -37,7 +37,8 @@ const customJestConfig = {
     '**/__tests__/components/basic-component.test.tsx',
     '**/__tests__/lib/services/service-imports.test.ts',
     '**/__tests__/lib/middleware/permission-enforcement.test.ts',
-    '**/__tests__/components/auth/mfa-setup-modal.test.tsx'
+    '**/__tests__/components/auth/mfa-setup-modal.test.tsx',
+    '**/__tests__/lib/services/ml-service-simple.test.ts'
   ],
   testTimeout: 10000,
   testPathIgnorePatterns: [

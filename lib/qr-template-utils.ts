@@ -7,5 +7,5 @@ export async function fetchQRTemplates() {
 
 export async function fetchDefaultQRTemplate() {
   const templates = await fetchQRTemplates()
-  return templates.find((tpl: any) => tpl.is_default) || templates[0] || null
+  return templates.find((tpl: Record<string, unknown>) => tpl.is_default) || templates[0] || null
 } 

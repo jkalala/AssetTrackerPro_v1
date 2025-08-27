@@ -611,7 +611,7 @@ export class TenantProvisioningService {
       notifyUsers?: boolean
       gracePeriodDays?: number
     } = {}
-  ): Promise<{ success: boolean; error?: string; details?: any }> {
+  ): Promise<{ success: boolean; error?: string; details?: Record<string, unknown> }> {
     const {
       immediate = false,
       retainData = true,
@@ -654,7 +654,7 @@ export class TenantProvisioningService {
         : new Date(deprovisioningDate.getTime() + gracePeriodDays * 24 * 60 * 60 * 1000)
 
       const updatedSettings = {
-        ...(tenant.settings as any || {}),
+        ...(tenant?.settings as any || {}),
         deprovisioned_at: deprovisioningDate.toISOString(),
         deprovisioning_reason: reason,
         final_deletion_date: finalDeletionDate.toISOString(),
@@ -738,7 +738,7 @@ export class TenantProvisioningService {
   /**
    * Create deprovisioning audit log
    */
-  private async createDeprovisioningAuditLog(tenantId: string, reason: string, options: any): Promise<void> {
+  private async createDeprovisioningAuditLog(tenantId: string, reason: string, options: Record<string, unknown>): Promise<void> {
     try {
       const supabase = await this.getSupabase()
       await supabase
@@ -790,9 +790,9 @@ export class TenantProvisioningService {
    * Send deprovisioning notifications to users
    */
   private async sendDeprovisioningNotifications(
-    users: any[],
-    _tenant: any,
-    _details: any
+    users: unknown[],
+    _tenant: Record<string, unknown>,
+    _details: Record<string, unknown>
   ): Promise<void> {
     try {
       // This would integrate with your email service
@@ -862,7 +862,7 @@ export class TenantProvisioningService {
         return { status: 'cancelled', details: { error: 'Tenant not found' } }
       }
 
-      const settings = tenant.settings as any || {}
+      const settings = tenant?.settings as any || {}
       
       return {
         status: tenant.status as any,

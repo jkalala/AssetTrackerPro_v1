@@ -3,8 +3,8 @@
  */
 
 export const webhookResolvers = {
-  deliveryAttempts: async (parent: any, _: any, context: any) => {
-    const { data } = await context.supabase
+  deliveryAttempts: async (parent: Record<string, unknown>, _: Record<string, unknown>, context: Record<string, unknown>) => {
+    const { data } = await (context as any).supabase
       .from('webhook_deliveries')
       .select('*')
       .eq('webhook_id', parent.id)

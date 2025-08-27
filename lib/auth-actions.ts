@@ -4,14 +4,14 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { getAuthRedirectUrl } from "@/lib/supabase/config"
 
-const getURL = () => {
-  let url = process.env.NEXT_PUBLIC_APP_URL ?? "https://cloudeleavepro.vercel.app"
-  // Make sure to include `https://` when not localhost.
-  url = url.includes("http") ? url : `https://${url}`
-  // Make sure to include a trailing `/`.
-  url = url.charAt(url.length - 1) === "/" ? url : `${url}/`
-  return url
-}
+// const getURL = () => {
+//   let url = process.env.NEXT_PUBLIC_APP_URL ?? "https://cloudeleavepro.vercel.app"
+//   // Make sure to include `https://` when not localhost.
+//   url = url.includes("http") ? url : `https://${url}`
+//   // Make sure to include a trailing `/`.
+//   url = url.charAt(url.length - 1) === "/" ? url : `${url}/`
+//   return url
+// }
 
 export async function signInWithEmail(email: string, password: string) {
   const supabase = await createClient()

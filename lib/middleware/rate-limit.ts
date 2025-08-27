@@ -21,7 +21,7 @@ export function withRateLimit(handler: RateLimitedHandler) {
   return async (request: NextRequest, context?: any): Promise<NextResponse> => {
     try {
       // Get client identifier (user ID if available, otherwise IP)
-      const clientId = context?.user?.id || getClientIP(request)
+      const clientId = (context as any)?.user?.id || getClientIP(request)
 
       // Check rate limit
       await rateLimiter.consume(clientId)

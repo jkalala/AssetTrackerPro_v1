@@ -306,7 +306,7 @@ export class TenantService {
     size?: number
   ): Promise<{ allowed: boolean; reason?: string }> {
     try {
-      const { data: usage, error } = await this.getTenantUsage(tenantId)
+      const { data: usage, error: error } = await this.getTenantUsage(tenantId)
       
       if (error || !usage) {
         return { allowed: false, reason: 'Unable to check tenant limits' }

@@ -259,7 +259,7 @@ export default function TenantPage() {
               </div>
               <div>
                 <Badge variant="outline" className="mb-2">Plan</Badge>
-                <p className="font-medium capitalize">{tenant.plan}</p>
+                <p className="font-medium capitalize">{tenant?.plan}</p>
               </div>
             </div>
 

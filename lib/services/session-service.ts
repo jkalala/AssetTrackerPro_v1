@@ -731,7 +731,7 @@ export class SessionService {
     const result = parser.getResult()
 
     // Generate device fingerprint
-    const fingerprint = customFingerprint || this.generateDeviceFingerprint(userAgent, result)
+    const fingerprint = customFingerprint || this.generateDeviceFingerprint(userAgent, result as any)
 
     // Determine device type
     let deviceType: DeviceInfo['type'] = 'desktop'
@@ -740,7 +740,7 @@ export class SessionService {
     else if (userAgent.includes('API') || userAgent.includes('Bot')) deviceType = 'api'
 
     // Generate device name
-    const deviceName = this.generateDeviceName(result)
+    const deviceName = this.generateDeviceName(result as any)
 
     return {
       fingerprint,
@@ -823,14 +823,14 @@ export class SessionService {
     return crypto.createHash('sha256').update(token).digest('hex')
   }
 
-  private generateDeviceFingerprint(userAgent: string, parsedUA: any): string {
+  private generateDeviceFingerprint(userAgent: string, parsedUA: Record<string, unknown>): string {
     const components = [
-      parsedUA.browser.name || '',
-      parsedUA.browser.version || '',
-      parsedUA.os.name || '',
-      parsedUA.os.version || '',
-      parsedUA.device.vendor || '',
-      parsedUA.device.model || '',
+      (parsedUA as any).browser?.name || '',
+      (parsedUA as any).browser?.version || '',
+      (parsedUA as any).os?.name || '',
+      (parsedUA as any).os?.version || '',
+      (parsedUA as any).device?.vendor || '',
+      (parsedUA as any).device?.model || '',
       userAgent.length.toString()
     ]
 
@@ -841,20 +841,20 @@ export class SessionService {
       .substring(0, 16)
   }
 
-  private generateDeviceName(parsedUA: any): string {
+  private generateDeviceName(parsedUA: Record<string, unknown>): string {
     const parts = []
 
-    if (parsedUA.device.vendor && parsedUA.device.model) {
-      parts.push(`${parsedUA.device.vendor} ${parsedUA.device.model}`)
-    } else if (parsedUA.os.name) {
-      parts.push(parsedUA.os.name)
-      if (parsedUA.os.version) {
-        parts.push(parsedUA.os.version)
+    if ((parsedUA as any).device?.vendor && (parsedUA as any).device?.model) {
+      parts.push(`${(parsedUA as any).device?.vendor} ${(parsedUA as any).device?.model}`)
+    } else if ((parsedUA as any).os?.name) {
+      parts.push((parsedUA as any).os?.name)
+      if ((parsedUA as any).os?.version) {
+        parts.push((parsedUA as any).os?.version)
       }
     }
 
-    if (parsedUA.browser.name) {
-      parts.push(parsedUA.browser.name)
+    if ((parsedUA as any).browser?.name) {
+      parts.push((parsedUA as any).browser?.name)
     }
 
     return parts.join(' ') || 'Unknown Device'
@@ -897,7 +897,7 @@ export class SessionService {
     try {
       const supabase = await this.getSupabase()
       
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         last_activity_at: new Date().toISOString()
       }
       

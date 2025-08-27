@@ -64,7 +64,7 @@ export class TenantConfigurationService {
       }
 
       // Merge with existing branding
-      const currentBranding = (tenant.branding as Partial<BrandingConfig>) || {}
+      const currentBranding = (tenant?.branding as Partial<BrandingConfig>) || {}
       const updatedBranding = { ...currentBranding, ...branding }
 
       // Update tenant
@@ -185,7 +185,7 @@ export class TenantConfigurationService {
       }
 
       // Validate feature flags for tenant's plan
-      const validation = tenantConfig.validateFeatureFlags(featureFlags, tenant.plan)
+      const validation = tenantConfig.validateFeatureFlags(featureFlags, tenant?.plan)
       if (!validation.valid) {
         return {
           success: false,
@@ -210,7 +210,7 @@ export class TenantConfigurationService {
       }
 
       // Merge with existing feature flags
-      const currentFlags = (tenant.feature_flags as Partial<FeatureFlags>) || {}
+      const currentFlags = (tenant?.feature_flags as Partial<FeatureFlags>) || {}
       const updatedFlags = { ...currentFlags, ...featureFlags }
 
       // Update tenant
@@ -340,7 +340,7 @@ export class TenantConfigurationService {
       }
 
       // Merge with existing settings
-      const currentSettings = (tenant.settings as Partial<TenantSettings>) || {}
+      const currentSettings = (tenant?.settings as Partial<TenantSettings>) || {}
       const updatedSettings = { ...currentSettings, ...settings }
 
       // Update tenant
@@ -419,7 +419,7 @@ export class TenantConfigurationService {
     userId: string
   ): Promise<TenantConfigurationResult> {
     try {
-      const results: any = {}
+      const results: Record<string, unknown> = {}
       let hasErrors = false
       const errors: string[] = []
 
@@ -541,7 +541,7 @@ export class TenantConfigurationService {
         return { success: false, error: fetchError.message }
       }
 
-      const oldPlan = tenant.plan
+      const oldPlan = tenant?.plan
       const planLimits = tenantConfig.getPlanLimits(newPlan)
 
       // Update tenant with new plan and limits
@@ -589,8 +589,8 @@ export class TenantConfigurationService {
     tenantId: string,
     userId: string,
     configType: string,
-    beforeState: any,
-    afterState: any
+    beforeState: Record<string, unknown>,
+    afterState: Record<string, unknown>
   ): Promise<void> {
     try {
       const supabase = await this.getSupabase()
@@ -655,7 +655,7 @@ export class TenantConfigurationService {
    */
   async importConfiguration(
     tenantId: string,
-    configData: any,
+    configData: Record<string, unknown>,
     userId: string
   ): Promise<TenantConfigurationResult> {
     try {
@@ -664,7 +664,7 @@ export class TenantConfigurationService {
         return { success: false, error: 'Invalid configuration data format' }
       }
 
-      const { branding, settings, featureFlags } = configData.configuration
+      const { branding, settings, featureFlags } = (configData.configuration as any)
 
       // Import configuration
       const result = await this.updateConfiguration(

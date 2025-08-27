@@ -385,7 +385,7 @@ export async function bulkUpdateAssets(operation: BulkOperation) {
       return { error: 'Unauthorized to update some assets' }
     }
 
-    let updateData: any = {}
+    const updateData: Record<string, unknown> = {}
     
     switch (operation.operation) {
       case 'update_status':

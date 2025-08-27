@@ -556,8 +556,8 @@ export class DepartmentService {
         throw new Error(`Failed to get user departments: ${error.message}`)
       }
 
-      return userDepts?.map((ud: any) => ({
-        ...ud.departments,
+      return userDepts?.map((ud: Record<string, unknown>) => ({
+        ...(ud.departments as any),
         is_primary: ud.is_primary,
         role_in_department: ud.role_in_department
       })) || []
@@ -594,8 +594,8 @@ export class DepartmentService {
         throw new Error(`Failed to get department users: ${error.message}`)
       }
 
-      return deptUsers?.map((du: any) => ({
-        ...du.profiles,
+      return deptUsers?.map((du: Record<string, unknown>) => ({
+        ...(du.profiles as any),
         is_primary: du.is_primary,
         role_in_department: du.role_in_department,
         assigned_at: du.assigned_at
@@ -697,8 +697,8 @@ export class DepartmentService {
         .eq('is_active', true)
         .in('user_id', users.map(u => u.id))
 
-      const roleDistMap = roleDistribution?.reduce((acc: Record<string, number>, ur: any) => {
-        const roleName = ur.roles?.display_name || ur.roles?.name || 'Unknown'
+      const roleDistMap = roleDistribution?.reduce((acc: Record<string, number>, ur: Record<string, unknown>) => {
+        const roleName = (ur.roles as any)?.display_name || (ur.roles as any)?.name || 'Unknown'
         acc[roleName] = (acc[roleName] || 0) + 1
         return acc
       }, {} as Record<string, number>) || {}

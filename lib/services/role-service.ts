@@ -262,8 +262,8 @@ export class RoleService {
       }
 
       // Transform the data to match our interface
-      const permissions = role.role_permissions?.map((rp: any) => ({
-        ...rp.permissions,
+      const permissions = role.role_permissions?.map((rp: Record<string, unknown>) => ({
+        ...(rp.permissions as any),
         conditions: rp.conditions,
         resource_filters: rp.resource_filters,
         inherited_from_role_id: rp.inherited_from_role_id
@@ -537,8 +537,8 @@ export class RoleService {
         throw new Error(`Failed to get user roles: ${error.message}`)
       }
 
-      return userRoles?.map((ur: any) => ({
-        ...ur.roles,
+      return userRoles?.map((ur: Record<string, unknown>) => ({
+        ...(ur.roles as any),
         assigned_at: ur.assigned_at,
         expires_at: ur.expires_at,
         assigned_by: ur.assigned_by
@@ -577,8 +577,8 @@ export class RoleService {
         throw new Error(`Failed to get role users: ${error.message}`)
       }
 
-      return roleUsers?.map((ru: any) => ({
-        ...ru.profiles,
+      return roleUsers?.map((ru: Record<string, unknown>) => ({
+        ...(ru.profiles as any),
         assigned_at: ru.assigned_at,
         expires_at: ru.expires_at,
         assigned_by: ru.assigned_by

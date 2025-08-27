@@ -5,4 +5,12 @@ pandas
 numpy
 joblib
 python-multipart
-# For future: torch, tensorflow, prophet, sentence-transformers, etc. 
+scipy
+matplotlib
+seaborn
+# Time series forecasting
+prophet
+# Additional ML libraries
+xgboost
+lightgbm
+# For future: torch, tensorflow, sentence-transformers, etc. 

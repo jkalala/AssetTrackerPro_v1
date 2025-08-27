@@ -1,8 +1,9 @@
 import "@testing-library/jest-dom"
 
 // Ensure jest is available globally
-if (typeof jest === 'undefined') {
-  global.jest = require('@jest/globals').jest
+import { jest } from '@jest/globals'
+if (typeof global.jest === 'undefined') {
+  global.jest = jest
 }
 
 // Mock Next.js router

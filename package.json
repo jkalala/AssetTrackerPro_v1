@@ -31,7 +31,9 @@
     "migrate:show": "node scripts/show-migration.js",
     "migrate:plan": "node scripts/run-all-pending-migrations.js",
     "migrate:analyze": "node scripts/run-all-pending-migrations.js --analyze",
-    "migrate:sql": "node scripts/run-all-pending-migrations.js --sql"
+    "migrate:sql": "node scripts/run-all-pending-migrations.js --sql",
+    "fix:critical": "node scripts/fix-critical-lint-issues.js",
+    "fix:security": "pnpm audit --fix"
   },
   "dependencies": {
     "@apollo/server": "^5.0.0",
@@ -140,7 +142,7 @@
     "tailwind-merge": "^3.3.1",
     "ua-parser-js": "^2.0.4",
     "vaul": "^1.1.2",
-    "xlsx": "^0.18.5",
+    "xlsx": "^0.20.2",
     "zod": "^4.1.3"
   },
   "devDependencies": {

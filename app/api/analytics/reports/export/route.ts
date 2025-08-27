@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ReportingService } from '@/lib/services/reporting-service'
-import { getCurrentUser } from '@/lib/auth-actions'
+import { createClient } from '@/lib/supabase/server'
 
 const reportingService = new ReportingService()
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser()
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     if (!user?.tenant_id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -38,7 +42,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unsupported format' }, { status: 400 })
     }
 
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(fileBuffer as any, {
       headers: {
         'Content-Type': mimeType,
         'Content-Disposition': `attachment; filename="${fileName}"`

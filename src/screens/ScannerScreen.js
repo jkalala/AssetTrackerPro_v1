@@ -7,15 +7,6 @@ import {
 } from 'react-native';
 import { Camera } from 'expo-camera';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import {
-  Button,
-  Card,
-  Title,
-  Paragraph,
-  ActivityIndicator,
-  Text,
-  IconButton,
-} from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from 'react-native-paper';
 import { assetAPI } from '../services/api';
@@ -76,7 +67,7 @@ export default function ScannerScreen({ navigation }) {
           ]
         );
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error processing QR code:', error);
       Alert.alert(
         'Error',
@@ -106,7 +97,7 @@ export default function ScannerScreen({ navigation }) {
       }
       
       return { success: false };
-    } catch (error) {
+    } catch (_error) {
       console.error('Error processing QR code:', error);
       throw error;
     }

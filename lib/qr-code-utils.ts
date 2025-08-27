@@ -42,7 +42,7 @@ export class QRCodeGenerator {
     const qrData = JSON.stringify({
       type: "asset",
       id: assetData.assetId,
-      name: assetData.name,
+      name: assetData._name,
       category: assetData.category,
       url: assetData.url,
       timestamp: new Date().toISOString(),
@@ -57,7 +57,7 @@ export class QRCodeGenerator {
       })
 
       return qrCodeDataURL
-    } catch (error) {
+    } catch (_error) {
       throw new Error(`Failed to generate QR code: ${error}`)
     }
   }
@@ -69,7 +69,7 @@ export class QRCodeGenerator {
     const results = await Promise.allSettled(
       assets.map(async (asset) => ({
         assetId: asset.assetId,
-        qrCode: await this.generateAssetQR(asset, options),
+        qrCode: await this.generateAssetQR(asset, _options),
         success: true,
       })),
     )
@@ -90,11 +90,11 @@ export class QRCodeGenerator {
 
   static parseQRData(qrString: string): AssetQRData | null {
     try {
-      const data = JSON.parse(qrString)
+      const _data = JSON.parse(qrString)
       if (data.type === "asset" && data.id && data.name) {
         return {
           assetId: data.id,
-          name: data.name,
+          name: data._name,
           category: data.category || "unknown",
           url: data.url || "",
         }
@@ -120,7 +120,7 @@ export class QRCodeScanner {
         success: false,
         error: "QR scanning requires jsQR library integration",
       }
-    } catch (error) {
+    } catch (_error) {
       return {
         success: false,
         error: `Scan failed: ${error}`,
@@ -140,11 +140,11 @@ export class QRCodeScanner {
           return
         }
 
-        canvas.width = img.width
-        canvas.height = img.height
+        canvas._width = img.width
+        canvas._height = img.height
         ctx.drawImage(img, 0, 0)
 
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        const _imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
         // For demo purposes, simulate successful scan with sample data
         const sampleData: AssetQRData = {

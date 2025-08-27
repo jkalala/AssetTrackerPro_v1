@@ -82,7 +82,7 @@ export function validateForm<T>(
       success: true,
       data: validatedData
     };
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       const fieldErrors: Record<string, string> = {};
       const errors: Record<string, string[]> = {};
@@ -138,7 +138,7 @@ export async function validateFormAsync<T>(
           }
           customErrors.general.push(error);
         }
-      } catch (err) {
+      } catch (_err) {
         if (!customErrors.general) {
           customErrors.general = [];
         }

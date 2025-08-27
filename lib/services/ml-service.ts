@@ -4,7 +4,6 @@
  */
 
 import { SupabaseClient } from '@supabase/supabase-js'
-import { Database } from '../types/database'
 import {
   MaintenancePrediction,
   UtilizationAnalysis,
@@ -34,7 +33,7 @@ export class MLService {
 
     for (const assetId of assetIds) {
       // Get asset features from database
-      const features = await this.getAssetFeatures(tenantId, assetId)
+      const features = await this.getAssetFeatures(_tenantId, assetId)
       if (!features) continue
 
       try {
@@ -55,20 +54,20 @@ export class MLService {
         const prediction: MaintenancePrediction = {
           asset_id: assetId,
           prediction_type: result.will_fail_soon ? 'failure_risk' : 'maintenance_due',
-          probability: result.probability,
+          probability: result._probability,
           confidence: this.calculateConfidence(result.probability),
-          predicted_date: this.calculatePredictedDate(result.probability, features.last_maintenance_days),
-          factors: this.analyzePredictionFactors(features, result.probability),
-          recommendations: this.generateMaintenanceRecommendations(result.probability, features),
+          predicted_date: this.calculatePredictedDate(result._probability, features.last_maintenance_days),
+          factors: this.analyzePredictionFactors(_features, result.probability),
+          recommendations: this.generateMaintenanceRecommendations(result._probability, features),
           created_at: new Date().toISOString()
         }
 
         predictions.push(prediction)
 
         // Store prediction in database
-        await this.storePrediction(tenantId, prediction)
+        await this.storePrediction(_tenantId, prediction)
 
-      } catch (error) {
+      } catch (_error) {
         console.error(`Failed to predict maintenance for asset ${assetId}:`, error)
       }
     }
@@ -86,7 +85,7 @@ export class MLService {
     for (const assetId of assetIds) {
       try {
         // Get utilization data from database
-        const utilizationData = await this.getUtilizationData(tenantId, assetId)
+        const utilizationData = await this.getUtilizationData(_tenantId, assetId)
         if (!utilizationData) continue
 
         // Calculate optimization metrics
@@ -94,9 +93,9 @@ export class MLService {
         analyses.push(analysis)
 
         // Store analysis in database
-        await this.storeUtilizationAnalysis(tenantId, analysis)
+        await this.storeUtilizationAnalysis(_tenantId, analysis)
 
-      } catch (error) {
+      } catch (_error) {
         console.error(`Failed to analyze utilization for asset ${assetId}:`, error)
       }
     }
@@ -117,7 +116,7 @@ export class MLService {
 
     for (let i = 0; i < assetIds.length; i++) {
       const assetId = assetIds[i]
-      const features = await this.getAssetFeatures(tenantId, assetId)
+      const features = await this.getAssetFeatures(_tenantId, assetId)
       if (features) {
         featuresData.push([
           features.usage_hours,
@@ -146,7 +145,7 @@ export class MLService {
         if (result.anomalies[i] === -1) { // -1 indicates anomaly
           const assetId = assetFeatureMap.get(i)
           if (assetId) {
-            const anomaly = await this.createAnomalyDetection(tenantId, assetId, featuresData[i])
+            const anomaly = await this.createAnomalyDetection(_tenantId, assetId, featuresData[i])
             anomalies.push(anomaly)
           }
         }
@@ -154,10 +153,10 @@ export class MLService {
 
       // Store anomalies in database
       for (const anomaly of anomalies) {
-        await this.storeAnomalyDetection(tenantId, anomaly)
+        await this.storeAnomalyDetection(_tenantId, anomaly)
       }
 
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to detect anomalies:', error)
     }
 
@@ -174,7 +173,7 @@ export class MLService {
     for (const assetId of assetIds) {
       try {
         // Get historical data for forecasting
-        const historicalData = await this.getHistoricalData(tenantId, assetId)
+        const historicalData = await this.getHistoricalData(_tenantId, assetId)
         if (!historicalData || historicalData.length < 12) continue // Need at least 12 months of data
 
         // Generate forecast using time series analysis
@@ -182,9 +181,9 @@ export class MLService {
         forecasts.push(forecast)
 
         // Store forecast in database
-        await this.storeForecast(tenantId, forecast)
+        await this.storeForecast(_tenantId, forecast)
 
-      } catch (error) {
+      } catch (_error) {
         console.error(`Failed to forecast lifecycle for asset ${assetId}:`, error)
       }
     }
@@ -201,8 +200,8 @@ export class MLService {
 
     try {
       // Get recent predictions and analyses
-      const maintenancePredictions = await this.getRecentPredictions(tenantId, 'maintenance')
-      const utilizationAnalyses = await this.getRecentAnalyses(tenantId, 'utilization')
+      const maintenancePredictions = await this.getRecentPredictions(_tenantId, 'maintenance')
+      const utilizationAnalyses = await this.getRecentAnalyses(_tenantId, 'utilization')
       // const anomalies = await this.getRecentAnomalies(tenantId)
 
       // Generate maintenance insights
@@ -210,7 +209,7 @@ export class MLService {
         if (prediction.probability > 0.7) {
           insights.push({
             id: `maintenance-${prediction.asset_id}-${Date.now()}`,
-            tenant_id: tenantId,
+            tenant_id: _tenantId,
             type: 'maintenance_alert',
             title: `High Maintenance Risk Detected`,
             description: `Asset ${prediction.asset_id} has a ${Math.round(prediction.probability * 100)}% probability of requiring maintenance soon.`,
@@ -233,7 +232,7 @@ export class MLService {
         if (analysis.current_utilization < analysis.optimal_utilization * 0.7) {
           insights.push({
             id: `utilization-${analysis.asset_id}-${Date.now()}`,
-            tenant_id: tenantId,
+            tenant_id: _tenantId,
             type: 'utilization_opportunity',
             title: `Underutilized Asset Identified`,
             description: `Asset ${analysis.asset_id} is operating at ${Math.round(analysis.current_utilization * 100)}% utilization, well below optimal levels.`,
@@ -253,10 +252,10 @@ export class MLService {
 
       // Store insights in database
       for (const insight of insights) {
-        await this.storeInsight(tenantId, insight)
+        await this.storeInsight(_tenantId, insight)
       }
 
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to generate insights:', error)
     }
 
@@ -285,7 +284,7 @@ export class MLService {
 
     const job: BatchPredictionJob = {
       id: `job-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      tenant_id: tenantId,
+      tenant_id: _tenantId,
       job_type: jobType,
       status: 'queued',
       progress: 0,
@@ -295,10 +294,10 @@ export class MLService {
     }
 
     // Store job in database
-    await this.storeBatchJob(tenantId, job)
+    await this.storeBatchJob(_tenantId, job)
 
     // Process job asynchronously
-    this.processBatchJob(job, assetIds).catch(error => {
+    this.processBatchJob(job, assetIds).catch(_error => {
       console.error(`Batch job ${job.id} failed:`, error)
     })
 
@@ -342,7 +341,7 @@ export class MLService {
     return {
       asset_id: assetId,
       usage_hours: usageHours,
-      last_maintenance_days: lastMaintenanceDays,
+      last_maintenance_days: _lastMaintenanceDays,
       failure_count: failureCount,
       age_years: ageYears
     }
@@ -432,17 +431,17 @@ export class MLService {
       await this.supabase
         .from('ml_predictions')
         .insert({
-          tenant_id: tenantId,
+          tenant_id: _tenantId,
           asset_id: prediction.asset_id,
           prediction_type: prediction.prediction_type,
-          probability: prediction.probability,
+          probability: prediction._probability,
           confidence: prediction.confidence,
           predicted_date: prediction.predicted_date,
           factors: prediction.factors,
           recommendations: prediction.recommendations,
           created_at: prediction.created_at
         })
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to store prediction:', error)
     }
   }
@@ -460,7 +459,7 @@ export class MLService {
     return data || []
   }
 
-  private async calculateUtilizationOptimization(assetId: string, utilizationData: any[]): Promise<UtilizationAnalysis> {
+  private async calculateUtilizationOptimization(assetId: string, utilizationData: Record<string, unknown>[]): Promise<UtilizationAnalysis> {
     // Simplified utilization calculation
     const currentUtilization = Math.random() * 0.8 // Placeholder
     const optimalUtilization = 0.85
@@ -537,7 +536,7 @@ export class MLService {
     return data || []
   }
 
-  private async generateLifecycleForecast(assetId: string, historicalData: any[]): Promise<AssetForecast> {
+  private async generateLifecycleForecast(assetId: string, historicalData: Record<string, unknown>[]): Promise<AssetForecast> {
     // Simplified forecasting - in production, would use more sophisticated time series analysis
     const predictions = []
     const confidenceIntervals = []
@@ -635,7 +634,7 @@ export class MLService {
       job.status = 'completed'
       job.completed_at = new Date().toISOString()
 
-    } catch (error) {
+    } catch (_error) {
       job.status = 'failed'
       job.error_message = error instanceof Error ? error.message : 'Unknown error'
       job.completed_at = new Date().toISOString()

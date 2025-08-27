@@ -55,7 +55,7 @@ export default function HomeScreen({ navigation }) {
         // Store data for offline use
         await offlineStorage.storeData('dashboardStats', statsData);
         await offlineStorage.storeData('recentActivity', activityData.assets || []);
-      } catch (error) {
+      } catch (_error) {
         console.log('API unavailable, loading from offline storage');
         setOfflineMode(true);
         
@@ -66,7 +66,7 @@ export default function HomeScreen({ navigation }) {
         if (offlineStats) setStats(offlineStats);
         if (offlineActivity) setRecentActivity(offlineActivity);
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error loading dashboard data:', error);
     } finally {
       setLoading(false);

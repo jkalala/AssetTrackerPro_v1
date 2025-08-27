@@ -49,7 +49,7 @@ export function ReportScheduler({
   const [formData, setFormData] = useState({
     name: '',
     report_id: '',
-    frequency: 'weekly' as const,
+    frequency: 'weekly' as 'daily' | 'weekly' | 'monthly' | 'quarterly',
     day_of_week: 1,
     day_of_month: 1,
     time: '09:00',
@@ -64,7 +64,7 @@ export function ReportScheduler({
     setFormData({
       name: '',
       report_id: '',
-      frequency: 'weekly',
+      frequency: 'weekly' as 'daily' | 'weekly' | 'monthly' | 'quarterly',
       day_of_week: 1,
       day_of_month: 1,
       time: '09:00',
@@ -86,12 +86,12 @@ export function ReportScheduler({
     setFormData({
       name: schedule.name,
       report_id: schedule.report_id,
-      frequency: schedule.frequency,
+      frequency: schedule.frequency as 'daily' | 'weekly' | 'monthly' | 'quarterly',
       day_of_week: schedule.day_of_week || 1,
       day_of_month: schedule.day_of_month || 1,
       time: schedule.time,
       timezone: schedule.timezone,
-      format: schedule.format,
+      format: 'pdf' as const,
       recipients: schedule.recipients,
       is_active: schedule.is_active
     })

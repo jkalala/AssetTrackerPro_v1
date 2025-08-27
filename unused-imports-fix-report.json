@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-08-27T09:21:00.410Z",
+  "fixedFiles": [
+    "components\\ui\\command.tsx",
+    "components\\ui\\toggle-group.tsx"
+  ],
+  "errorFiles": [],
+  "summary": {
+    "totalFilesFixed": 2,
+    "totalErrors": 0
+  }
+}

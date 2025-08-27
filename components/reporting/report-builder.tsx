@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
+// import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -45,12 +45,12 @@ export function ReportBuilder({ availableFields, initialReport, onSave, onPrevie
   const [reportName, setReportName] = useState(initialReport?.name || '')
   const [reportDescription, setReportDescription] = useState(initialReport?.description || '')
   const [reportCategory, setReportCategory] = useState(initialReport?.category || 'custom')
-  const [selectedFields, setSelectedFields] = useState<ReportField[]>(initialReport?.definition?.fields || [])
-  const [filters, setFilters] = useState<ReportFilter[]>(initialReport?.definition?.filters || [])
-  const [sorting, setSorting] = useState<ReportSort[]>(initialReport?.definition?.sorting || [])
-  const [grouping, setGrouping] = useState<ReportGrouping[]>(initialReport?.definition?.grouping || [])
+  const [selectedFields, setSelectedFields] = useState<ReportField[]>(initialReport?.fields || [])
+  const [filters, setFilters] = useState<ReportFilter[]>(initialReport?.filters || [])
+  const [sorting, setSorting] = useState<ReportSort[]>(initialReport?.sorting || [])
+  const [grouping, setGrouping] = useState<ReportGrouping[]>(initialReport?.grouping || [])
   const [visualization, setVisualization] = useState<ReportVisualization>(
-    initialReport?.definition?.visualization || {
+    initialReport?.visualization || {
       type: 'table',
       config: {}
     }
@@ -64,7 +64,7 @@ export function ReportBuilder({ availableFields, initialReport, onSave, onPrevie
     return acc
   }, {} as Record<string, AvailableField[]>)
 
-  const handleDragEnd = (result: DropResult) => {
+  const handleDragEnd = (result: any) => {
     if (!result.destination) return
 
     const { source, destination } = result
@@ -158,13 +158,10 @@ export function ReportBuilder({ availableFields, initialReport, onSave, onPrevie
       name: reportName,
       description: reportDescription,
       category: reportCategory,
-      definition: {
-        fields: selectedFields,
-        filters,
-        sorting,
-        grouping,
-        visualization
-      },
+      fields: selectedFields,
+      filters,
+      sorting,
+      grouping,
       visualization,
       is_active: true
     }
@@ -176,13 +173,10 @@ export function ReportBuilder({ availableFields, initialReport, onSave, onPrevie
       name: reportName,
       description: reportDescription,
       category: reportCategory,
-      definition: {
-        fields: selectedFields,
-        filters,
-        sorting,
-        grouping,
-        visualization
-      },
+      fields: selectedFields,
+      filters,
+      sorting,
+      grouping,
       visualization,
       is_active: true
     }

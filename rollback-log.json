@@ -1,0 +1,15 @@
+{
+  "checkpoints": [
+    {
+      "id": 1756285900722,
+      "phaseName": "foundation",
+      "description": "Initial baseline before lint cleanup",
+      "timestamp": "2025-08-27T09:11:40.722Z",
+      "gitTag": "lint-cleanup-foundation-1756285900610",
+      "gitCommit": "c8d25d8a84e0334710773ffc20c2013fd0b0c48f",
+      "testResults": null
+    }
+  ],
+  "currentPhase": "foundation",
+  "lastSafePoint": 1756285900722
+}

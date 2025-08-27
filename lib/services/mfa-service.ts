@@ -4,13 +4,6 @@
 // Service for managing MFA methods, verification, and security
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  MfaMethod, 
-  MfaMethodInsert, 
-  MfaMethodUpdate,
-  MfaVerificationAttempt,
-  SecurityEventInsert
-} from '@/lib/types/database'
 import { authenticator } from 'otplib'
 import crypto from 'crypto'
 
@@ -72,8 +65,8 @@ export class MfaService {
 
       // Create MFA method record
       const methodData: MfaMethodInsert = {
-        tenant_id: tenantId,
-        user_id: userId,
+        tenant_id: _tenantId,
+        user_id: _userId,
         method_type: 'totp',
         method_name: methodName,
         secret_encrypted: encryptedSecret,
@@ -103,7 +96,7 @@ export class MfaService {
         qrCode,
         backupCodes
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error setting up TOTP:', error)
       return {
         success: false,
@@ -129,8 +122,8 @@ export class MfaService {
 
       // Create MFA method record
       const methodData: MfaMethodInsert = {
-        tenant_id: tenantId,
-        user_id: userId,
+        tenant_id: _tenantId,
+        user_id: _userId,
         method_type: 'sms',
         method_name: methodName,
         secret_encrypted: encryptedPhone,
@@ -155,8 +148,8 @@ export class MfaService {
 
       // Store verification attempt
       await this.createVerificationAttempt(
-        tenantId,
-        userId,
+        _tenantId,
+        _userId,
         method.id,
         'setup',
         verificationCode
@@ -166,7 +159,7 @@ export class MfaService {
         success: true,
         method
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error setting up SMS:', error)
       return {
         success: false,
@@ -192,8 +185,8 @@ export class MfaService {
 
       // Create MFA method record
       const methodData: MfaMethodInsert = {
-        tenant_id: tenantId,
-        user_id: userId,
+        tenant_id: _tenantId,
+        user_id: _userId,
         method_type: 'email',
         method_name: methodName,
         secret_encrypted: encryptedEmail,
@@ -218,8 +211,8 @@ export class MfaService {
 
       // Store verification attempt
       await this.createVerificationAttempt(
-        tenantId,
-        userId,
+        _tenantId,
+        _userId,
         method.id,
         'setup',
         verificationCode
@@ -229,7 +222,7 @@ export class MfaService {
         success: true,
         method
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error setting up email MFA:', error)
       return {
         success: false,
@@ -289,8 +282,8 @@ export class MfaService {
 
       // Create verification attempt record
       await this.createVerificationAttempt(
-        tenantId,
-        userId,
+        _tenantId,
+        _userId,
         methodId,
         attemptType,
         code,
@@ -299,7 +292,7 @@ export class MfaService {
 
       if (!isValid) {
         // Log security event for failed verification
-        await this.logSecurityEvent(tenantId, userId, 'mfa_failure', {
+        await this.logSecurityEvent(_tenantId, _userId, 'mfa_failure', {
           method_type: method.method_type,
           method_name: method.method_name,
           attempt_type: attemptType
@@ -331,7 +324,7 @@ export class MfaService {
       }
 
       // Log successful verification
-      await this.logSecurityEvent(tenantId, userId, 'mfa_success', {
+      await this.logSecurityEvent(_tenantId, _userId, 'mfa_success', {
         method_type: method.method_type,
         method_name: method.method_name,
         attempt_type: attemptType,
@@ -345,7 +338,7 @@ export class MfaService {
                        method.backup_codes && 
                        method.backup_codes.length <= 2
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error verifying MFA code:', error)
       return {
         success: false,
@@ -388,7 +381,7 @@ export class MfaService {
         primaryMethod,
         backupCodesRemaining
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting MFA status:', error)
       return {
         isEnabled: false,
@@ -422,13 +415,13 @@ export class MfaService {
       }
 
       // Log security event
-      await this.logSecurityEvent(tenantId, userId, 'mfa_success', {
+      await this.logSecurityEvent(_tenantId, _userId, 'mfa_success', {
         action: 'method_disabled',
         method_id: methodId
       })
 
       return { success: true }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error disabling MFA method:', error)
       return {
         success: false,
@@ -518,7 +511,7 @@ export class MfaService {
         success: true,
         backupCodes
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error verifying MFA setup:', error)
       return {
         success: false,
@@ -567,8 +560,8 @@ export class MfaService {
       } else {
         // Create new backup codes method
         const methodData: MfaMethodInsert = {
-          tenant_id: tenantId,
-          user_id: userId,
+          tenant_id: _tenantId,
+          user_id: _userId,
           method_type: 'backup_codes',
           method_name: 'Backup Codes',
           backup_codes: encryptedBackupCodes,
@@ -589,7 +582,7 @@ export class MfaService {
         success: true,
         backupCodes
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error generating backup codes:', error)
       return {
         success: false,
@@ -608,7 +601,7 @@ export class MfaService {
       
       const secret = this.decryptSecret(method.secret_encrypted)
       return authenticator.verify({ token: code, secret })
-    } catch (error) {
+    } catch (_error) {
       console.error('Error verifying TOTP code:', error)
       return false
     }
@@ -633,7 +626,7 @@ export class MfaService {
 
       const codeHash = crypto.createHash('sha256').update(code).digest('hex')
       return codeHash === attempt.code_hash
-    } catch (error) {
+    } catch (_error) {
       console.error('Error verifying temporary code:', error)
       return false
     }
@@ -658,7 +651,7 @@ export class MfaService {
       }
 
       return { valid: false, used: false }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error verifying backup code:', error)
       return { valid: false, used: false }
     }
@@ -682,7 +675,7 @@ export class MfaService {
         .from('mfa_methods')
         .update({ backup_codes: updatedCodes })
         .eq('id', method.id)
-    } catch (error) {
+    } catch (_error) {
       console.error('Error updating backup codes:', error)
     }
   }
@@ -703,15 +696,15 @@ export class MfaService {
       await supabase
         .from('mfa_verification_attempts')
         .insert({
-          tenant_id: tenantId,
-          user_id: userId,
+          tenant_id: _tenantId,
+          user_id: _userId,
           mfa_method_id: methodId,
           attempt_type: attemptType,
           code_hash: codeHash,
           is_successful: isSuccessful,
           expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString() // 10 minutes
         })
-    } catch (error) {
+    } catch (_error) {
       console.error('Error creating verification attempt:', error)
     }
   }
@@ -726,8 +719,8 @@ export class MfaService {
       const supabase = await this.getSupabase()
 
       const eventData: SecurityEventInsert = {
-        tenant_id: tenantId,
-        user_id: userId,
+        tenant_id: _tenantId,
+        user_id: _userId,
         event_type: eventType,
         severity: eventType === 'mfa_failure' ? 'medium' : 'low',
         description: eventType === 'mfa_failure' 
@@ -739,7 +732,7 @@ export class MfaService {
       await supabase
         .from('security_events')
         .insert(eventData)
-    } catch (error) {
+    } catch (_error) {
       console.error('Error logging security event:', error)
     }
   }
@@ -790,7 +783,7 @@ export class MfaService {
     try {
       const QRCode = await import('qrcode')
       return await QRCode.toDataURL(data)
-    } catch (error) {
+    } catch (_error) {
       console.error('Error generating QR code:', error)
       return ''
     }
@@ -853,7 +846,7 @@ export class MfaService {
         .eq('method_type', 'backup_codes')
 
       return { success: true, codesRemaining: updatedCodes.length }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error verifying backup code:', error)
       return { success: false, error: 'Failed to verify backup code' }
     }
@@ -877,7 +870,7 @@ export class MfaService {
       }
 
       return { success: true }
-    } catch (error) {
+    } catch (_error) {
       return { 
         success: false, 
         error: error instanceof Error ? error.message : 'Unknown error' 
@@ -911,7 +904,7 @@ export class MfaService {
   validateTOTPToken(secret: string, token: string): boolean {
     try {
       return authenticator.verify({ token, secret })
-    } catch (error) {
+    } catch (_error) {
       console.error('Error validating TOTP token:', error)
       return false
     }

@@ -1,25 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  RefreshControl,
-  Alert,
-} from 'react-native';
-import {
-  Card,
-  Title,
-  Paragraph,
-  Searchbar,
-  Chip,
-  List,
-  Divider,
-  ActivityIndicator,
-  Text,
-  Button,
-  Menu,
-  IconButton,
-} from 'react-native-paper';
+import React, { useState, useEffect, useCallback } from 'react';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from 'react-native-paper';
 import { assetAPI, offlineStorage } from '../services/api';
@@ -64,7 +43,7 @@ export default function AssetsScreen({ navigation }) {
         // Store for offline use
         await offlineStorage.storeData('assets', assetsData);
         await offlineStorage.storeData('categories', uniqueCategories);
-      } catch (error) {
+      } catch (_error) {
         console.log('API unavailable, loading from offline storage');
         setOfflineMode(true);
         
@@ -75,7 +54,7 @@ export default function AssetsScreen({ navigation }) {
         if (offlineAssets) setAssets(offlineAssets);
         if (offlineCategories) setCategories(offlineCategories);
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error loading assets:', error);
     } finally {
       setLoading(false);
@@ -88,7 +67,7 @@ export default function AssetsScreen({ navigation }) {
     setRefreshing(false);
   };
 
-  const filterAssets = () => {
+  const filterAssets = useCallback(() => {=> {
     let filtered = [...assets];
 
     // Filter by search query
@@ -122,7 +101,7 @@ export default function AssetsScreen({ navigation }) {
     });
 
     setFilteredAssets(filtered);
-  };
+  }, [searchQuery, selectedCategory, assets]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -137,7 +116,7 @@ export default function AssetsScreen({ navigation }) {
     }
   };
 
-  const getStatusIcon = (status) => {
+  const _getStatusIcon = (status) => {
     switch (status) {
       case 'available':
         return 'check-circle';
@@ -308,7 +287,7 @@ export default function AssetsScreen({ navigation }) {
 
       {/* Assets List */}
       <FlatList
-        data={filteredAssets}
+        _data ={filteredAssets}
         renderItem={renderAssetItem}
         keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
         contentContainerStyle={styles.listContainer}

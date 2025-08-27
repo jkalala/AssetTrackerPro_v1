@@ -4,18 +4,6 @@
 // Service for managing organizational departments and hierarchy
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  Department, 
-  DepartmentInsert, 
-  DepartmentUpdate,
-  DepartmentWithHierarchy,
-  UserDepartment,
-  DepartmentRole,
-  DepartmentRoleInsert,
-  DepartmentHierarchyNode,
-  DepartmentAnalytics
-} from '@/lib/types/rbac'
-
 export class DepartmentService {
   private async getSupabase() {
     return createClient()
@@ -79,7 +67,7 @@ export class DepartmentService {
         .from('departments')
         .insert({
           ...departmentData,
-          tenant_id: tenantId,
+          tenant_id: _tenantId,
           created_by: createdBy
         })
         .select()
@@ -90,7 +78,7 @@ export class DepartmentService {
       }
 
       return department
-    } catch (error) {
+    } catch (_error) {
       console.error('Error creating department:', error)
       throw error
     }
@@ -103,7 +91,7 @@ export class DepartmentService {
       // Check if department exists
       const { data: existingDept } = await supabase
         .from('departments')
-        .select('id, name, code')
+        .select('id, _name, code')
         .eq('id', departmentId)
         .eq('tenant_id', tenantId)
         .single()
@@ -177,7 +165,7 @@ export class DepartmentService {
       }
 
       return department
-    } catch (error) {
+    } catch (_error) {
       console.error('Error updating department:', error)
       throw error
     }
@@ -242,7 +230,7 @@ export class DepartmentService {
       }
 
       return true
-    } catch (error) {
+    } catch (_error) {
       console.error('Error deleting department:', error)
       throw error
     }
@@ -284,7 +272,7 @@ export class DepartmentService {
           *,
           roles (
             id,
-            name,
+            _name,
             display_name,
             description
           )
@@ -297,7 +285,7 @@ export class DepartmentService {
         user_count: userCount?.length || 0,
         roles: deptRoles?.map(dr => dr.roles).filter(Boolean) || []
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting department:', error)
       throw error
     }
@@ -307,7 +295,7 @@ export class DepartmentService {
     try {
       const supabase = await this.getSupabase()
       
-      let query = supabase
+      let _query = supabase
         .from('departments')
         .select('*')
         .eq('tenant_id', tenantId)
@@ -315,7 +303,7 @@ export class DepartmentService {
         .order('name', { ascending: true })
 
       if (!includeInactive) {
-        query = query.eq('is_active', true)
+        _query = query.eq('is_active', true)
       }
 
       const { data: departments, error } = await query
@@ -325,7 +313,7 @@ export class DepartmentService {
       }
 
       return departments || []
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting departments:', error)
       throw error
     }
@@ -342,7 +330,7 @@ export class DepartmentService {
         .select('department_id')
         .eq('tenant_id', tenantId)
 
-      const userCountMap = userCounts?.reduce((acc, ud) => {
+      const _userCountMap = userCounts?.reduce((acc, ud) => {
         acc[ud.department_id] = (acc[ud.department_id] || 0) + 1
         return acc
       }, {} as Record<string, number>) || {}
@@ -354,7 +342,7 @@ export class DepartmentService {
           department_id,
           roles (
             id,
-            name,
+            _name,
             display_name,
             description
           )
@@ -400,7 +388,7 @@ export class DepartmentService {
       })
 
       return rootNodes
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting department hierarchy:', error)
       throw error
     }
@@ -461,8 +449,8 @@ export class DepartmentService {
       const { data: assignment, error } = await supabase
         .from('user_departments')
         .insert({
-          tenant_id: tenantId,
-          user_id: userId,
+          tenant_id: _tenantId,
+          user_id: _userId,
           department_id: departmentId,
           is_primary: isPrimary,
           role_in_department: roleInDepartment,
@@ -479,7 +467,7 @@ export class DepartmentService {
             .update({
               is_primary: isPrimary,
               role_in_department: roleInDepartment,
-              assigned_by: assignedBy || userId,
+              assigned_by: assignedBy || _userId,
               assigned_at: new Date().toISOString()
             })
             .eq('tenant_id', tenantId)
@@ -499,7 +487,7 @@ export class DepartmentService {
       }
 
       return assignment
-    } catch (error) {
+    } catch (_error) {
       console.error('Error assigning user to department:', error)
       throw error
     }
@@ -521,7 +509,7 @@ export class DepartmentService {
       }
 
       return true
-    } catch (error) {
+    } catch (_error) {
       console.error('Error removing user from department:', error)
       throw error
     }
@@ -538,7 +526,7 @@ export class DepartmentService {
           role_in_department,
           departments (
             id,
-            name,
+            _name,
             display_name,
             description,
             code,
@@ -561,7 +549,7 @@ export class DepartmentService {
         is_primary: ud.is_primary,
         role_in_department: ud.role_in_department
       })) || []
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting user departments:', error)
       throw error
     }
@@ -600,7 +588,7 @@ export class DepartmentService {
         role_in_department: du.role_in_department,
         assigned_at: du.assigned_at
       })) || []
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting department users:', error)
       throw error
     }
@@ -624,7 +612,7 @@ export class DepartmentService {
       const { data: deptRole, error } = await supabase
         .from('department_roles')
         .insert({
-          tenant_id: tenantId,
+          tenant_id: _tenantId,
           department_id: departmentId,
           role_id: roleId,
           is_default_role: isDefaultRole,
@@ -642,7 +630,7 @@ export class DepartmentService {
       }
 
       return deptRole
-    } catch (error) {
+    } catch (_error) {
       console.error('Error assigning role to department:', error)
       throw error
     }
@@ -664,7 +652,7 @@ export class DepartmentService {
       }
 
       return true
-    } catch (error) {
+    } catch (_error) {
       console.error('Error removing role from department:', error)
       throw error
     }
@@ -674,16 +662,16 @@ export class DepartmentService {
   // ANALYTICS AND REPORTING
   // =====================================================
 
-  async getDepartmentAnalytics(tenantId: string, departmentId: string, days = 30): Promise<DepartmentAnalytics> {
+  async getDepartmentAnalytics(tenantId: string, departmentId: string, _days = 30): Promise<DepartmentAnalytics> {
     try {
       const supabase = await this.getSupabase()
-      const department = await this.getDepartment(tenantId, departmentId)
+      const department = await this.getDepartment(_tenantId, departmentId)
       if (!department) {
         throw new Error('Department not found')
       }
 
       // Get user count
-      const users = await this.getDepartmentUsers(tenantId, departmentId)
+      const users = await this.getDepartmentUsers(_tenantId, departmentId)
       const userCount = users.length
 
       // Get role distribution
@@ -691,7 +679,7 @@ export class DepartmentService {
         .from('user_roles')
         .select(`
           role_id,
-          roles (name, display_name)
+          roles (_name, display_name)
         `)
         .eq('tenant_id', tenantId)
         .eq('is_active', true)
@@ -717,12 +705,12 @@ export class DepartmentService {
 
       return {
         department_id: departmentId,
-        department_name: department.name,
+        department_name: department._name,
         user_count: userCount,
         role_distribution: roleDistributionArray,
         permission_usage: permissionUsage
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting department analytics:', error)
       throw error
     }
@@ -751,7 +739,7 @@ export class DepartmentService {
       }
 
       return true
-    } catch (error) {
+    } catch (_error) {
       console.error('Error validating department hierarchy:', error)
       throw error
     }
@@ -775,7 +763,7 @@ export class DepartmentService {
       }
 
       return departments || []
-    } catch (error) {
+    } catch (_error) {
       console.error('Error searching departments:', error)
       throw error
     }

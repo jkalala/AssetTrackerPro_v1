@@ -14,7 +14,11 @@ import {
 } from '@/lib/types/reporting'
 
 export class ReportingService {
-  private supabase = createClient()
+  private supabase: any;
+
+  constructor() {
+    this.supabase = createClient();
+  }
 
   // Report Definitions
   async createReportDefinition(
@@ -150,7 +154,7 @@ export class ReportingService {
       .from('report_schedules')
       .select(`
         *,
-        report_definitions!inner(name, category)
+        report_definitions!inner(_name, category)
       `)
       .eq('tenant_id', tenantId)
       .order('created_at', { ascending: false })
@@ -214,18 +218,18 @@ export class ReportingService {
     reportId?: string,
     limit: number = 50
   ): Promise<ReportExecution[]> {
-    let query = this.supabase
+    let _query = this.supabase
       .from('report_executions')
       .select(`
         *,
-        report_definitions!inner(name, category)
+        report_definitions!inner(_name, category)
       `)
       .eq('tenant_id', tenantId)
       .order('created_at', { ascending: false })
       .limit(limit)
 
     if (reportId) {
-      query = query.eq('report_id', reportId)
+      _query = query.eq('report_id', reportId)
     }
 
     const { data, error } = await query
@@ -276,7 +280,7 @@ export class ReportingService {
 
     if (error) throw error
     
-    return (data || []).map(dashboard => ({
+    return (data || []).map((dashboard: Record<string, unknown>) => ({
       ...dashboard,
       insights: dashboard.configuration?.insights || [],
       kpis: dashboard.configuration?.kpis || [],
@@ -291,7 +295,7 @@ export class ReportingService {
 
     if (error) throw error
     
-    return (data || []).map((insight: any) => ({
+    return (data || []).map((insight: Record<string, unknown>) => ({
       id: `insight_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       title: insight.title,
       description: insight.description,
@@ -312,7 +316,7 @@ export class ReportingService {
       .order('display_name', { ascending: true })
 
     if (error) throw error
-    return (data || []).map(field => ({
+    return (data || []).map((field: Record<string, unknown>) => ({
       id: field.name,
       name: field.display_name,
       type: field.type,
@@ -330,8 +334,8 @@ export class ReportingService {
   async buildQuery(
     fields: ReportField[],
     filters: ReportFilter[],
-    sorting: any[],
-    grouping: any[],
+    sorting: Record<string, unknown>[],
+    grouping: Record<string, unknown>[],
     limit?: number
   ): Promise<ReportQueryBuilder> {
     const tables = [...new Set(fields.map(f => f.table))]
@@ -393,11 +397,11 @@ export class ReportingService {
     }
 
     // Build and execute query based on report definition
-    const query = await this.buildQuery(
-      report.definition.fields || [],
-      report.definition.filters || [],
-      report.definition.sorting || [],
-      report.definition.grouping || []
+    const _query = await this.buildQuery(
+      report.fields || [],
+      report.filters || [],
+      report.sorting || [],
+      report.grouping || []
     )
 
     // For now, return mock data - in production this would execute the actual query
@@ -416,7 +420,7 @@ export class ReportingService {
 
   private async generateMockReportData(report: ReportDefinition): Promise<ReportData> {
     // Generate mock data based on report fields
-    const columns = (report.definition.fields || []).map(field => ({
+    const columns = (report.fields || []).map(field => ({
       key: field.id,
       name: field.name,
       type: field.type,
@@ -446,7 +450,13 @@ export class ReportingService {
       return row
     })
 
-    return { columns, rows }
+    return { 
+      columns, 
+      rows,
+      total_rows: rows.length,
+      execution_time_ms: 0,
+      generated_at: new Date().toISOString()
+    }
   }
 
   // Export Functions
@@ -469,7 +479,7 @@ export class ReportingService {
   }
 
   async exportReportToCSV(reportData: ReportData): Promise<string> {
-    const headers = reportData.columns.map(col => col.name).join(',')
+    const _headers = reportData.columns.map(col => col.name).join(',')
     const rows = reportData.rows.map(row => 
       reportData.columns.map(col => {
         const value = row[col.key]
@@ -506,7 +516,7 @@ export class ReportingService {
           schedule_id: schedule.id,
           status: 'running',
           format: schedule.format,
-          parameters: schedule.parameters || {}
+          parameters: {} // schedule.parameters || {}
         }
       )
 
@@ -514,7 +524,7 @@ export class ReportingService {
       const reportData = await this.executeReport(
         schedule.tenant_id,
         schedule.report_id,
-        schedule.parameters || {}
+        {} // schedule.parameters || {}
       )
 
       // Generate file based on format
@@ -526,18 +536,18 @@ export class ReportingService {
         case 'pdf':
           fileBuffer = await this.exportReportToPDF(reportData)
           fileName = `report_${schedule.id}_${Date.now()}.pdf`
-          mimeType = 'application/pdf'
+          _mimeType = 'application/pdf'
           break
         case 'excel':
           fileBuffer = await this.exportReportToExcel(reportData)
           fileName = `report_${schedule.id}_${Date.now()}.xlsx`
-          mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          _mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
           break
         case 'csv':
           const csvContent = await this.exportReportToCSV(reportData)
           fileBuffer = Buffer.from(csvContent, 'utf-8')
           fileName = `report_${schedule.id}_${Date.now()}.csv`
-          mimeType = 'text/csv'
+          _mimeType = 'text/csv'
           break
         default:
           throw new Error(`Unsupported format: ${schedule.format}`)
@@ -564,7 +574,7 @@ export class ReportingService {
       // Send notifications to recipients (mock)
       console.log(`Report sent to: ${schedule.recipients.join(', ')}`)
 
-    } catch (error) {
+    } catch (_error) {
       console.error('Error processing scheduled report:', error)
       // Update execution with error
       // This would be implemented in production

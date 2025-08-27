@@ -4,13 +4,6 @@
 // Service for managing SSO providers, SAML, OAuth, and OIDC integration
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  SsoProvider, 
-  SsoProviderInsert, 
-  SsoProviderUpdate,
-  SsoSession,
-  SecurityEventInsert
-} from '@/lib/types/database'
 import crypto from 'crypto'
 
 export interface SsoProviderConfig {
@@ -147,7 +140,7 @@ export class SsoService {
 
       return { success: true, provider }
     } catch (error) {
-      console.error('Error creating SSO provider:', error)
+      console.error
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -237,7 +230,7 @@ export class SsoService {
 
       return { success: true, provider }
     } catch (error) {
-      console.error('Error updating SSO provider:', error)
+      console.error
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -255,14 +248,14 @@ export class SsoService {
     try {
       const supabase = await this.getSupabase()
 
-      let query = supabase
+      let _query = supabase
         .from('sso_providers')
         .select('*')
         .eq('tenant_id', tenantId)
         .order('created_at', { ascending: false })
 
       if (enabledOnly) {
-        query = query.eq('is_enabled', true)
+        _query = query.eq('is_enabled', true)
       }
 
       const { data: providers, error } = await query
@@ -280,7 +273,7 @@ export class SsoService {
 
       return { success: true, providers: decryptedProviders }
     } catch (error) {
-      console.error('Error getting SSO providers:', error)
+      console.error
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -349,7 +342,7 @@ export class SsoService {
         sessionId
       }
     } catch (error) {
-      console.error('Error initiating SSO auth:', error)
+      console.error
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -414,7 +407,7 @@ export class SsoService {
         sessionId
       }
     } catch (error) {
-      console.error('Error handling SSO callback:', error)
+      console.error
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -468,7 +461,7 @@ export class SsoService {
       }
 
       // Decode and parse SAML response
-      const decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf-8')
+      const _decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf-8')
       
       // Validate signature and extract user attributes
       // This would involve XML parsing and signature verification
@@ -488,7 +481,7 @@ export class SsoService {
         sessionId: relayState
       }
     } catch (error) {
-      console.error('Error processing SAML response:', error)
+      console.error
       return {
         success: false,
         error: error instanceof Error ? error.message : 'SAML processing error'
@@ -505,7 +498,7 @@ export class SsoService {
     sessionState: string, 
     returnUrl?: string
   ): Promise<string> {
-    const config = this.decryptSensitiveConfig(provider.configuration)
+    const _config = this.decryptSensitiveConfig(provider.configuration)
     const oauth = config.oauth
 
     if (!oauth) {
@@ -528,7 +521,7 @@ export class SsoService {
     callbackData: Record<string, any>
   ): Promise<{ success: boolean; userInfo?: any; sessionId?: string; error?: string }> {
     try {
-      const config = this.decryptSensitiveConfig(provider.configuration)
+      const _config = this.decryptSensitiveConfig(provider.configuration)
       const oauth = config.oauth
 
       if (!oauth) {
@@ -594,7 +587,7 @@ export class SsoService {
         sessionId: state
       }
     } catch (error) {
-      console.error('Error processing OAuth callback:', error)
+      console.error
       return {
         success: false,
         error: error instanceof Error ? error.message : 'OAuth processing error'
@@ -658,7 +651,7 @@ export class SsoService {
       const [, payload] = token.split('.')
       return JSON.parse(Buffer.from(payload, 'base64url').toString())
     } catch (error) {
-      console.error('Error parsing JWT payload:', error)
+      console.error
       return {}
     }
   }
@@ -709,7 +702,7 @@ export class SsoService {
         .from('security_events')
         .insert(eventData)
     } catch (error) {
-      console.error('Error logging security event:', error)
+      console.error
     }
   }
 }

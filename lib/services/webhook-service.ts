@@ -31,7 +31,7 @@ export interface WebhookDelivery {
   id: string
   webhookId: string
   eventType: string
-  payload: any
+  payload: Record<string, unknown>
   status: WebhookDeliveryStatus
   responseCode?: number
   responseBody?: string
@@ -51,7 +51,7 @@ export enum WebhookDeliveryStatus {
 
 export interface WebhookEvent {
   type: string
-  data: any
+  data: Record<string, unknown>
   tenantId: string
   timestamp: Date
   metadata?: Record<string, any>

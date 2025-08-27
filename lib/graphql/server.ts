@@ -27,13 +27,13 @@ const isAuthenticated = rule({ cache: 'contextual' })(
   }
 )
 
-const isAdmin = rule({ cache: 'contextual' })(
+const _isAdmin = rule({ cache: 'contextual' })(
   async (parent, args, context: AuthenticatedContext) => {
     return context.user?.role === 'TENANT_ADMIN' || context.user?.role === 'SUPER_ADMIN'
   }
 )
 
-const isSuperAdmin = rule({ cache: 'contextual' })(
+const _isSuperAdmin = rule({ cache: 'contextual' })(
   async (parent, args, context: AuthenticatedContext) => {
     return context.user?.role === 'SUPER_ADMIN'
   }
@@ -50,7 +50,7 @@ const hasPermission = (permission: string) =>
   )
 
 // Permission shield
-const permissions = shield(
+const _permissions = shield(
   {
     Query: {
       tenant: isAuthenticated,
@@ -96,7 +96,7 @@ const rateLimitMiddleware = async (resolve: Record<string, unknown>, root: Recor
     const key = (context as any).user?.id || (context as any).req?.ip || 'anonymous'
     await rateLimiter.consume(key)
     return (resolve as any)(root, args, context, info)
-  } catch (rejRes: any) {
+  } catch (rejRes: Record<string, unknown>) {
     throw new GraphQLError('Rate limit exceeded', {
       extensions: {
         code: 'RATE_LIMITED',
@@ -125,10 +125,10 @@ const server = new ApolloServer({
     {
       async requestDidStart() {
         return {
-          async didResolveOperation(requestContext: any) {
+          async didResolveOperation(requestContext: Record<string, unknown>) {
             console.log(`GraphQL Operation: ${requestContext.request.operationName}`)
           },
-          async didEncounterErrors(requestContext: any) {
+          async didEncounterErrors(requestContext: Record<string, unknown>) {
             console.error('GraphQL Errors:', requestContext.errors)
           },
         }
@@ -138,7 +138,7 @@ const server = new ApolloServer({
     {
       async requestDidStart() {
         return {
-          async willSendResponse(requestContext: any) {
+          async willSendResponse(requestContext: Record<string, unknown>) {
             const startTime = requestContext.request.http?.startTime || Date.now()
             const duration = Date.now() - startTime
             if (duration > 1000) {
@@ -177,14 +177,14 @@ const server = new ApolloServer({
 
 // Create Next.js handler
 export const handler = startServerAndCreateNextHandler(server, {
-  context: async (req: any) => {
+  context: async (req: Record<string, unknown>) => {
     const baseContext = await createContext(req)
     
     try {
       // Try to authenticate the request
       const authenticatedContext = await authenticateContext(baseContext)
       return authenticatedContext
-    } catch (error) {
+    } catch (_error) {
       // Return base context for public operations
       return baseContext
     }

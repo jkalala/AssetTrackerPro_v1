@@ -45,8 +45,8 @@ export class DelegationService {
       // Validate delegator has the permissions they want to delegate
       if (request.permission_names && request.permission_names.length > 0) {
         const hasPermissions = await this.validateDelegatorPermissions(
-          tenantId,
-          delegatorId,
+          _tenantId,
+          _delegatorId,
           request.permission_names
         )
 
@@ -57,7 +57,7 @@ export class DelegationService {
 
       // Validate role delegation if specified
       if (request.role_id) {
-        const hasRole = await this.validateDelegatorRole(tenantId, delegatorId, request.role_id)
+        const hasRole = await this.validateDelegatorRole(_tenantId, _delegatorId, request.role_id)
         if (!hasRole) {
           throw new Error('Delegator does not have the role they are trying to delegate')
         }
@@ -94,8 +94,8 @@ export class DelegationService {
       const { data: delegation, error } = await supabase
         .from('permission_delegations')
         .insert({
-          tenant_id: tenantId,
-          delegator_id: delegatorId,
+          tenant_id: _tenantId,
+          delegator_id: _delegatorId,
           delegatee_id: request.delegatee_id,
           role_id: request.role_id,
           permission_ids: permissionIds,
@@ -114,7 +114,7 @@ export class DelegationService {
       }
 
       return delegation
-    } catch (error) {
+    } catch (_error) {
       console.error('Error creating delegation:', error)
       throw error
     }
@@ -175,7 +175,7 @@ export class DelegationService {
       }
 
       return updatedDelegation
-    } catch (error) {
+    } catch (_error) {
       console.error('Error updating delegation:', error)
       throw error
     }
@@ -224,7 +224,7 @@ export class DelegationService {
       }
 
       return true
-    } catch (error) {
+    } catch (_error) {
       console.error('Error revoking delegation:', error)
       throw error
     }
@@ -250,7 +250,7 @@ export class DelegationService {
           ),
           role:roles (
             id,
-            name,
+            _name,
             display_name
           )
         `)
@@ -259,7 +259,7 @@ export class DelegationService {
         .single()
 
       return delegation
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting delegation:', error)
       return null
     }
@@ -273,7 +273,7 @@ export class DelegationService {
     try {
       const supabase = await this.getSupabase()
       
-      let query = supabase
+      let _query = supabase
         .from('permission_delegations')
         .select(`
           *,
@@ -289,21 +289,21 @@ export class DelegationService {
           ),
           role:roles (
             id,
-            name,
+            _name,
             display_name
           )
         `)
         .eq('tenant_id', tenantId)
 
-      switch (type) {
+      switch (_type) {
         case 'delegated':
-          query = query.eq('delegator_id', userId)
+          _query = query.eq('delegator_id', userId)
           break
         case 'received':
-          query = query.eq('delegatee_id', userId)
+          _query = query.eq('delegatee_id', userId)
           break
         case 'all':
-          query = query.or(`delegator_id.eq.${userId},delegatee_id.eq.${userId}`)
+          _query = query.or(`delegator_id.eq.${userId},delegatee_id.eq.${userId}`)
           break
       }
 
@@ -315,7 +315,7 @@ export class DelegationService {
       }
 
       return delegations || []
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting user delegations:', error)
       throw error
     }
@@ -350,7 +350,7 @@ export class DelegationService {
       }
 
       return delegations || []
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting active delegations:', error)
       throw error
     }
@@ -420,7 +420,7 @@ export class DelegationService {
       const { data: guestAccess, error } = await supabase
         .from('guest_access')
         .insert({
-          tenant_id: tenantId,
+          tenant_id: _tenantId,
           email: request.email,
           full_name: request.full_name,
           invited_by: invitedBy,
@@ -438,7 +438,7 @@ export class DelegationService {
       }
 
       return guestAccess
-    } catch (error) {
+    } catch (_error) {
       console.error('Error creating guest access:', error)
       throw error
     }
@@ -468,7 +468,7 @@ export class DelegationService {
       }
 
       return guestAccess
-    } catch (error) {
+    } catch (_error) {
       console.error('Error updating guest access:', error)
       throw error
     }
@@ -492,7 +492,7 @@ export class DelegationService {
       }
 
       return true
-    } catch (error) {
+    } catch (_error) {
       console.error('Error revoking guest access:', error)
       throw error
     }
@@ -513,7 +513,7 @@ export class DelegationService {
           ),
           role:roles (
             id,
-            name,
+            _name,
             display_name
           )
         `)
@@ -522,7 +522,7 @@ export class DelegationService {
         .single()
 
       return guestAccess
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting guest access:', error)
       return null
     }
@@ -552,7 +552,7 @@ export class DelegationService {
       }
 
       return guestAccess || []
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting active guest access:', error)
       throw error
     }
@@ -566,14 +566,14 @@ export class DelegationService {
     try {
       const supabase = await this.getSupabase()
       
-      let query = supabase
+      let _query = supabase
         .from('permission_delegations')
         .update({ status: 'expired' })
         .eq('status', 'active')
         .lt('expires_at', new Date().toISOString())
 
       if (tenantId) {
-        query = query.eq('tenant_id', tenantId)
+        _query = query.eq('tenant_id', tenantId)
       }
 
       const { error, count } = await query
@@ -583,7 +583,7 @@ export class DelegationService {
       }
 
       return count || 0
-    } catch (error) {
+    } catch (_error) {
       console.error('Error cleaning up expired delegations:', error)
       throw error
     }
@@ -593,14 +593,14 @@ export class DelegationService {
     try {
       const supabase = await this.getSupabase()
       
-      let query = supabase
+      let _query = supabase
         .from('guest_access')
         .update({ is_active: false })
         .eq('is_active', true)
         .lt('expires_at', new Date().toISOString())
 
       if (tenantId) {
-        query = query.eq('tenant_id', tenantId)
+        _query = query.eq('tenant_id', tenantId)
       }
 
       const { error, count } = await query
@@ -610,7 +610,7 @@ export class DelegationService {
       }
 
       return count || 0
-    } catch (error) {
+    } catch (_error) {
       console.error('Error cleaning up expired guest access:', error)
       throw error
     }
@@ -629,7 +629,7 @@ export class DelegationService {
       // This would integrate with the permission service to check if the delegator has all the permissions
       // For now, we'll assume they do (this should be implemented with actual permission checking)
       return true
-    } catch (error) {
+    } catch (_error) {
       console.error('Error validating delegator permissions:', error)
       return false
     }
@@ -653,7 +653,7 @@ export class DelegationService {
         .single()
 
       return !!userRole
-    } catch (error) {
+    } catch (_error) {
       console.error('Error validating delegator role:', error)
       return false
     }
@@ -663,7 +663,7 @@ export class DelegationService {
   // ANALYTICS AND REPORTING
   // =====================================================
 
-  async getDelegationStats(tenantId: string, days = 30): Promise<{
+  async getDelegationStats(tenantId: string, _days = 30): Promise<{
     total_delegations: number
     active_delegations: number
     expired_delegations: number
@@ -711,7 +711,7 @@ export class DelegationService {
         guest_access_count: guestAccessCount,
         most_delegated_permissions: mostDelegatedPermissions
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting delegation stats:', error)
       throw error
     }

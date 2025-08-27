@@ -41,7 +41,7 @@ export class TenantService {
 
       return { data, error: null }
     } catch (error) {
-      console.error('Unexpected error creating tenant:', error)
+      console.error
       return { data: null, error: 'Failed to create tenant' }
     }
   }
@@ -65,7 +65,7 @@ export class TenantService {
 
       return { data, error: null }
     } catch (error) {
-      console.error('Unexpected error fetching tenant:', error)
+      console.error
       return { data: null, error: 'Failed to fetch tenant' }
     }
   }
@@ -89,7 +89,7 @@ export class TenantService {
 
       return { data, error: null }
     } catch (error) {
-      console.error('Unexpected error fetching tenant by slug:', error)
+      console.error
       return { data: null, error: 'Failed to fetch tenant' }
     }
   }
@@ -114,7 +114,7 @@ export class TenantService {
 
       return { data, error: null }
     } catch (error) {
-      console.error('Unexpected error updating tenant:', error)
+      console.error
       return { data: null, error: 'Failed to update tenant' }
     }
   }
@@ -140,7 +140,7 @@ export class TenantService {
 
       return { success: true, error: null }
     } catch (error) {
-      console.error('Unexpected error suspending tenant:', error)
+      console.error
       return { success: false, error: 'Failed to suspend tenant' }
     }
   }
@@ -179,7 +179,7 @@ export class TenantService {
 
       return { data: context, error: null }
     } catch (error) {
-      console.error('Unexpected error fetching tenant context:', error)
+      console.error
       return { data: null, error: 'Failed to fetch tenant context' }
     }
   }
@@ -202,7 +202,7 @@ export class TenantService {
 
       return { success: true, error: null }
     } catch (error) {
-      console.error('Unexpected error setting tenant context:', error)
+      console.error
       return { success: false, error: 'Failed to set tenant context' }
     }
   }
@@ -222,7 +222,7 @@ export class TenantService {
 
       return { success: true, error: null }
     } catch (error) {
-      console.error('Unexpected error clearing tenant context:', error)
+      console.error
       return { success: false, error: 'Failed to clear tenant context' }
     }
   }
@@ -239,7 +239,7 @@ export class TenantService {
       const supabase = await this.getSupabase()
       
       // Get tenant limits
-      const { data: tenant, error: tenantError } = await supabase
+      const { data: _tenant, error: tenantError } = await supabase
         .from('tenants')
         .select('asset_limit, user_limit, storage_limit_gb')
         .eq('id', tenantId)
@@ -292,7 +292,7 @@ export class TenantService {
 
       return { data: usage, error: null }
     } catch (error) {
-      console.error('Unexpected error fetching tenant usage:', error)
+      console.error
       return { data: null, error: 'Failed to fetch tenant usage' }
     }
   }
@@ -344,7 +344,7 @@ export class TenantService {
 
       return { allowed: true }
     } catch (error) {
-      console.error('Error checking tenant limits:', error)
+      console.error
       return { allowed: false, reason: 'Unable to verify tenant limits' }
     }
   }
@@ -374,7 +374,7 @@ export class TenantService {
 
       return { success: true, error: null }
     } catch (error) {
-      console.error('Unexpected error updating tenant branding:', error)
+      console.error
       return { success: false, error: 'Failed to update tenant branding' }
     }
   }
@@ -400,7 +400,7 @@ export class TenantService {
 
       return { success: true, error: null }
     } catch (error) {
-      console.error('Unexpected error updating feature flags:', error)
+      console.error
       return { success: false, error: 'Failed to update feature flags' }
     }
   }
@@ -424,7 +424,7 @@ export class TenantService {
 
       return { data, error: null }
     } catch (error) {
-      console.error('Unexpected error fetching tenant members:', error)
+      console.error
       return { data: null, error: 'Failed to fetch tenant members' }
     }
   }
@@ -455,7 +455,7 @@ export class TenantService {
 
       return { valid: true }
     } catch (error) {
-      console.error('Error validating tenant access:', error)
+      console.error
       return { valid: false, error: 'Failed to validate access' }
     }
   }
@@ -466,13 +466,13 @@ export class TenantService {
   async isSlugAvailable(slug: string, excludeTenantId?: string): Promise<{ available: boolean; error?: string }> {
     try {
       const supabase = await this.getSupabase()
-      let query = supabase
+      let _query = supabase
         .from('tenants')
         .select('id')
         .eq('slug', slug)
 
       if (excludeTenantId) {
-        query = query.neq('id', excludeTenantId)
+        _query = query.neq('id', excludeTenantId)
       }
 
       const { data, error } = await query.single()
@@ -489,7 +489,7 @@ export class TenantService {
       // Slug exists
       return { available: false }
     } catch (error) {
-      console.error('Error checking slug availability:', error)
+      console.error
       return { available: false, error: 'Failed to check slug availability' }
     }
   }

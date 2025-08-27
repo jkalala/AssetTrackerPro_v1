@@ -14,11 +14,11 @@ const rateLimiter = new RateLimiterMemory({
 
 export type RateLimitedHandler = (
   request: NextRequest,
-  context?: any
+  context?: Record<string, unknown>
 ) => Promise<NextResponse>
 
 export function withRateLimit(handler: RateLimitedHandler) {
-  return async (request: NextRequest, context?: any): Promise<NextResponse> => {
+  return async (request: NextRequest, context?: Record<string, unknown>): Promise<NextResponse> => {
     try {
       // Get client identifier (user ID if available, otherwise IP)
       const clientId = (context as any)?.user?.id || getClientIP(request)
@@ -28,7 +28,7 @@ export function withRateLimit(handler: RateLimitedHandler) {
 
       // Proceed with the request
       return await handler(request, context)
-    } catch (rejRes: any) {
+    } catch (rejRes: Record<string, unknown>) {
       // Rate limit exceeded
       const retryAfter = Math.round(rejRes.msBeforeNext / 1000)
       

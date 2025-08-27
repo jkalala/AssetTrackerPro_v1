@@ -19,7 +19,7 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'
 
 export function ReportPreview({ report, data, onExport }: ReportPreviewProps) {
   const renderVisualization = () => {
-    const visualization = report.visualization || report.definition?.visualization
+    const visualization = report.visualization
     if (!visualization || !data.rows.length) {
       return <div className="text-center text-gray-500 py-8">No data to display</div>
     }
@@ -138,7 +138,7 @@ export function ReportPreview({ report, data, onExport }: ReportPreviewProps) {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                 outerRadius={120}
                 fill="#8884d8"
                 dataKey="value"

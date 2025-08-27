@@ -22,7 +22,7 @@ export async function deliverWebhooks({ tenant_id, event, payload }: { tenant_id
         body: JSON.stringify({ event, payload }),
       });
       // Optionally: log delivery success
-    } catch (err) {
+    } catch (_err) {
       // Optionally: log delivery failure, retry, etc.
       // console.error('Webhook delivery failed:', err);
     }

@@ -287,7 +287,7 @@ export class TenantSecurityManager {
  * Decorator to ensure tenant context is available
  */
 export function withTenantContext<T extends any[]>(
-  handler: (context: TenantContext, ...args: T) => Promise<any>
+  handler: (context: TenantContext, ...args: T) => Promise<Record<string, unknown>>
 ) {
   return async (req: NextRequest, ...args: T) => {
     const context = TenantContextManager.getTenantContextFromHeaders(req)
@@ -313,7 +313,7 @@ export function withTenantContext<T extends any[]>(
  */
 export function withRole(requiredRole: string | string[]) {
   return function<T extends any[]>(
-    handler: (context: TenantContext, ...args: T) => Promise<any>
+    handler: (context: TenantContext, ...args: T) => Promise<Record<string, unknown>>
   ) {
     return withTenantContext(async (context: TenantContext, ...args: T) => {
       const validation = await TenantContextManager.validateTenantContext(
@@ -346,7 +346,7 @@ export function withRole(requiredRole: string | string[]) {
  */
 export function withFeature(requiredFeature: string) {
   return function<T extends any[]>(
-    handler: (context: TenantContext, ...args: T) => Promise<any>
+    handler: (context: TenantContext, ...args: T) => Promise<Record<string, unknown>>
   ) {
     return withTenantContext(async (context: TenantContext, ...args: T) => {
       const featureCheck = await TenantFeatureManager.checkFeatureAccess(
@@ -371,7 +371,7 @@ export function withFeature(requiredFeature: string) {
  */
 export function withUsageLimit(action: 'create_asset' | 'create_user' | 'upload_file') {
   return function<T extends any[]>(
-    handler: (context: TenantContext, ...args: T) => Promise<any>
+    handler: (context: TenantContext, ...args: T) => Promise<Record<string, unknown>>
   ) {
     return withTenantContext(async (context: TenantContext, ...args: T) => {
       const limitCheck = await TenantFeatureManager.checkActionLimit(

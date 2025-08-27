@@ -1,22 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   ScrollView,
   StyleSheet,
   Alert,
 } from 'react-native';
-import {
-  Card,
-  Title,
-  Paragraph,
-  Button,
-  Chip,
-  List,
-  Divider,
-  ActivityIndicator,
-  Text,
-  Switch,
-} from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from 'react-native-paper';
 import * as Location from 'expo-location';
@@ -34,7 +22,7 @@ export default function LocationScreen({ navigation }) {
 
   useEffect(() => {
     checkLocationPermission();
-  }, []);
+  }, [checkLocationPermission]);
 
   useEffect(() => {
     if (location) {
@@ -43,7 +31,7 @@ export default function LocationScreen({ navigation }) {
     }
   }, [location]);
 
-  const checkLocationPermission = async () => {
+  const checkLocationPermission = useCallback(async () => { () => {
     try {
       const { status } = await Location.getForegroundPermissionsAsync();
       setLocationPermission(status);
@@ -51,10 +39,10 @@ export default function LocationScreen({ navigation }) {
       if (status === 'granted') {
         getCurrentLocation();
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error checking location permission:', error);
     }
-  };
+  }, []);
 
   const requestLocationPermission = async () => {
     try {
@@ -71,7 +59,7 @@ export default function LocationScreen({ navigation }) {
           [{ text: 'OK' }]
         );
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error requesting location permission:', error);
     } finally {
       setLoading(false);
@@ -111,7 +99,7 @@ export default function LocationScreen({ navigation }) {
       
       // Store location for offline use
       await offlineStorage.storeData('lastLocation', locationData);
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting current location:', error);
       Alert.alert(
         'Location Error',
@@ -123,7 +111,7 @@ export default function LocationScreen({ navigation }) {
     }
   };
 
-  const loadNearbyAssets = async () => {
+  const loadNearbyAssets = useCallback(async () => {) => {
     try {
       // Try to load from API first
       try {
@@ -138,7 +126,7 @@ export default function LocationScreen({ navigation }) {
         
         // Store for offline use
         await offlineStorage.storeData('nearbyAssets', response.assets || []);
-      } catch (error) {
+      } catch (_error) {
         console.log('API unavailable, loading from offline storage');
         setOfflineMode(true);
         
@@ -146,10 +134,10 @@ export default function LocationScreen({ navigation }) {
         const offlineAssets = await offlineStorage.getData('nearbyAssets');
         if (offlineAssets) setNearbyAssets(offlineAssets);
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error loading nearby assets:', error);
     }
-  };
+  }, [location]);
 
   const loadLocationHistory = async () => {
     try {
@@ -165,7 +153,7 @@ export default function LocationScreen({ navigation }) {
         
         // Store for offline use
         await offlineStorage.storeData('locationHistory', response.location_history || []);
-      } catch (error) {
+      } catch (_error) {
         console.log('API unavailable, loading from offline storage');
         setOfflineMode(true);
         
@@ -173,7 +161,7 @@ export default function LocationScreen({ navigation }) {
         const offlineHistory = await offlineStorage.getData('locationHistory');
         if (offlineHistory) setLocationHistory(offlineHistory);
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error loading location history:', error);
     }
   };
@@ -347,7 +335,7 @@ export default function LocationScreen({ navigation }) {
                 color={theme.colors.primary}
               />
               <Text style={styles.geofencingInfoText}>
-                Geofencing is active. You'll receive notifications for asset movements.
+                Geofencing is active. You&apos;ll receive notifications for asset movements.
               </Text>
             </View>
           )}

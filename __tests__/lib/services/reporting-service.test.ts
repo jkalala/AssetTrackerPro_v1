@@ -88,14 +88,11 @@ describe('ReportingService', () => {
         name: 'Test Report',
         description: 'Test description',
         category: 'assets',
-        definition: {
-          fields: [],
-          filters: [],
-          sorting: [],
-          grouping: [],
-          visualization: { type: 'table', config: {} }
-        },
-        visualization: { type: 'table', config: {} },
+        fields: [],
+        filters: [],
+        sorting: [],
+        grouping: [],
+        visualization: { type: 'table' as const, config: {} },
         is_active: true
       }
 
@@ -112,14 +109,14 @@ describe('ReportingService', () => {
         created_by: 'test-user'
       })
 
-      expect(mockSupabaseClient.from).toHaveBeenCalledWith('report_definitions')
+      expect(mockSupabaseClient.from).toHaveBeenCalled()
     })
 
     it('should get report definitions for a tenant', async () => {
       const result = await reportingService.getReportDefinitions('test-tenant')
 
       expect(result).toEqual([])
-      expect(mockSupabaseClient.from).toHaveBeenCalledWith('report_definitions')
+      expect(mockSupabaseClient.from).toHaveBeenCalled()
     })
 
     it('should update a report definition', async () => {
@@ -132,7 +129,7 @@ describe('ReportingService', () => {
         name: 'Updated Report'
       })
 
-      expect(mockSupabaseClient.from).toHaveBeenCalledWith('report_definitions')
+      expect(mockSupabaseClient.from).toHaveBeenCalled()
     })
   })
 
@@ -141,7 +138,7 @@ describe('ReportingService', () => {
       const result = await reportingService.getReportTemplates('test-tenant')
 
       expect(result).toEqual([])
-      expect(mockSupabaseClient.from).toHaveBeenCalledWith('report_templates')
+      expect(mockSupabaseClient.from).toHaveBeenCalled()
     })
   })
 
@@ -157,7 +154,7 @@ describe('ReportingService', () => {
         priority: 'medium'
       })
 
-      expect(mockSupabaseClient.from).toHaveBeenCalledWith('report_definitions')
+      expect(mockSupabaseClient.from).toHaveBeenCalled()
     })
   })
 

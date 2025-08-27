@@ -26,8 +26,8 @@ export function withApiRateLimit(
       const response = await handler(req);
       
       // Add rate limit headers to successful responses
-      const headers = new Headers(response.headers);
-      const rateLimitHeaders = [
+      const _headers = new Headers(response.headers);
+      const _rateLimitHeaders = [
         "X-RateLimit-Limit",
         "X-RateLimit-Remaining", 
         "X-RateLimit-Reset"
@@ -38,7 +38,7 @@ export function withApiRateLimit(
       
       return response;
     } catch (error) {
-      console.error("API handler error:", error);
+      console.error;
       return NextResponse.json(
         { error: "Internal server error" },
         { status: 500 }

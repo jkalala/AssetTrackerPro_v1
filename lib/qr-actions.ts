@@ -60,7 +60,7 @@ export async function generateAssetQRCode(assetId: string) {
 
     const qrCodeDataURL = await QRCodeGenerator.generateAssetQR({
       assetId: asset.asset_id,
-      name: asset.name,
+      name: asset._name,
       category: asset.category,
       url: assetUrl,
     })
@@ -86,7 +86,7 @@ export async function generateAssetQRCode(assetId: string) {
     revalidatePath("/qr-management")
 
     return { success: true, qrCode: qrCodeDataURL, assetUrl }
-  } catch (error) {
+  } catch (_error) {
     console.error("QR generation error:", error)
     return { error: `Failed to generate QR code: ${error instanceof Error ? error.message : "Unknown error"}` }
   }
@@ -140,7 +140,7 @@ export async function generateBulkQRCodes(assetIds: string[]) {
     // Generate QR codes for all assets
     const assetQRData = assets.map((asset: Record<string, unknown>) => ({
       assetId: asset.asset_id,
-      name: asset.name,
+      name: asset._name,
       category: asset.category,
       url: `${baseUrl}/asset/${asset.asset_id}`,
     }))
@@ -172,7 +172,7 @@ export async function generateBulkQRCodes(assetIds: string[]) {
     revalidatePath("/qr-management")
 
     return { success: true, results: qrResults }
-  } catch (error) {
+  } catch (_error) {
     console.error("Bulk QR generation error:", error)
     return { error: `Failed to generate QR codes: ${error instanceof Error ? error.message : "Unknown error"}` }
   }
@@ -223,7 +223,7 @@ export async function lookupAssetByQR(qrData: string) {
       .eq("created_by", user.id) // Ensure user owns the asset
       .single()
 
-    console.log("QR Lookup: Asset query result:", { asset: asset?.name, assetError })
+    console.log("QR Lookup: Asset query result:", { asset: asset?._name, assetError })
 
     if (assetError) {
       console.error("QR Lookup: Asset query error:", assetError)
@@ -237,7 +237,7 @@ export async function lookupAssetByQR(qrData: string) {
     console.log("QR Lookup: Asset found successfully:", asset.name)
 
     return { success: true, asset, qrData: assetData }
-  } catch (error) {
+  } catch (_error) {
     console.error("QR lookup error:", error)
     return { error: `Failed to lookup asset: ${error instanceof Error ? error.message : "Unknown error"}` }
   }
@@ -270,7 +270,7 @@ export async function updateAssetQRCodeUrl(assetId: string, qrCodeUrl: string) {
     revalidatePath("/dashboard")
     revalidatePath("/qr-management")
     return { success: true }
-  } catch (error) {
+  } catch (_error) {
     return { error: `Failed to update QR code: ${error instanceof Error ? error.message : "Unknown error"}` }
   }
 }

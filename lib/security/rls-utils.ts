@@ -372,7 +372,7 @@ export const rlsManager = new RLSManager()
  * Decorator to enforce tenant context in API routes
  */
 export function withTenantContext<T extends any[]>(
-  handler: (...args: T) => Promise<any>
+  handler: (...args: T) => Promise<Record<string, unknown>>
 ) {
   return async (...args: T) => {
     const context = await rlsManager.getTenantContextFromHeaders()
@@ -396,7 +396,7 @@ export function withTenantContext<T extends any[]>(
  */
 export function withRole(requiredRole: string | string[]) {
   return function<T extends any[]>(
-    handler: (...args: T) => Promise<any>
+    handler: (...args: T) => Promise<Record<string, unknown>>
   ) {
     return async (...args: T) => {
       const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
@@ -421,7 +421,7 @@ export function withRole(requiredRole: string | string[]) {
  */
 export function withAssetAccess(assetIdParam: string = 'assetId') {
   return function<T extends any[]>(
-    handler: (...args: T) => Promise<any>
+    handler: (...args: T) => Promise<Record<string, unknown>>
   ) {
     return async (...args: T) => {
       // Extract asset ID from request parameters

@@ -12,8 +12,8 @@ export interface ReportFilter {
   id: string
   field: string
   operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than' | 'between' | 'in'
-  value: any
-  values?: any[]
+  value: unknown
+  values?: Record<string, unknown>[]
 }
 
 export interface ReportSort {

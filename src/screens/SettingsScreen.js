@@ -5,20 +5,6 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import {
-  Card,
-  Title,
-  Paragraph,
-  Button,
-  Switch,
-  List,
-  Divider,
-  ActivityIndicator,
-  Text,
-  TextInput,
-  Dialog,
-  Portal,
-} from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -50,7 +36,7 @@ export default function SettingsScreen({ navigation }) {
       if (storedSettings) {
         setSettings(JSON.parse(storedSettings));
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error loading settings:', error);
     }
   };
@@ -59,7 +45,7 @@ export default function SettingsScreen({ navigation }) {
     try {
       await AsyncStorage.setItem('appSettings', JSON.stringify(newSettings));
       setSettings(newSettings);
-    } catch (error) {
+    } catch (_error) {
       console.error('Error saving settings:', error);
     }
   };
@@ -70,7 +56,7 @@ export default function SettingsScreen({ navigation }) {
       if (userData) {
         setUser(JSON.parse(userData));
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error loading user info:', error);
     }
   };
@@ -101,7 +87,7 @@ export default function SettingsScreen({ navigation }) {
           // Attempt to sync each action
           await authAPI.syncOfflineAction(action);
           successCount++;
-        } catch (error) {
+        } catch (_error) {
           console.error('Error syncing action:', error);
           errorCount++;
         }
@@ -119,7 +105,7 @@ export default function SettingsScreen({ navigation }) {
         `Successfully synced ${successCount} actions.${errorCount > 0 ? ` ${errorCount} failed.` : ''}`,
         [{ text: 'OK' }]
       );
-    } catch (error) {
+    } catch (_error) {
       console.error('Error syncing offline data:', error);
       setSyncStatus('error');
       Alert.alert('Sync Error', 'Failed to sync offline data. Please try again.');
@@ -153,7 +139,7 @@ export default function SettingsScreen({ navigation }) {
               await AsyncStorage.multiRemove(cacheKeys);
               
               Alert.alert('Cache Cleared', 'All cached data has been cleared successfully.');
-            } catch (error) {
+            } catch (_error) {
               console.error('Error clearing cache:', error);
               Alert.alert('Error', 'Failed to clear cache. Please try again.');
             } finally {
@@ -183,7 +169,7 @@ export default function SettingsScreen({ navigation }) {
         `Data exported successfully.\n\nSettings: ${JSON.stringify(exportData, null, 2)}`,
         [{ text: 'OK' }]
       );
-    } catch (error) {
+    } catch (_error) {
       console.error('Error exporting data:', error);
       Alert.alert('Export Error', 'Failed to export data. Please try again.');
     } finally {
@@ -209,7 +195,7 @@ export default function SettingsScreen({ navigation }) {
               
               // Navigate to login or show login screen
               Alert.alert('Logged Out', 'You have been successfully logged out.');
-            } catch (error) {
+            } catch (_error) {
               console.error('Error logging out:', error);
               Alert.alert('Error', 'Failed to logout. Please try again.');
             } finally {

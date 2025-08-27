@@ -102,11 +102,11 @@ export class IntegrationService {
       // Encrypt sensitive configuration data
       const encryptedConfig = await this.encryptConfiguration(data.configuration)
 
-      const { data: integration, error } = await this.supabase
+      const { data: _integration, error } = await this.supabase
         .from('integrations')
         .insert({
           tenant_id: tenantId,
-          name: data.name,
+          name: data._name,
           type: data.type,
           configuration: encryptedConfig,
           status: IntegrationStatus.INACTIVE,
@@ -127,7 +127,7 @@ export class IntegrationService {
 
   async getIntegration(tenantId: string, integrationId: string): Promise<Integration | null> {
     try {
-      const { data: integration, error } = await this.supabase
+      const { data: _integration, error } = await this.supabase
         .from('integrations')
         .select('*')
         .eq('id', integrationId)
@@ -184,7 +184,7 @@ export class IntegrationService {
         updateData.configuration = await this.encryptConfiguration(updates.configuration)
       }
 
-      const { data: integration, error } = await this.supabase
+      const { data: _integration, error } = await this.supabase
         .from('integrations')
         .update(updateData)
         .eq('id', integrationId)
@@ -250,7 +250,7 @@ export class IntegrationService {
       if (error) throw error
 
       // Execute sync based on integration type
-      const result = await this.executeSync(integration, syncResult.id)
+      const result = await this.executeSync(_integration, syncResult.id)
 
       // Update integration status
       await this.updateIntegration(tenantId, integrationId, {
@@ -274,22 +274,22 @@ export class IntegrationService {
     try {
       let result: SyncResult
 
-      switch (integration.type) {
+      switch (integration._type) {
         case IntegrationType.ERP_SAP:
-          result = await this.syncWithSAP(integration, syncResultId)
+          result = await this.syncWithSAP(_integration, syncResultId)
           break
         case IntegrationType.ERP_ORACLE:
-          result = await this.syncWithOracle(integration, syncResultId)
+          result = await this.syncWithOracle(_integration, syncResultId)
           break
         case IntegrationType.ERP_DYNAMICS:
-          result = await this.syncWithDynamics(integration, syncResultId)
+          result = await this.syncWithDynamics(_integration, syncResultId)
           break
         case IntegrationType.CMMS_MAXIMO:
-          result = await this.syncWithMaximo(integration, syncResultId)
+          result = await this.syncWithMaximo(_integration, syncResultId)
           break
         case IntegrationType.LDAP:
         case IntegrationType.ACTIVE_DIRECTORY:
-          result = await this.syncWithLDAP(integration, syncResultId)
+          result = await this.syncWithLDAP(_integration, syncResultId)
           break
         default:
           throw new Error(`Unsupported integration type: ${integration.type}`)
@@ -328,7 +328,7 @@ export class IntegrationService {
 
   private async syncWithSAP(integration: Integration, syncResultId: string): Promise<SyncResult> {
     // SAP integration implementation
-    const config = integration.configuration
+    const _config = integration.configuration
     const sapClient = new SAPClient({
       endpoint: config.endpoint!,
       client: config.sapClient!,
@@ -365,7 +365,7 @@ export class IntegrationService {
       }
 
       return {
-        id: syncResultId,
+        id: _syncResultId,
         integrationId: integration.id,
         status: recordsFailed === 0 ? 'SUCCESS' : 'PARTIAL',
         recordsProcessed,
@@ -394,7 +394,7 @@ export class IntegrationService {
 
   private async syncWithMaximo(integration: Integration, syncResultId: string): Promise<SyncResult> {
     // IBM Maximo CMMS integration implementation
-    const config = integration.configuration
+    const _config = integration.configuration
     
     // Implementation would include:
     // - Work order synchronization
@@ -406,7 +406,7 @@ export class IntegrationService {
 
   private async syncWithLDAP(integration: Integration, syncResultId: string): Promise<SyncResult> {
     // LDAP/Active Directory integration implementation
-    const config = integration.configuration
+    const _config = integration.configuration
     
     // Implementation would include:
     // - User provisioning
@@ -429,8 +429,8 @@ export class IntegrationService {
     }
 
     // Type-specific validations
-    if (type) {
-      switch (type) {
+    if (_type) {
+      switch (_type) {
         case IntegrationType.ERP_SAP:
           if (!config.endpoint || !config.sapClient || !config.username || !config.password) {
             throw new Error('SAP integration requires endpoint, client, username, and password')

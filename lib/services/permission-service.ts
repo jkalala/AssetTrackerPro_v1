@@ -4,17 +4,6 @@
 // Service for checking and managing user permissions
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  UserPermission,
-  PermissionCheckRequest,
-  PermissionCheckResponse,
-  PermissionUsage,
-  PermissionUsageInsert,
-  ResourceType,
-  PermissionAction,
-  PermissionScope
-} from '@/lib/types/rbac'
-import { Database } from '@/lib/types/database'
 import { globalPermissionCache, hashContext } from '@/lib/utils/permission-cache'
 
 export class PermissionService {
@@ -127,7 +116,7 @@ export class PermissionService {
         conditions: matchingPermission.conditions
       }
     } catch (error) {
-      console.error('Error checking permission:', error)
+      console.error
       const result = false
       globalPermissionCache.setPermissionCheck(
         tenantId, userId, request.permission_name, result, request.resource_id, contextHash
@@ -210,7 +199,7 @@ export class PermissionService {
         // Log usage
         await this.logPermissionUsage(tenantId, userId, request, granted, reason, Date.now() - startTime)
       } catch (error) {
-        console.error(`Error checking permission ${request.permission_name}:`, error)
+      console.error
         results[request.permission_name] = {
           granted: false,
           reason: 'System error'
@@ -253,7 +242,7 @@ export class PermissionService {
 
       return userPermissions
     } catch (error) {
-      console.error('Error getting user permissions:', error)
+      console.error
       throw error
     }
   }
@@ -283,7 +272,7 @@ export class PermissionService {
 
       return hasPermission || false
     } catch (error) {
-      console.error('Error checking permission:', error)
+      console.error
       return false
     }
   }
@@ -327,7 +316,7 @@ export class PermissionService {
       // If no specific filters, allow access
       return true
     } catch (error) {
-      console.error('Error checking resource filters:', error)
+      console.error
       return false
     }
   }
@@ -391,7 +380,7 @@ export class PermissionService {
 
       return true
     } catch (error) {
-      console.error('Error checking conditions:', error)
+      console.error
       return false
     }
   }
@@ -405,7 +394,7 @@ export class PermissionService {
     // Implement custom condition evaluation logic
     // This could include database queries, external API calls, etc.
     
-    switch (condition.type) {
+    switch (condition._type) {
       case 'asset_ownership':
         // Check if user owns or is assigned to the asset
         if (context?.asset_id && userId) {
@@ -495,8 +484,7 @@ export class PermissionService {
         .from('permission_usage')
         .insert(usage)
     } catch (error) {
-      // Don't throw errors for logging failures
-      console.error('Error logging permission usage:', error)
+      console.error
     }
   }
 
@@ -527,7 +515,7 @@ export class PermissionService {
   async getPermissionUsageStats(
     tenantId: string,
     userId?: string,
-    days = 30
+    _days = 30
   ): Promise<{
     total_checks: number
     granted_checks: number
@@ -539,7 +527,7 @@ export class PermissionService {
     try {
       const supabase = await this.getSupabaseClient()
       
-      let query = supabase
+      let _query = supabase
         .from('permission_usage')
         .select(`
           was_granted,
@@ -551,7 +539,7 @@ export class PermissionService {
         .gte('timestamp', new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString())
 
       if (userId) {
-        query = query.eq('user_id', userId)
+        _query = query.eq('user_id', userId)
       }
 
       const { data: usage, error } = await query
@@ -597,7 +585,7 @@ export class PermissionService {
         denial_reasons: denialReasons
       }
     } catch (error) {
-      console.error('Error getting permission usage stats:', error)
+      console.error
       throw error
     }
   }
@@ -627,22 +615,7 @@ export class PermissionService {
 
       return !!permission
     } catch (error) {
-      return false
-    }
-  }
-
-  async getResourceTypePermissions(resourceType: ResourceType): Promise<string[]> {
-    try {
-      const supabase = await this.getSupabaseClient()
-      const { data: permissions } = await supabase
-        .from('permissions')
-        .select('name')
-        .eq('resource_type', resourceType)
-        .order('action')
-
-      return permissions?.map((p: any) => p.name) || []
-    } catch (error) {
-      console.error('Error getting resource type permissions:', error)
+      console.error
       return []
     }
   }

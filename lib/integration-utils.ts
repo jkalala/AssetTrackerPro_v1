@@ -19,7 +19,7 @@ export async function sendIntegrationNotification({ tenant_id, message, event }:
         body: JSON.stringify({ text: message }), // Slack/Teams expect { text }
       });
       // Optionally: log delivery success
-    } catch (err) {
+    } catch (_err) {
       // Optionally: log delivery failure, retry, etc.
     }
   }

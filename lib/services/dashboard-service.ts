@@ -35,7 +35,7 @@ export class DashboardService {
         .from('dashboards')
         .insert({
           tenant_id: config.tenant_id,
-          name: config.name,
+          name: config._name,
           description: config.description,
           layout: config.layout,
           widgets: config.widgets,
@@ -52,7 +52,7 @@ export class DashboardService {
       }
 
       return dashboard
-    } catch (error) {
+    } catch (_error) {
       console.error('Error creating dashboard:', error)
       throw error
     }
@@ -77,7 +77,7 @@ export class DashboardService {
       }
 
       return dashboard
-    } catch (error) {
+    } catch (_error) {
       console.error('Error updating dashboard:', error)
       throw error
     }
@@ -111,7 +111,7 @@ export class DashboardService {
         ...dashboard,
         widgets
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting dashboard:', error)
       return null
     }
@@ -121,13 +121,13 @@ export class DashboardService {
     try {
       const supabase = await this.getSupabase()
       
-      let query = supabase
+      let _query = supabase
         .from('dashboards')
         .select('*')
         .eq('tenant_id', tenantId)
 
       if (userId) {
-        query = query.or(`created_by.eq.${userId},is_public.eq.true`)
+        _query = query.or(`created_by.eq.${userId},is_public.eq.true`)
       }
 
       const { data: dashboards, error } = await query
@@ -138,7 +138,7 @@ export class DashboardService {
       }
 
       return dashboards || []
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting dashboards:', error)
       throw error
     }
@@ -159,7 +159,7 @@ export class DashboardService {
       }
 
       return true
-    } catch (error) {
+    } catch (_error) {
       console.error('Error deleting dashboard:', error)
       throw error
     }
@@ -173,11 +173,11 @@ export class DashboardService {
     try {
       const { data_source } = widget
 
-      switch (data_source.type) {
+      switch (data_source._type) {
         case 'sql':
           const queryParts = this.parseQuery(data_source.query || '', data_source.parameters)
           const result = await this.executeAnalyticsQuery({
-            tenant_id: tenantId,
+            tenant_id: _tenantId,
             table: queryParts.table || 'assets',
             select: queryParts.select || ['*'],
             where: queryParts.where,
@@ -206,7 +206,7 @@ export class DashboardService {
         default:
           throw new Error(`Unsupported data source type: ${data_source.type}`)
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting widget data:', error)
       return { 
         rows: [],
@@ -249,7 +249,7 @@ export class DashboardService {
       }
 
       return await response.json()
-    } catch (error) {
+    } catch (_error) {
       console.error('Error fetching API data:', error)
       throw error
     }
@@ -345,7 +345,7 @@ export class DashboardService {
         execution_time_ms: executionTime,
         cached: false
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error executing analytics query:', error)
       throw error
     }
@@ -370,7 +370,7 @@ export class DashboardService {
       }
 
       return kpi
-    } catch (error) {
+    } catch (_error) {
       console.error('Error creating KPI:', error)
       throw error
     }
@@ -380,14 +380,14 @@ export class DashboardService {
     try {
       const supabase = await this.getSupabase()
       
-      let query = supabase
+      let _query = supabase
         .from('kpi_configs')
         .select('*')
         .eq('tenant_id', tenantId)
         .eq('is_active', true)
 
       if (kpiIds && kpiIds.length > 0) {
-        query = query.in('id', kpiIds)
+        _query = query.in('id', kpiIds)
       }
 
       const { data: kpis, error } = await query
@@ -405,7 +405,7 @@ export class DashboardService {
       )
 
       return results
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting KPI results:', error)
       throw error
     }
@@ -424,7 +424,7 @@ export class DashboardService {
 
       const result = await this.executeAnalyticsQuery(query)
       return (result.data[0]?.value as number) || 0
-    } catch (error) {
+    } catch (_error) {
       console.error('Error calculating KPI value:', error)
       return 0
     }
@@ -506,13 +506,13 @@ export class DashboardService {
     try {
       const supabase = await this.getSupabase()
       
-      let query = supabase
+      let _query = supabase
         .from('dashboard_templates')
         .select('*')
         .eq('is_public', true)
 
       if (category) {
-        query = query.eq('category', category)
+        _query = query.eq('category', category)
       }
 
       const { data: templates, error } = await query
@@ -523,7 +523,7 @@ export class DashboardService {
       }
 
       return templates || []
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting dashboard templates:', error)
       throw error
     }
@@ -551,12 +551,12 @@ export class DashboardService {
       const dashboardConfig: DashboardConfig = {
         ...template.config,
         ...customizations,
-        tenant_id: tenantId,
+        tenant_id: _tenantId,
         created_by: userId
       }
 
       return await this.createDashboard(dashboardConfig)
-    } catch (error) {
+    } catch (_error) {
       console.error('Error creating dashboard from template:', error)
       throw error
     }
@@ -579,7 +579,7 @@ export class DashboardService {
       }
 
       return await this.getWidgetData(widget, tenantId)
-    } catch (error) {
+    } catch (_error) {
       console.error('Error refreshing widget:', error)
       throw error
     }
@@ -594,7 +594,7 @@ export class DashboardService {
       // This would integrate with a PDF/image generation service
       // For now, return a placeholder
       throw new Error('Dashboard export not yet implemented')
-    } catch (error) {
+    } catch (_error) {
       console.error('Error exporting dashboard:', error)
       throw error
     }
@@ -627,7 +627,7 @@ export class DashboardService {
       }
 
       return share
-    } catch (error) {
+    } catch (_error) {
       console.error('Error creating dashboard share:', error)
       throw error
     }

@@ -1,10 +1,10 @@
 {
-  "timestamp": "2025-08-27T09:05:16.832Z",
+  "timestamp": "2025-08-27T09:18:15.710Z",
   "summary": {
-    "totalWarnings": 1072,
+    "totalWarnings": 1071,
     "riskDistribution": {
       "low": 467,
-      "medium": 33,
+      "medium": 32,
       "high": 572
     },
     "categoryDistribution": {
@@ -13,10 +13,9 @@
       "typescript-any": 534,
       "nextjs-links": 31,
       "html-entities": 94,
-      "error-handling": 1,
-      "empty-interfaces": 1
+      "error-handling": 1
     },
-    "estimatedTotalFixTime": 6915
+    "estimatedTotalFixTime": 6910
   },
   "categorizedWarnings": {
     "unused-variables": [
@@ -11808,19 +11807,6 @@
         "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
         "severity": "warning",
         "category": "error-handling",
-        "riskLevel": "medium",
-        "estimatedFixTime": 5
-      }
-    ],
-    "empty-interfaces": [
-      {
-        "file": "components\\ui\\textarea.tsx",
-        "line": 5,
-        "column": 18,
-        "rule": "@typescript-eslint/no-empty-object-type",
-        "message": "An interface declaring no members is equivalent to its supertype.",
-        "severity": "error",
-        "category": "empty-interfaces",
         "riskLevel": "medium",
         "estimatedFixTime": 5
       }

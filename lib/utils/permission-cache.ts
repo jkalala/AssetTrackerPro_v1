@@ -89,7 +89,7 @@ export class PermissionCache {
     resourceId?: string,
     contextHash?: string
   ): boolean | null {
-    const userKey = this.getUserPermissionKey(tenantId, userId)
+    const _userKey = this.getUserPermissionKey(tenantId, userId)
     const checkKey = this.getPermissionCheckKey(permissionName, resourceId, contextHash)
     
     const userChecks = this.permissionChecksCache.get(userKey)
@@ -119,7 +119,7 @@ export class PermissionCache {
     contextHash?: string,
     ttl?: number
   ): void {
-    const userKey = this.getUserPermissionKey(tenantId, userId)
+    const _userKey = this.getUserPermissionKey(tenantId, userId)
     const checkKey = this.getPermissionCheckKey(permissionName, resourceId, contextHash)
     
     if (!this.permissionChecksCache.has(userKey)) {
@@ -138,7 +138,7 @@ export class PermissionCache {
   }
 
   clearUserPermissionChecks(tenantId: string, userId: string): void {
-    const userKey = this.getUserPermissionKey(tenantId, userId)
+    const _userKey = this.getUserPermissionKey(tenantId, userId)
     this.permissionChecksCache.delete(userKey)
   }
 

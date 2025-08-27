@@ -1,23 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   ScrollView,
   StyleSheet,
   Alert,
 } from 'react-native';
-import {
-  Card,
-  Title,
-  Paragraph,
-  Button,
-  TextInput,
-  Chip,
-  List,
-  Divider,
-  ActivityIndicator,
-  Text,
-  Searchbar,
-} from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from 'react-native-paper';
 import * as Location from 'expo-location';
@@ -63,7 +50,7 @@ export default function CheckoutScreen({ navigation, route }) {
         
         // Store for offline use
         await offlineStorage.storeData('assets', assetsData);
-      } catch (error) {
+      } catch (_error) {
         console.log('API unavailable, loading from offline storage');
         setOfflineMode(true);
         
@@ -71,12 +58,12 @@ export default function CheckoutScreen({ navigation, route }) {
         const offlineAssets = await offlineStorage.getData('assets');
         if (offlineAssets) setAssets(offlineAssets);
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error loading assets:', error);
     }
   };
 
-  const filterAssets = () => {
+  const filterAssets = useCallback(() => {=> {
     let filtered = assets;
 
     // Filter by search query
@@ -95,7 +82,7 @@ export default function CheckoutScreen({ navigation, route }) {
     }
 
     setFilteredAssets(filtered);
-  };
+  }, [searchQuery, assets]);
 
   const getCurrentLocation = async () => {
     try {
@@ -141,7 +128,7 @@ export default function CheckoutScreen({ navigation, route }) {
         `Location: ${locationString}`,
         [{ text: 'OK' }]
       );
-    } catch (error) {
+    } catch (_error) {
       console.error('Error getting location:', error);
       Alert.alert(
         'Location Error',
@@ -194,7 +181,7 @@ export default function CheckoutScreen({ navigation, route }) {
             },
           ]
         );
-      } catch (error) {
+      } catch (_error) {
         console.log('API unavailable, storing action for later sync');
         
         // Store action for offline sync
@@ -215,7 +202,7 @@ export default function CheckoutScreen({ navigation, route }) {
           ]
         );
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error performing check in/out:', error);
       Alert.alert(
         'Error',

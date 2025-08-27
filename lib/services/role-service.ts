@@ -4,24 +4,6 @@
 // Service for managing hierarchical roles and permissions
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  Role, 
-  RoleInsert, 
-  RoleUpdate, 
-  RoleWithPermissions,
-  Permission,
-  RolePermission,
-  UserRole,
-  UserRoleInsert,
-  CreateRoleRequest,
-  AssignRoleRequest,
-  RevokeRoleRequest,
-  RoleHierarchyNode,
-  RoleAnalytics,
-  RBACError
-} from '@/lib/types/rbac'
-import { Database } from '@/lib/types/database'
-
 export class RoleService {
   private async getSupabase() {
     return await createClient()
@@ -69,7 +51,7 @@ export class RoleService {
       const { data: roleId, error } = await supabase
         .rpc('create_role_with_permissions', {
           p_tenant_id: tenantId,
-          p_name: request.name,
+          p_name: request._name,
           p_display_name: request.display_name,
           p_description: request.description || null,
           p_parent_role_id: request.parent_role_id || null,
@@ -94,7 +76,7 @@ export class RoleService {
 
       return role
     } catch (error) {
-      console.error('Error creating role:', error)
+      console.error
       throw error
     }
   }
@@ -155,7 +137,7 @@ export class RoleService {
 
       return role
     } catch (error) {
-      console.error('Error updating role:', error)
+      console.error
       throw error
     }
   }
@@ -224,7 +206,7 @@ export class RoleService {
 
       return true
     } catch (error) {
-      console.error('Error deleting role:', error)
+      console.error
       throw error
     }
   }
@@ -244,7 +226,7 @@ export class RoleService {
             inherited_from_role_id,
             permissions (
               id,
-              name,
+              _name,
               display_name,
               description,
               resource_type,
@@ -262,7 +244,7 @@ export class RoleService {
       }
 
       // Transform the data to match our interface
-      const permissions = role.role_permissions?.map((rp: Record<string, unknown>) => ({
+      const _permissions = role.role_permissions?.map((rp: Record<string, unknown>) => ({
         ...(rp.permissions as any),
         conditions: rp.conditions,
         resource_filters: rp.resource_filters,
@@ -274,7 +256,7 @@ export class RoleService {
         permissions
       }
     } catch (error) {
-      console.error('Error getting role:', error)
+      console.error
       throw error
     }
   }
@@ -283,7 +265,7 @@ export class RoleService {
     try {
       const supabase = await this.getSupabase()
       
-      let query = supabase
+      let _query = supabase
         .from('roles')
         .select('*')
         .eq('tenant_id', tenantId)
@@ -291,7 +273,7 @@ export class RoleService {
         .order('name', { ascending: true })
 
       if (!includeInactive) {
-        query = query.eq('is_active', true)
+        _query = query.eq('is_active', true)
       }
 
       const { data: roles, error } = await query
@@ -302,7 +284,7 @@ export class RoleService {
 
       return roles || []
     } catch (error) {
-      console.error('Error getting roles:', error)
+      console.error
       throw error
     }
   }
@@ -319,7 +301,7 @@ export class RoleService {
         .eq('tenant_id', tenantId)
         .eq('is_active', true)
 
-      const userCountMap = userCounts?.reduce((acc, ur) => {
+      const _userCountMap = userCounts?.reduce((acc, ur) => {
         acc[ur.role_id] = (acc[ur.role_id] || 0) + 1
         return acc
       }, {} as Record<string, number>) || {}
@@ -331,7 +313,7 @@ export class RoleService {
           role_id,
           permissions (
             id,
-            name,
+            _name,
             display_name,
             resource_type,
             action,
@@ -346,7 +328,7 @@ export class RoleService {
         }
         // rp.permissions is already an array of permissions
         if (Array.isArray(rp.permissions)) {
-          acc[rp.role_id].push(...rp.permissions.map((p: any) => ({
+          acc[rp.role_id].push(...rp.permissions.map((p: Record<string, unknown>) => ({
             ...p,
             is_system_permission: p.is_system_permission || false,
             created_at: p.created_at || new Date().toISOString(),
@@ -394,7 +376,7 @@ export class RoleService {
 
       return rootNodes
     } catch (error) {
-      console.error('Error getting role hierarchy:', error)
+      console.error
       throw error
     }
   }
@@ -476,7 +458,7 @@ export class RoleService {
 
       return assignment
     } catch (error) {
-      console.error('Error assigning role to user:', error)
+      console.error
       throw error
     }
   }
@@ -501,7 +483,7 @@ export class RoleService {
 
       return success
     } catch (error) {
-      console.error('Error revoking role from user:', error)
+      console.error
       throw error
     }
   }
@@ -518,7 +500,7 @@ export class RoleService {
           assigned_by,
           roles (
             id,
-            name,
+            _name,
             display_name,
             description,
             level,
@@ -544,7 +526,7 @@ export class RoleService {
         assigned_by: ur.assigned_by
       })) || []
     } catch (error) {
-      console.error('Error getting user roles:', error)
+      console.error
       throw error
     }
   }
@@ -584,7 +566,7 @@ export class RoleService {
         assigned_by: ru.assigned_by
       })) || []
     } catch (error) {
-      console.error('Error getting role users:', error)
+      console.error
       throw error
     }
   }
@@ -615,7 +597,7 @@ export class RoleService {
 
       return rolePermission
     } catch (error) {
-      console.error('Error adding permission to role:', error)
+      console.error
       throw error
     }
   }
@@ -637,7 +619,7 @@ export class RoleService {
 
       return true
     } catch (error) {
-      console.error('Error removing permission from role:', error)
+      console.error
       throw error
     }
   }
@@ -658,7 +640,7 @@ export class RoleService {
 
       return permissions || []
     } catch (error) {
-      console.error('Error getting system permissions:', error)
+      console.error
       throw error
     }
   }
@@ -667,7 +649,7 @@ export class RoleService {
   // ANALYTICS AND REPORTING
   // =====================================================
 
-  async getRoleAnalytics(tenantId: string, roleId: string, days = 30): Promise<RoleAnalytics> {
+  async getRoleAnalytics(tenantId: string, roleId: string, _days = 30): Promise<RoleAnalytics> {
     try {
       const supabase = await this.getSupabase()
       const role = await this.getRole(tenantId, roleId)
@@ -717,7 +699,7 @@ export class RoleService {
 
       return {
         role_id: roleId,
-        role_name: role.name,
+        role_name: role._name,
         user_count: userCount,
         permission_count: role.permissions.length,
         usage_stats: {
@@ -729,7 +711,7 @@ export class RoleService {
         most_used_permissions: mostUsedPermissions
       }
     } catch (error) {
-      console.error('Error getting role analytics:', error)
+      console.error
       throw error
     }
   }
@@ -751,7 +733,7 @@ export class RoleService {
 
       return count || 0
     } catch (error) {
-      console.error('Error cleaning up expired assignments:', error)
+      console.error
       throw error
     }
   }
@@ -776,7 +758,7 @@ export class RoleService {
 
       return true
     } catch (error) {
-      console.error('Error validating role hierarchy:', error)
+      console.error
       throw error
     }
   }

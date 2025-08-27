@@ -323,7 +323,7 @@ export class DataPermissionFilter {
   async buildAssetQuery(
     baseQuery: Record<string, unknown>,
     options: DataFilterOptions
-  ): Promise<any> {
+  ): Promise<Record<string, unknown>> {
     const userPermissions = await this.permissionService.getUserPermissions(
       options.tenantId,
       options.userId
@@ -378,7 +378,7 @@ export class DataPermissionFilter {
   async buildUserQuery(
     baseQuery: Record<string, unknown>,
     options: DataFilterOptions
-  ): Promise<any> {
+  ): Promise<Record<string, unknown>> {
     const userPermissions = await this.permissionService.getUserPermissions(
       options.tenantId,
       options.userId
@@ -560,7 +560,7 @@ export async function buildPermissionFilteredQuery(
   action: string,
   tenantId: string,
   userId: string
-): Promise<any> {
+): Promise<Record<string, unknown>> {
   const options = { tenantId, userId, resourceType, action }
 
   switch (resourceType) {

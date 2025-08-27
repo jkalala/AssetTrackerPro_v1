@@ -444,7 +444,7 @@ export function ReportsPageClient() {
                     <div className="flex items-center space-x-2">
                       <FileText className="h-4 w-4 text-gray-400" />
                       <span className="text-sm text-gray-500">
-                        {report.definition?.fields?.length || 0} fields
+                        {report.fields?.length || 0} fields
                       </span>
                     </div>
                     <div className="flex space-x-1">

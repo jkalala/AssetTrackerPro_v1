@@ -53,10 +53,10 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number,
             });
-            
+
             const maxLines = 1000;
             const totalChanges = pr.additions + pr.deletions;
-            
+
             if (totalChanges > maxLines) {
               core.setFailed(`PR is too large: ${totalChanges} lines changed (max: ${maxLines})`);
             } else {
@@ -78,9 +78,9 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number,
             });
-            
+
             const approvedReviews = reviews.filter(review => review.state === 'APPROVED');
-            
+
             if (approvedReviews.length === 0) {
               core.setFailed('This PR requires at least one approval from a code owner.');
             }
@@ -112,7 +112,7 @@ jobs:
         run: |
           # Check if package.json major version changed
           git diff origin/main HEAD -- package.json | grep -q '"version"' && echo "Version change detected"
-          
+
           # Check for API breaking changes (simplified check)
           if git diff origin/main HEAD --name-only | grep -q "app/api/"; then
             echo "API changes detected - manual review required"

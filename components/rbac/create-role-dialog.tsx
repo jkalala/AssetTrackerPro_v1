@@ -6,12 +6,12 @@
 // Dialog component for creating new roles with permissions
 
 import { useState, useEffect } from 'react'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
-  DialogFooter
+  DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,23 +20,17 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { 
-  Shield, 
-  Key, 
-  AlertTriangle,
-  Search,
-  X
-} from 'lucide-react'
+import { Shield, Key, AlertTriangle, Search, X } from 'lucide-react'
 import { Role, Permission, CreateRoleRequest } from '@/lib/types/rbac'
 
 interface CreateRoleDialogProps {
@@ -50,7 +44,7 @@ export function CreateRoleDialog({
   open,
   onOpenChange,
   onCreateRole,
-  existingRoles
+  existingRoles,
 }: CreateRoleDialogProps) {
   const [formData, setFormData] = useState<CreateRoleRequest>({
     name: '',
@@ -59,9 +53,9 @@ export function CreateRoleDialog({
     parent_role_id: undefined,
     permission_names: [],
     is_default_role: false,
-    max_users: undefined
+    max_users: undefined,
   })
-  
+
   const [permissions, setPermissions] = useState<Permission[]>([])
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(new Set())
   const [permissionSearch, setPermissionSearch] = useState('')
@@ -80,11 +74,11 @@ export function CreateRoleDialog({
     try {
       const response = await fetch('/api/permissions')
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       setPermissions(data.permissions || [])
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load permissions')
@@ -99,7 +93,7 @@ export function CreateRoleDialog({
       parent_role_id: undefined,
       permission_names: [],
       is_default_role: false,
-      max_users: undefined
+      max_users: undefined,
     })
     setSelectedPermissions(new Set())
     setPermissionSearch('')
@@ -136,10 +130,10 @@ export function CreateRoleDialog({
       newSelected.delete(permissionName)
     }
     setSelectedPermissions(newSelected)
-    
+
     setFormData(prev => ({
       ...prev,
-      permission_names: Array.from(newSelected)
+      permission_names: Array.from(newSelected),
     }))
   }
 
@@ -157,7 +151,7 @@ export function CreateRoleDialog({
     try {
       setLoading(true)
       setError(null)
-      
+
       await onCreateRole(formData)
       onOpenChange(false)
     } catch (err: unknown) {
@@ -168,25 +162,27 @@ export function CreateRoleDialog({
   }
 
   // Filter permissions based on search
-  const filteredPermissions = permissions.filter(permission =>
-    permission.name.toLowerCase().includes(permissionSearch.toLowerCase()) ||
-    permission.display_name.toLowerCase().includes(permissionSearch.toLowerCase()) ||
-    permission.resource_type.toLowerCase().includes(permissionSearch.toLowerCase())
+  const filteredPermissions = permissions.filter(
+    permission =>
+      permission.name.toLowerCase().includes(permissionSearch.toLowerCase()) ||
+      permission.display_name.toLowerCase().includes(permissionSearch.toLowerCase()) ||
+      permission.resource_type.toLowerCase().includes(permissionSearch.toLowerCase())
   )
 
   // Group permissions by resource type
-  const permissionsByResource = filteredPermissions.reduce((acc, permission) => {
-    if (!acc[permission.resource_type]) {
-      acc[permission.resource_type] = []
-    }
-    acc[permission.resource_type].push(permission)
-    return acc
-  }, {} as Record<string, Permission[]>)
+  const permissionsByResource = filteredPermissions.reduce(
+    (acc, permission) => {
+      if (!acc[permission.resource_type]) {
+        acc[permission.resource_type] = []
+      }
+      acc[permission.resource_type].push(permission)
+      return acc
+    },
+    {} as Record<string, Permission[]>
+  )
 
   // Get available parent roles (excluding system roles and roles that would create circular references)
-  const availableParentRoles = existingRoles.filter(role => 
-    !role.is_system_role && role.is_active
-  )
+  const availableParentRoles = existingRoles.filter(role => !role.is_system_role && role.is_active)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -219,12 +215,10 @@ export function CreateRoleDialog({
                   id="name"
                   placeholder="e.g., asset_manager"
                   value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   className={nameError ? 'border-red-500' : ''}
                 />
-                {nameError && (
-                  <p className="text-sm text-red-600">{nameError}</p>
-                )}
+                {nameError && <p className="text-sm text-red-600">{nameError}</p>}
                 <p className="text-xs text-gray-500">
                   Used internally. Only letters, numbers, underscores, and hyphens allowed.
                 </p>
@@ -236,11 +230,9 @@ export function CreateRoleDialog({
                   id="display_name"
                   placeholder="e.g., Asset Manager"
                   value={formData.display_name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, display_name: e.target.value }))}
+                  onChange={e => setFormData(prev => ({ ...prev, display_name: e.target.value }))}
                 />
-                <p className="text-xs text-gray-500">
-                  Human-readable name shown in the UI.
-                </p>
+                <p className="text-xs text-gray-500">Human-readable name shown in the UI.</p>
               </div>
             </div>
 
@@ -250,7 +242,7 @@ export function CreateRoleDialog({
                 id="description"
                 placeholder="Describe what this role is for and what permissions it should have..."
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 rows={3}
               />
             </div>
@@ -260,17 +252,19 @@ export function CreateRoleDialog({
                 <Label htmlFor="parent_role">Parent Role</Label>
                 <Select
                   value={formData.parent_role_id || ''}
-                  onValueChange={(value) => setFormData(prev => ({ 
-                    ...prev, 
-                    parent_role_id: value || undefined 
-                  }))}
+                  onValueChange={value =>
+                    setFormData(prev => ({
+                      ...prev,
+                      parent_role_id: value || undefined,
+                    }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select parent role (optional)" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">No parent role</SelectItem>
-                    {availableParentRoles.map((role) => (
+                    {availableParentRoles.map(role => (
                       <SelectItem key={role.id} value={role.id}>
                         {role.display_name} (Level {role.level})
                       </SelectItem>
@@ -290,10 +284,12 @@ export function CreateRoleDialog({
                   min="1"
                   placeholder="No limit"
                   value={formData.max_users || ''}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    max_users: e.target.value ? parseInt(e.target.value) : undefined 
-                  }))}
+                  onChange={e =>
+                    setFormData(prev => ({
+                      ...prev,
+                      max_users: e.target.value ? parseInt(e.target.value) : undefined,
+                    }))
+                  }
                 />
                 <p className="text-xs text-gray-500">
                   Maximum number of users that can have this role.
@@ -305,10 +301,12 @@ export function CreateRoleDialog({
               <Switch
                 id="is_default"
                 checked={formData.is_default_role}
-                onCheckedChange={(checked) => setFormData(prev => ({ 
-                  ...prev, 
-                  is_default_role: checked 
-                }))}
+                onCheckedChange={checked =>
+                  setFormData(prev => ({
+                    ...prev,
+                    is_default_role: checked,
+                  }))
+                }
               />
               <Label htmlFor="is_default">Default Role</Label>
               <p className="text-xs text-gray-500">
@@ -324,9 +322,7 @@ export function CreateRoleDialog({
                 <h3 className="font-semibold">Select Permissions</h3>
               </div>
               <div className="flex items-center space-x-2">
-                <Badge variant="outline">
-                  {selectedPermissions.size} selected
-                </Badge>
+                <Badge variant="outline">{selectedPermissions.size} selected</Badge>
               </div>
             </div>
 
@@ -336,7 +332,7 @@ export function CreateRoleDialog({
               <Input
                 placeholder="Search permissions..."
                 value={permissionSearch}
-                onChange={(e) => setPermissionSearch(e.target.value)}
+                onChange={e => setPermissionSearch(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -349,16 +345,16 @@ export function CreateRoleDialog({
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-1">
-                    {Array.from(selectedPermissions).map((permissionName) => {
+                    {Array.from(selectedPermissions).map(permissionName => {
                       const permission = permissions.find(p => p.name === permissionName)
                       return (
-                        <Badge 
-                          key={permissionName} 
+                        <Badge
+                          key={permissionName}
                           variant="secondary"
                           className="flex items-center space-x-1"
                         >
                           <span>{permission?.display_name || permissionName}</span>
-                          <X 
+                          <X
                             className="h-3 w-3 cursor-pointer hover:text-red-600"
                             onClick={() => handlePermissionToggle(permissionName, false)}
                           />
@@ -382,9 +378,7 @@ export function CreateRoleDialog({
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            resourcePermissions.forEach(p => 
-                              handlePermissionToggle(p.name, true)
-                            )
+                            resourcePermissions.forEach(p => handlePermissionToggle(p.name, true))
                           }}
                         >
                           Select All
@@ -393,9 +387,7 @@ export function CreateRoleDialog({
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            resourcePermissions.forEach(p => 
-                              handlePermissionToggle(p.name, false)
-                            )
+                            resourcePermissions.forEach(p => handlePermissionToggle(p.name, false))
                           }}
                         >
                           Clear All
@@ -405,29 +397,24 @@ export function CreateRoleDialog({
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {resourcePermissions.map((permission) => (
-                        <div 
+                      {resourcePermissions.map(permission => (
+                        <div
                           key={permission.id}
                           className="flex items-start space-x-3 p-2 rounded border hover:bg-gray-50"
                         >
                           <Checkbox
                             id={permission.id}
                             checked={selectedPermissions.has(permission.name)}
-                            onCheckedChange={(checked) => 
+                            onCheckedChange={checked =>
                               handlePermissionToggle(permission.name, checked as boolean)
                             }
                           />
                           <div className="flex-1">
-                            <Label 
-                              htmlFor={permission.id}
-                              className="font-medium cursor-pointer"
-                            >
+                            <Label htmlFor={permission.id} className="font-medium cursor-pointer">
                               {permission.display_name}
                             </Label>
                             {permission.description && (
-                              <p className="text-xs text-gray-600 mt-1">
-                                {permission.description}
-                              </p>
+                              <p className="text-xs text-gray-600 mt-1">{permission.description}</p>
                             )}
                             <div className="flex items-center space-x-2 mt-1">
                               <Badge variant="outline" className="text-xs">
@@ -456,14 +443,10 @@ export function CreateRoleDialog({
         </Tabs>
 
         <DialogFooter>
-          <Button 
-            variant="outline" 
-            onClick={() => onOpenChange(false)}
-            disabled={loading}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleSubmit}
             disabled={loading || !formData.name || !formData.display_name || !!nameError}
           >

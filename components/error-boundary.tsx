@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import React from "react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertTriangle, RefreshCw } from "lucide-react"
+import React from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertTriangle, RefreshCw } from 'lucide-react'
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -32,7 +32,7 @@ class ErrorBoundary extends React.Component<
     })
 
     // Log error to console for debugging
-    console.error("Error Boundary caught an error:", error, errorInfo)
+    console.error('Error Boundary caught an error:', error, errorInfo)
   }
 
   render() {
@@ -54,7 +54,9 @@ class ErrorBoundary extends React.Component<
             <CardContent className="space-y-4">
               <Alert variant="destructive">
                 <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>{this.state.error?.message || "An unexpected error occurred"}</AlertDescription>
+                <AlertDescription>
+                  {this.state.error?.message || 'An unexpected error occurred'}
+                </AlertDescription>
               </Alert>
 
               <div className="space-y-2">
@@ -69,15 +71,23 @@ class ErrorBoundary extends React.Component<
                   Reload Application
                 </Button>
 
-                <Button variant="outline" onClick={() => (window.location.href = "/")} className="w-full">
+                <Button
+                  variant="outline"
+                  onClick={() => (window.location.href = '/')}
+                  className="w-full"
+                >
                   Go to Homepage
                 </Button>
               </div>
 
-              {process.env.NODE_ENV === "development" && this.state.error && (
+              {process.env.NODE_ENV === 'development' && this.state.error && (
                 <details className="mt-4">
-                  <summary className="cursor-pointer text-sm font-medium">Error Details (Development)</summary>
-                  <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto">{this.state.error.stack}</pre>
+                  <summary className="cursor-pointer text-sm font-medium">
+                    Error Details (Development)
+                  </summary>
+                  <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto">
+                    {this.state.error.stack}
+                  </pre>
                 </details>
               )}
             </CardContent>

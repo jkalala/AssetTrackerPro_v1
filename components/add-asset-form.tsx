@@ -1,50 +1,56 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useRouter } from "next/navigation"
-import { Package, Loader2, AlertTriangle, Settings, Save, ArrowLeft, Sparkles } from "lucide-react"
-import { addAsset, generateAssetId } from "@/lib/asset-actions"
-import { useAuth } from "@/components/auth/auth-provider"
-import { checkUserProfile } from "@/lib/profile-actions"
-import { useToast } from "@/hooks/use-toast"
-import Link from "next/link"
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useRouter } from 'next/navigation'
+import { Package, Loader2, AlertTriangle, Settings, Save, ArrowLeft, Sparkles } from 'lucide-react'
+import { addAsset, generateAssetId } from '@/lib/asset-actions'
+import { useAuth } from '@/components/auth/auth-provider'
+import { checkUserProfile } from '@/lib/profile-actions'
+import { useToast } from '@/hooks/use-toast'
+import Link from 'next/link'
 
 export default function AddAssetForm() {
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [profileStatus, setProfileStatus] = useState<"loading" | "exists" | "missing">("loading")
+  const [profileStatus, setProfileStatus] = useState<'loading' | 'exists' | 'missing'>('loading')
   const [generatingId, setGeneratingId] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
   const [formData, setFormData] = useState({
-    asset_id: "",
-    name: "",
-    description: "",
-    category: "",
-    status: "active" as const,
-    location: "",
-    purchase_value: "",
-    purchase_date: "",
-    manufacturer: "",
-    model: "",
-    serial_number: "",
-    warranty_expiry: "",
-    assigned_to: "",
-    tags: "",
-    notes: "",
+    asset_id: '',
+    name: '',
+    description: '',
+    category: '',
+    status: 'active' as const,
+    location: '',
+    purchase_value: '',
+    purchase_date: '',
+    manufacturer: '',
+    model: '',
+    serial_number: '',
+    warranty_expiry: '',
+    assigned_to: '',
+    tags: '',
+    notes: '',
   })
 
   const [customFieldDefs, setCustomFieldDefs] = useState<any[]>([])
@@ -56,25 +62,25 @@ export default function AddAssetForm() {
       if (!user) return
 
       try {
-        setProfileStatus("loading")
+        setProfileStatus('loading')
         const result = await checkUserProfile()
 
         if (result.error) {
-          console.error("Profile check error:", result.error)
-          setProfileStatus("exists")
+          console.error('Profile check error:', result.error)
+          setProfileStatus('exists')
           return
         }
 
         if (result.exists) {
-          console.log("Profile exists:", result.profile)
-          setProfileStatus("exists")
+          console.log('Profile exists:', result.profile)
+          setProfileStatus('exists')
         } else {
-          console.log("Profile missing, user:", result.user)
-          setProfileStatus("missing")
+          console.log('Profile missing, user:', result.user)
+          setProfileStatus('missing')
         }
       } catch (err) {
-        console.error("Profile check failed:", err)
-        setProfileStatus("exists")
+        console.error('Profile check failed:', err)
+        setProfileStatus('exists')
       }
     }
 
@@ -83,7 +89,7 @@ export default function AddAssetForm() {
 
   useEffect(() => {
     async function fetchCustomFields() {
-      const res = await fetch("/api/custom-fields")
+      const res = await fetch('/api/custom-fields')
       const json = await res.json()
       setCustomFieldDefs(json.data || [])
     }
@@ -92,7 +98,7 @@ export default function AddAssetForm() {
 
   useEffect(() => {
     async function fetchCategories() {
-      const res = await fetch("/api/categories")
+      const res = await fetch('/api/categories')
       const json = await res.json()
       setCategories(json.data || [])
     }
@@ -101,13 +107,12 @@ export default function AddAssetForm() {
 
   // Helper to build category options (flat with indentation for subcategories)
   const buildCategoryOptions = (list: any[], parentId: string | null = null, level = 0): any[] =>
-    list.filter(c => (c.parent_id || "") === (parentId || "")).flatMap(c => [
-      { ...c, indent: level },
-      ...buildCategoryOptions(list, c.id, level + 1)
-    ])
+    list
+      .filter(c => (c.parent_id || '') === (parentId || ''))
+      .flatMap(c => [{ ...c, indent: level }, ...buildCategoryOptions(list, c.id, level + 1)])
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData(prev => ({ ...prev, [field]: value }))
   }
 
   const handleCustomFieldChange = (fieldId: string, value: string) => {
@@ -120,14 +125,14 @@ export default function AddAssetForm() {
       const newId = await generateAssetId(formData.category)
       setFormData(prev => ({ ...prev, asset_id: newId }))
       toast({
-        title: "Asset ID Generated",
-        description: "A unique asset ID has been generated for you."
+        title: 'Asset ID Generated',
+        description: 'A unique asset ID has been generated for you.',
       })
     } catch (error) {
       toast({
-        title: "Error Generating ID",
-        description: "Failed to generate asset ID. Please try again.",
-        variant: "destructive"
+        title: 'Error Generating ID',
+        description: 'Failed to generate asset ID. Please try again.',
+        variant: 'destructive',
       })
     } finally {
       setGeneratingId(false)
@@ -137,11 +142,11 @@ export default function AddAssetForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError("")
+    setError('')
 
     // Validate custom fields
     for (const field of customFieldDefs) {
-      const value = customFields[field.id] ?? ""
+      const value = customFields[field.id] ?? ''
       if (field.required && !value) {
         setError(`Custom field "${field.label}" is required.`)
         setLoading(false)
@@ -149,8 +154,9 @@ export default function AddAssetForm() {
       }
       if (field.validation) {
         try {
-          const rules = typeof field.validation === "string" ? JSON.parse(field.validation) : field.validation
-          if (field.type === "text" || field.type === "dropdown") {
+          const rules =
+            typeof field.validation === 'string' ? JSON.parse(field.validation) : field.validation
+          if (field.type === 'text' || field.type === 'dropdown') {
             if (rules.min !== undefined && value.length < rules.min) {
               setError(`Custom field "${field.label}" must be at least ${rules.min} characters.`)
               setLoading(false)
@@ -161,7 +167,7 @@ export default function AddAssetForm() {
               setLoading(false)
               return
             }
-          } else if (field.type === "number") {
+          } else if (field.type === 'number') {
             const num = Number(value)
             if (isNaN(num)) {
               setError(`Custom field "${field.label}" must be a number.`)
@@ -206,63 +212,68 @@ export default function AddAssetForm() {
       if (result.error) {
         setError(result.error)
         toast({
-          title: "Error Adding Asset",
+          title: 'Error Adding Asset',
           description: result.error,
-          variant: "destructive"
+          variant: 'destructive',
         })
       } else {
         // Save custom field values
         if (Object.keys(customFields).length > 0) {
           await fetch(`/api/assets/${result.data.id}/custom-fields`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ values: Object.entries(customFields).map(([field_id, value]) => ({ field_id, value })) })
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              values: Object.entries(customFields).map(([field_id, value]) => ({
+                field_id,
+                value,
+              })),
+            }),
           })
         }
         setSuccess(true)
         toast({
-          title: "Asset Added Successfully",
-          description: "Your asset has been added to the inventory."
+          title: 'Asset Added Successfully',
+          description: 'Your asset has been added to the inventory.',
         })
-        
+
         // Reset form
         setFormData({
-          asset_id: "",
-          name: "",
-          description: "",
-          category: "",
-          status: "active",
-          location: "",
-          purchase_value: "",
-          purchase_date: "",
-          manufacturer: "",
-          model: "",
-          serial_number: "",
-          warranty_expiry: "",
-          assigned_to: "",
-          tags: "",
-          notes: "",
+          asset_id: '',
+          name: '',
+          description: '',
+          category: '',
+          status: 'active',
+          location: '',
+          purchase_value: '',
+          purchase_date: '',
+          manufacturer: '',
+          model: '',
+          serial_number: '',
+          warranty_expiry: '',
+          assigned_to: '',
+          tags: '',
+          notes: '',
         })
         setCustomFields({})
-        
+
         // Redirect to dashboard after a short delay
         setTimeout(() => {
-          router.push("/assets")
+          router.push('/assets')
         }, 1500)
       }
     } catch (err) {
-      setError("An unexpected error occurred")
+      setError('An unexpected error occurred')
       toast({
-        title: "Error Adding Asset",
-        description: "An unexpected error occurred while adding the asset.",
-        variant: "destructive"
+        title: 'Error Adding Asset',
+        description: 'An unexpected error occurred while adding the asset.',
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
     }
   }
 
-  if (profileStatus === "loading") {
+  if (profileStatus === 'loading') {
     return (
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
@@ -279,7 +290,7 @@ export default function AddAssetForm() {
   return (
     <div className="space-y-6">
       {/* Profile Setup Component - only show if profile is missing */}
-      {profileStatus === "missing" && (
+      {profileStatus === 'missing' && (
         <Card className="w-full max-w-2xl mx-auto border-orange-200 bg-orange-50">
           <CardHeader>
             <CardTitle className="text-orange-800">Profile Setup Required</CardTitle>
@@ -322,7 +333,7 @@ export default function AddAssetForm() {
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
                 <strong>Error:</strong> {error}
-                {error.includes("foreign key constraint") && (
+                {error.includes('foreign key constraint') && (
                   <div className="mt-3 p-3 bg-red-50 rounded border border-red-200">
                     <p className="text-sm font-medium text-red-800 mb-2">Profile Issue Detected</p>
                     <p className="text-sm text-red-700 mb-3">
@@ -366,7 +377,7 @@ export default function AddAssetForm() {
                       <Input
                         id="asset_id"
                         value={formData.asset_id}
-                        onChange={(e) => handleInputChange("asset_id", e.target.value)}
+                        onChange={e => handleInputChange('asset_id', e.target.value)}
                         placeholder="e.g., IT-123456-01"
                         required
                       />
@@ -390,7 +401,7 @@ export default function AddAssetForm() {
                     <Input
                       id="name"
                       value={formData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
+                      onChange={e => handleInputChange('name', e.target.value)}
                       placeholder="e.g., MacBook Pro 16-inch"
                       required
                     />
@@ -402,7 +413,7 @@ export default function AddAssetForm() {
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => handleInputChange("description", e.target.value)}
+                    onChange={e => handleInputChange('description', e.target.value)}
                     placeholder="Detailed description of the asset..."
                     rows={3}
                   />
@@ -413,7 +424,7 @@ export default function AddAssetForm() {
                     <Label htmlFor="category">Category *</Label>
                     <Select
                       value={formData.category}
-                      onValueChange={(value) => handleInputChange("category", value)}
+                      onValueChange={value => handleInputChange('category', value)}
                       required
                     >
                       <SelectTrigger>
@@ -422,7 +433,8 @@ export default function AddAssetForm() {
                       <SelectContent>
                         {buildCategoryOptions(categories).map(cat => (
                           <SelectItem key={cat.id} value={cat.id}>
-                            {"\u00A0".repeat(cat.indent * 4)}{cat.name}
+                            {'\u00A0'.repeat(cat.indent * 4)}
+                            {cat.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -433,7 +445,7 @@ export default function AddAssetForm() {
                     <Label htmlFor="status">Status *</Label>
                     <Select
                       value={formData.status}
-                      onValueChange={(value) => handleInputChange("status", value)}
+                      onValueChange={value => handleInputChange('status', value)}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -454,7 +466,7 @@ export default function AddAssetForm() {
                   <Input
                     id="location"
                     value={formData.location}
-                    onChange={(e) => handleInputChange("location", e.target.value)}
+                    onChange={e => handleInputChange('location', e.target.value)}
                     placeholder="e.g., Office A, Warehouse B, Conference Room"
                   />
                 </div>
@@ -467,7 +479,7 @@ export default function AddAssetForm() {
                     <Input
                       id="manufacturer"
                       value={formData.manufacturer}
-                      onChange={(e) => handleInputChange("manufacturer", e.target.value)}
+                      onChange={e => handleInputChange('manufacturer', e.target.value)}
                       placeholder="e.g., Apple, Dell, HP"
                     />
                   </div>
@@ -477,7 +489,7 @@ export default function AddAssetForm() {
                     <Input
                       id="model"
                       value={formData.model}
-                      onChange={(e) => handleInputChange("model", e.target.value)}
+                      onChange={e => handleInputChange('model', e.target.value)}
                       placeholder="e.g., MacBook Pro 16-inch, Latitude 5520"
                     />
                   </div>
@@ -488,7 +500,7 @@ export default function AddAssetForm() {
                   <Input
                     id="serial_number"
                     value={formData.serial_number}
-                    onChange={(e) => handleInputChange("serial_number", e.target.value)}
+                    onChange={e => handleInputChange('serial_number', e.target.value)}
                     placeholder="e.g., C02XYZ123456"
                   />
                 </div>
@@ -500,7 +512,7 @@ export default function AddAssetForm() {
                       id="purchase_date"
                       type="date"
                       value={formData.purchase_date}
-                      onChange={(e) => handleInputChange("purchase_date", e.target.value)}
+                      onChange={e => handleInputChange('purchase_date', e.target.value)}
                     />
                   </div>
 
@@ -510,7 +522,7 @@ export default function AddAssetForm() {
                       id="warranty_expiry"
                       type="date"
                       value={formData.warranty_expiry}
-                      onChange={(e) => handleInputChange("warranty_expiry", e.target.value)}
+                      onChange={e => handleInputChange('warranty_expiry', e.target.value)}
                     />
                   </div>
                 </div>
@@ -520,7 +532,7 @@ export default function AddAssetForm() {
                   <Input
                     id="tags"
                     value={formData.tags}
-                    onChange={(e) => handleInputChange("tags", e.target.value)}
+                    onChange={e => handleInputChange('tags', e.target.value)}
                     placeholder="e.g., laptop, development, high-value (comma separated)"
                   />
                 </div>
@@ -536,7 +548,7 @@ export default function AddAssetForm() {
                       step="0.01"
                       min="0"
                       value={formData.purchase_value}
-                      onChange={(e) => handleInputChange("purchase_value", e.target.value)}
+                      onChange={e => handleInputChange('purchase_value', e.target.value)}
                       placeholder="0.00"
                     />
                   </div>
@@ -546,7 +558,7 @@ export default function AddAssetForm() {
                     <Input
                       id="assigned_to"
                       value={formData.assigned_to}
-                      onChange={(e) => handleInputChange("assigned_to", e.target.value)}
+                      onChange={e => handleInputChange('assigned_to', e.target.value)}
                       placeholder="e.g., john.doe@company.com"
                     />
                   </div>
@@ -557,7 +569,7 @@ export default function AddAssetForm() {
                   <Textarea
                     id="notes"
                     value={formData.notes}
-                    onChange={(e) => handleInputChange("notes", e.target.value)}
+                    onChange={e => handleInputChange('notes', e.target.value)}
                     placeholder="Additional notes, maintenance history, or special instructions..."
                     rows={4}
                   />
@@ -569,36 +581,39 @@ export default function AddAssetForm() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {customFieldDefs.map(field => (
                         <div key={field.id} className="space-y-2">
-                          <Label htmlFor={`custom-${field.id}`}>{field.label}{field.required && " *"}</Label>
-                          {field.type === "text" && (
+                          <Label htmlFor={`custom-${field.id}`}>
+                            {field.label}
+                            {field.required && ' *'}
+                          </Label>
+                          {field.type === 'text' && (
                             <Input
                               id={`custom-${field.id}`}
-                              value={customFields[field.id] || ""}
+                              value={customFields[field.id] || ''}
                               onChange={e => handleCustomFieldChange(field.id, e.target.value)}
                               required={field.required}
                             />
                           )}
-                          {field.type === "number" && (
+                          {field.type === 'number' && (
                             <Input
                               id={`custom-${field.id}`}
                               type="number"
-                              value={customFields[field.id] || ""}
+                              value={customFields[field.id] || ''}
                               onChange={e => handleCustomFieldChange(field.id, e.target.value)}
                               required={field.required}
                             />
                           )}
-                          {field.type === "date" && (
+                          {field.type === 'date' && (
                             <Input
                               id={`custom-${field.id}`}
                               type="date"
-                              value={customFields[field.id] || ""}
+                              value={customFields[field.id] || ''}
                               onChange={e => handleCustomFieldChange(field.id, e.target.value)}
                               required={field.required}
                             />
                           )}
-                          {field.type === "dropdown" && Array.isArray(field.options) && (
+                          {field.type === 'dropdown' && Array.isArray(field.options) && (
                             <Select
-                              value={customFields[field.id] || ""}
+                              value={customFields[field.id] || ''}
                               onValueChange={val => handleCustomFieldChange(field.id, val)}
                               required={field.required}
                             >
@@ -607,7 +622,9 @@ export default function AddAssetForm() {
                               </SelectTrigger>
                               <SelectContent>
                                 {field.options.map((opt: string) => (
-                                  <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                  <SelectItem key={opt} value={opt}>
+                                    {opt}
+                                  </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
@@ -625,12 +642,12 @@ export default function AddAssetForm() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.push("/assets")}
+                onClick={() => router.push('/assets')}
                 disabled={loading}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading || profileStatus === "missing"}>
+              <Button type="submit" disabled={loading || profileStatus === 'missing'}>
                 {loading ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 ) : (

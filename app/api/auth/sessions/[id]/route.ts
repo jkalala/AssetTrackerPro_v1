@@ -7,22 +7,22 @@ function getClientIpAddress(request: NextRequest): string {
   const forwardedFor = request.headers.get('x-forwarded-for')
   const realIp = request.headers.get('x-real-ip')
   const cfConnectingIp = request.headers.get('cf-connecting-ip')
-  
+
   // Try different headers in order of preference
   if (cfConnectingIp) return cfConnectingIp
   if (forwardedFor) return forwardedFor.split(',')[0].trim()
   if (realIp) return realIp
-  
+
   return 'unknown'
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -31,10 +31,7 @@ export async function DELETE(
     const sessionId = params.id
 
     if (!sessionId) {
-      return NextResponse.json(
-        { error: 'Session ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Session ID is required' }, { status: 400 })
     }
 
     // Get user's tenant ID
@@ -62,8 +59,12 @@ export async function DELETE(
     )
 
     if (!canTerminate.canTerminate) {
-      const statusCode = canTerminate.reason === 'Session not found' ? 404 : 
-                        canTerminate.reason === 'Unauthorized to terminate this session' ? 403 : 400
+      const statusCode =
+        canTerminate.reason === 'Session not found'
+          ? 404
+          : canTerminate.reason === 'Unauthorized to terminate this session'
+            ? 403
+            : 400
       return NextResponse.json({ error: canTerminate.reason }, { status: statusCode })
     }
 
@@ -75,13 +76,10 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: 'Session terminated'
+      message: 'Session terminated',
     })
   } catch (error) {
     console.error('Terminate session error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

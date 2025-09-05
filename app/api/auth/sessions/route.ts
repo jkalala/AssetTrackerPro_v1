@@ -7,19 +7,22 @@ function getClientIpAddress(request: NextRequest): string {
   const forwardedFor = request.headers.get('x-forwarded-for')
   const realIp = request.headers.get('x-real-ip')
   const cfConnectingIp = request.headers.get('cf-connecting-ip')
-  
+
   // Try different headers in order of preference
   if (cfConnectingIp) return cfConnectingIp
   if (forwardedFor) return forwardedFor.split(',')[0].trim()
   if (realIp) return realIp
-  
+
   return 'unknown'
 }
 
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -41,7 +44,7 @@ export async function GET(request: NextRequest) {
     const currentIp = getClientIpAddress(request)
 
     const result = await sessionService.listActiveSessions(
-      profile.tenant_id, 
+      profile.tenant_id,
       user.id,
       currentIp,
       userAgent
@@ -53,21 +56,21 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      sessions: result.sessions || []
+      sessions: result.sessions || [],
     })
   } catch (error) {
     console.error('Get sessions error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -97,7 +100,7 @@ export async function DELETE(request: NextRequest) {
         undefined, // Don't exclude any session
         'admin_revoke'
       )
-      
+
       if (!result.success) {
         return NextResponse.json({ error: result.error }, { status: 400 })
       }
@@ -105,7 +108,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: `${result.terminatedCount} sessions terminated`,
-        terminatedCount: result.terminatedCount
+        terminatedCount: result.terminatedCount,
       })
     } else if (sessionId) {
       // Get current request info for session validation
@@ -126,14 +129,14 @@ export async function DELETE(request: NextRequest) {
       }
 
       result = await sessionService.terminateSession(sessionId, 'admin_revoke')
-      
+
       if (!result.success) {
         return NextResponse.json({ error: result.error }, { status: 400 })
       }
 
       return NextResponse.json({
         success: true,
-        message: 'Session terminated'
+        message: 'Session terminated',
       })
     } else {
       return NextResponse.json(
@@ -143,9 +146,6 @@ export async function DELETE(request: NextRequest) {
     }
   } catch (error) {
     console.error('Terminate sessions error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

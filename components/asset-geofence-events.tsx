@@ -27,10 +27,12 @@ export default function AssetGeofenceEvents({ assetId }: { assetId: string }) {
         <div key={ev.id} className="flex items-center gap-2 text-sm">
           <MapPin className="h-4 w-4 text-blue-600" />
           <span>
-            <b>{ev.event_type === 'entry' ? 'Entered' : 'Exited'}</b> zone <b>{ev.geofence?.name || ev.geofence_id}</b> at {new Date(ev.timestamp).toLocaleString()}
+            <b>{ev.event_type === 'entry' ? 'Entered' : 'Exited'}</b> zone{' '}
+            <b>{ev.geofence?.name || ev.geofence_id}</b> at{' '}
+            {new Date(ev.timestamp).toLocaleString()}
           </span>
         </div>
       ))}
     </div>
   )
-} 
+}

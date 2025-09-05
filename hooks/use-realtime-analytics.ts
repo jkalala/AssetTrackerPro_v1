@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useCallback } from "react"
-import { realtimeAnalytics, type RealtimeEvent, type AnalyticsEvent } from "@/lib/realtime-client"
+import { useState, useEffect, useCallback } from 'react'
+import { realtimeAnalytics, type RealtimeEvent, type AnalyticsEvent } from '@/lib/realtime-client'
 
 export interface RealtimeMetrics {
   totalAssets: number
@@ -15,7 +15,7 @@ export interface RealtimeMetrics {
 
 export interface ActivityFeed {
   id: string
-  type: "asset_created" | "asset_updated" | "asset_scanned" | "user_login" | "qr_generated"
+  type: 'asset_created' | 'asset_updated' | 'asset_scanned' | 'user_login' | 'qr_generated'
   title: string
   description: string
   timestamp: string
@@ -44,8 +44,8 @@ export function useRealtimeMetrics() {
       })
       setError(null)
     } catch (err) {
-      setError("Failed to update metrics")
-      console.error("Metrics update error:", err)
+      setError('Failed to update metrics')
+      console.error('Metrics update error:', err)
     }
   }, [])
 
@@ -55,7 +55,7 @@ export function useRealtimeMetrics() {
 
     // Subscribe to real-time updates
     const handleAssetChange = (event: RealtimeEvent) => {
-      if (event.table === "assets") {
+      if (event.table === 'assets') {
         updateMetrics()
       }
     }
@@ -64,7 +64,7 @@ export function useRealtimeMetrics() {
       updateMetrics()
     }
 
-    const assetChannelId = realtimeAnalytics.subscribeToTable("assets", handleAssetChange)
+    const assetChannelId = realtimeAnalytics.subscribeToTable('assets', handleAssetChange)
     realtimeAnalytics.subscribeToAnalytics(handleAnalyticsEvent)
 
     // Cleanup on unmount
@@ -91,9 +91,9 @@ export function useActivityFeed(limit = 20) {
         metadata: event.metadata,
       }
 
-      setActivities((prev) => [activity, ...prev.slice(0, limit - 1)])
+      setActivities(prev => [activity, ...prev.slice(0, limit - 1)])
     },
-    [limit],
+    [limit]
   )
 
   useEffect(() => {
@@ -103,24 +103,24 @@ export function useActivityFeed(limit = 20) {
     // Load initial activities (mock data for demo)
     const mockActivities: ActivityFeed[] = [
       {
-        id: "1",
-        type: "asset_created",
-        title: "New Asset Created",
+        id: '1',
+        type: 'asset_created',
+        title: 'New Asset Created',
         description: 'MacBook Pro 16" was added to inventory',
         timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
       },
       {
-        id: "2",
-        type: "asset_scanned",
-        title: "Asset Scanned",
-        description: "Office Chair QR code was scanned",
+        id: '2',
+        type: 'asset_scanned',
+        title: 'Asset Scanned',
+        description: 'Office Chair QR code was scanned',
         timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
       },
       {
-        id: "3",
-        type: "qr_generated",
-        title: "QR Code Generated",
-        description: "QR code created for Projector",
+        id: '3',
+        type: 'qr_generated',
+        title: 'QR Code Generated',
+        description: 'QR code created for Projector',
         timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
       },
     ]
@@ -147,21 +147,21 @@ export function useRealtimeAssetStatus(assetId?: string) {
     }
 
     const handleAssetUpdate = (event: RealtimeEvent) => {
-      if (event.type === "UPDATE" && event.record) {
+      if (event.type === 'UPDATE' && event.record) {
         setAssetStatus(event.record)
       }
     }
 
-    const channelId = realtimeAnalytics.subscribeToTable("assets", handleAssetUpdate, {
-      column: "asset_id",
+    const channelId = realtimeAnalytics.subscribeToTable('assets', handleAssetUpdate, {
+      column: 'asset_id',
       value: assetId,
     })
 
     // Load initial status
     realtimeAnalytics.supabase
-      .from("assets")
-      .select("*")
-      .eq("asset_id", assetId)
+      .from('assets')
+      .select('*')
+      .eq('asset_id', assetId)
       .single()
       .then(({ data }) => {
         setAssetStatus(data)
@@ -179,34 +179,34 @@ export function useRealtimeAssetStatus(assetId?: string) {
 // Helper functions
 function getActivityTitle(eventType: string): string {
   switch (eventType) {
-    case "asset_created":
-      return "New Asset Created"
-    case "asset_updated":
-      return "Asset Updated"
-    case "asset_scanned":
-      return "Asset Scanned"
-    case "user_login":
-      return "User Login"
-    case "qr_generated":
-      return "QR Code Generated"
+    case 'asset_created':
+      return 'New Asset Created'
+    case 'asset_updated':
+      return 'Asset Updated'
+    case 'asset_scanned':
+      return 'Asset Scanned'
+    case 'user_login':
+      return 'User Login'
+    case 'qr_generated':
+      return 'QR Code Generated'
     default:
-      return "Activity"
+      return 'Activity'
   }
 }
 
 function getActivityDescription(event: AnalyticsEvent): string {
   switch (event.event_type) {
-    case "asset_created":
+    case 'asset_created':
       return `Asset ${event.asset_id} was added to inventory`
-    case "asset_updated":
+    case 'asset_updated':
       return `Asset ${event.asset_id} was modified`
-    case "asset_scanned":
+    case 'asset_scanned':
       return `Asset ${event.asset_id} QR code was scanned`
-    case "user_login":
-      return "User logged into the system"
-    case "qr_generated":
+    case 'user_login':
+      return 'User logged into the system'
+    case 'qr_generated':
       return `QR code generated for asset ${event.asset_id}`
     default:
-      return "System activity occurred"
+      return 'System activity occurred'
   }
 }

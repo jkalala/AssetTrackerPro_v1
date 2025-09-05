@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ExternalLink, AlertTriangle } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { ExternalLink, AlertTriangle } from 'lucide-react'
 
 export default function GitHubOAuthFix() {
   return (
@@ -19,8 +19,8 @@ export default function GitHubOAuthFix() {
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              The "This site is blocked" error usually means your GitHub OAuth app configuration doesn't match your
-              current setup.
+              The "This site is blocked" error usually means your GitHub OAuth app configuration
+              doesn't match your current setup.
             </AlertDescription>
           </Alert>
 
@@ -44,7 +44,9 @@ export default function GitHubOAuthFix() {
             <div className="bg-gray-50 p-4 rounded-lg space-y-3">
               <div>
                 <p className="font-medium text-sm text-gray-600">Homepage URL:</p>
-                <code className="bg-white px-2 py-1 rounded border text-sm">http://localhost:3000</code>
+                <code className="bg-white px-2 py-1 rounded border text-sm">
+                  http://localhost:3000
+                </code>
               </div>
               <div>
                 <p className="font-medium text-sm text-gray-600">Authorization callback URL:</p>
@@ -67,7 +69,10 @@ export default function GitHubOAuthFix() {
                   <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
                     <li>Application name: AssetTracker Pro Dev</li>
                     <li>Homepage URL: http://localhost:3000</li>
-                    <li>Authorization callback URL: https://wyqohljdnrouovuqqdlt.supabase.co/auth/v1/callback</li>
+                    <li>
+                      Authorization callback URL:
+                      https://wyqohljdnrouovuqqdlt.supabase.co/auth/v1/callback
+                    </li>
                   </ul>
                 </li>
                 <li>Get the new Client ID and Client Secret</li>
@@ -102,8 +107,8 @@ export default function GitHubOAuthFix() {
 
           <Alert>
             <AlertDescription>
-              <strong>Pro Tip:</strong> After making changes to your GitHub OAuth app, wait a few minutes before
-              testing. GitHub sometimes takes time to propagate changes.
+              <strong>Pro Tip:</strong> After making changes to your GitHub OAuth app, wait a few
+              minutes before testing. GitHub sometimes takes time to propagate changes.
             </AlertDescription>
           </Alert>
         </CardContent>

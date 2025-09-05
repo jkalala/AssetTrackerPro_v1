@@ -35,16 +35,16 @@ export async function POST(request: Request) {
     const result = await bulkUpdateAssets({
       asset_ids,
       operation,
-      value
+      value,
     })
 
     if (result.error) {
       return NextResponse.json({ error: result.error }, { status: 400 })
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      updatedCount: result.updatedCount 
+    return NextResponse.json({
+      success: true,
+      updatedCount: result.updatedCount,
     })
   } catch (error) {
     console.error('Bulk update error:', error)
@@ -80,12 +80,12 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: result.error }, { status: 400 })
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      deletedCount: result.deletedCount 
+    return NextResponse.json({
+      success: true,
+      deletedCount: result.deletedCount,
     })
   } catch (error) {
     console.error('Bulk delete error:', error)
     return NextResponse.json({ error: 'Failed to delete assets' }, { status: 500 })
   }
-} 
+}

@@ -81,10 +81,7 @@ export async function DELETE(req: Request) {
   if (!authorized) {
     return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
   }
-  const { error } = await supabase
-    .from('geofence_zones')
-    .delete()
-    .eq('id', id)
+  const { error } = await supabase.from('geofence_zones').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ success: true })
-} 
+}

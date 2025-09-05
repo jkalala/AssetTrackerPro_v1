@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { createClient } from "@/lib/supabase/client"
-import type { RealtimeChannel } from "@supabase/supabase-js"
+import { createClient } from '@/lib/supabase/client'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 export interface RealtimeEvent {
-  type: "INSERT" | "UPDATE" | "DELETE"
+  type: 'INSERT' | 'UPDATE' | 'DELETE'
   table: string
   record: any
   old_record?: any
@@ -13,7 +13,7 @@ export interface RealtimeEvent {
 
 export interface AnalyticsEvent {
   id: string
-  event_type: "asset_created" | "asset_updated" | "asset_scanned" | "user_login" | "qr_generated"
+  event_type: 'asset_created' | 'asset_updated' | 'asset_scanned' | 'user_login' | 'qr_generated'
   asset_id?: string
   user_id?: string
   metadata?: Record<string, any>
@@ -27,7 +27,11 @@ class RealtimeAnalytics {
   private analyticsListeners: Set<(event: AnalyticsEvent) => void> = new Set()
 
   // Subscribe to real-time table changes
-  subscribeToTable(table: string, callback: (event: RealtimeEvent) => void, filter?: { column: string; value: any }) {
+  subscribeToTable(
+    table: string,
+    callback: (event: RealtimeEvent) => void,
+    filter?: { column: string; value: any }
+  ) {
     const channelName = filter ? `${table}_${filter.column}_${filter.value}` : table
 
     if (this.channels.has(channelName)) {
@@ -43,10 +47,10 @@ class RealtimeAnalytics {
 
     if (filter) {
       channel = channel.on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "*",
-          schema: "public",
+          event: '*',
+          schema: 'public',
           table: table,
           filter: `${filter.column}=eq.${filter.value}`,
         },
@@ -61,15 +65,15 @@ class RealtimeAnalytics {
 
           // Notify all listeners for this channel
           const listeners = this.eventListeners.get(channelName) || new Set()
-          listeners.forEach((listener) => listener(event))
-        },
+          listeners.forEach(listener => listener(event))
+        }
       )
     } else {
       channel = channel.on(
-        "postgres_changes",
+        'postgres_changes',
         {
-          event: "*",
-          schema: "public",
+          event: '*',
+          schema: 'public',
           table: table,
         },
         (payload: any) => {
@@ -83,8 +87,8 @@ class RealtimeAnalytics {
 
           // Notify all listeners for this channel
           const listeners = this.eventListeners.get(channelName) || new Set()
-          listeners.forEach((listener) => listener(event))
-        },
+          listeners.forEach(listener => listener(event))
+        }
       )
     }
 
@@ -129,8 +133,8 @@ class RealtimeAnalytics {
     this.analyticsListeners.add(callback)
 
     // Subscribe to analytics_events table if it exists
-    this.subscribeToTable("analytics_events", (event) => {
-      if (event.type === "INSERT" && event.record) {
+    this.subscribeToTable('analytics_events', event => {
+      if (event.type === 'INSERT' && event.record) {
         const analyticsEvent: AnalyticsEvent = {
           id: event.record.id,
           event_type: event.record.event_type,
@@ -140,15 +144,15 @@ class RealtimeAnalytics {
           timestamp: event.record.created_at || event.timestamp,
         }
 
-        this.analyticsListeners.forEach((listener) => listener(analyticsEvent))
+        this.analyticsListeners.forEach(listener => listener(analyticsEvent))
       }
     })
   }
 
   // Track analytics event
-  async trackEvent(event: Omit<AnalyticsEvent, "id" | "timestamp">) {
+  async trackEvent(event: Omit<AnalyticsEvent, 'id' | 'timestamp'>) {
     try {
-      const { error } = await this.supabase.from("analytics_events").insert({
+      const { error } = await this.supabase.from('analytics_events').insert({
         event_type: event.event_type,
         asset_id: event.asset_id,
         user_id: event.user_id,
@@ -157,10 +161,10 @@ class RealtimeAnalytics {
       })
 
       if (error) {
-        console.error("Failed to track analytics event:", error)
+        console.error('Failed to track analytics event:', error)
       }
     } catch (error) {
-      console.error("Analytics tracking error:", error)
+      console.error('Analytics tracking error:', error)
     }
   }
 
@@ -168,13 +172,19 @@ class RealtimeAnalytics {
   async getRealtimeMetrics() {
     try {
       const [assetsResult, usersResult, scansResult] = await Promise.all([
-        this.supabase.from("assets").select("id, status, created_at").order("created_at", { ascending: false }),
-        this.supabase.from("profiles").select("id, created_at").order("created_at", { ascending: false }),
         this.supabase
-          .from("analytics_events")
-          .select("*")
-          .eq("event_type", "asset_scanned")
-          .order("created_at", { ascending: false })
+          .from('assets')
+          .select('id, status, created_at')
+          .order('created_at', { ascending: false }),
+        this.supabase
+          .from('profiles')
+          .select('id, created_at')
+          .order('created_at', { ascending: false }),
+        this.supabase
+          .from('analytics_events')
+          .select('*')
+          .eq('event_type', 'asset_scanned')
+          .order('created_at', { ascending: false })
           .limit(100),
       ])
 
@@ -184,14 +194,16 @@ class RealtimeAnalytics {
 
       return {
         totalAssets: assetsResult.data?.length || 0,
-        activeAssets: assetsResult.data?.filter((a: any) => a.status === "active").length || 0,
-        assetsCreatedToday: assetsResult.data?.filter((a: any) => new Date(a.created_at) >= today).length || 0,
+        activeAssets: assetsResult.data?.filter((a: any) => a.status === 'active').length || 0,
+        assetsCreatedToday:
+          assetsResult.data?.filter((a: any) => new Date(a.created_at) >= today).length || 0,
         totalUsers: usersResult.data?.length || 0,
-        scansThisWeek: scansResult.data?.filter((s: any) => new Date(s.created_at) >= thisWeek).length || 0,
+        scansThisWeek:
+          scansResult.data?.filter((s: any) => new Date(s.created_at) >= thisWeek).length || 0,
         recentScans: scansResult.data?.slice(0, 10) || [],
       }
     } catch (error) {
-      console.error("Failed to get realtime metrics:", error)
+      console.error('Failed to get realtime metrics:', error)
       return {
         totalAssets: 0,
         activeAssets: 0,
@@ -205,7 +217,7 @@ class RealtimeAnalytics {
 
   // Cleanup all subscriptions
   cleanup() {
-    this.channels.forEach((channel) => {
+    this.channels.forEach(channel => {
       this.supabase.removeChannel(channel)
     })
     this.channels.clear()

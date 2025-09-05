@@ -14,10 +14,13 @@ export async function GET(request: Request, { params }: { params: { assetId: str
       .eq('asset_id', assetId)
       .order('checked_out_at', { ascending: false })
     if (error) {
-      return NextResponse.json({ error: 'Failed to fetch assignment history: ' + error.message }, { status: 500 })
+      return NextResponse.json(
+        { error: 'Failed to fetch assignment history: ' + error.message },
+        { status: 500 }
+      )
     }
     return NextResponse.json({ success: true, assignments: data })
   } catch (err) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-} 
+}

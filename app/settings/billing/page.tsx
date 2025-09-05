@@ -1,19 +1,19 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { createClient } from "@/lib/supabase/client"
-import { useAuth } from "@/components/auth/auth-provider"
-import { createCheckoutSession, cancelSubscription } from "@/lib/billing/stripe"
-import { Tenant } from "@/lib/rbac/types"
-import { 
-  CreditCard, 
-  Package, 
-  Check, 
-  X, 
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/components/auth/auth-provider'
+import { createCheckoutSession, cancelSubscription } from '@/lib/billing/stripe'
+import { Tenant } from '@/lib/rbac/types'
+import {
+  CreditCard,
+  Package,
+  Check,
+  X,
   AlertTriangle,
   Building2,
   Users,
@@ -23,9 +23,9 @@ import {
   Paintbrush,
   MapPin,
   FileText,
-  Loader2
-} from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+  Loader2,
+} from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 interface PlanFeature {
   name: string
@@ -38,60 +38,60 @@ interface PlanFeature {
 
 const planFeatures: PlanFeature[] = [
   {
-    name: "QR Code Generation",
+    name: 'QR Code Generation',
     free: true,
     basic: true,
     pro: true,
     enterprise: true,
-    icon: QrCode
+    icon: QrCode,
   },
   {
-    name: "Analytics",
+    name: 'Analytics',
     free: false,
     basic: true,
     pro: true,
     enterprise: true,
-    icon: BarChart3
+    icon: BarChart3,
   },
   {
-    name: "API Access",
+    name: 'API Access',
     free: false,
     basic: false,
     pro: true,
     enterprise: true,
-    icon: Code2
+    icon: Code2,
   },
   {
-    name: "Custom Branding",
+    name: 'Custom Branding',
     free: false,
     basic: false,
     pro: true,
     enterprise: true,
-    icon: Paintbrush
+    icon: Paintbrush,
   },
   {
-    name: "Multiple Locations",
+    name: 'Multiple Locations',
     free: false,
     basic: false,
     pro: true,
     enterprise: true,
-    icon: MapPin
+    icon: MapPin,
   },
   {
-    name: "Advanced Reports",
+    name: 'Advanced Reports',
     free: false,
     basic: false,
     pro: false,
     enterprise: true,
-    icon: FileText
-  }
+    icon: FileText,
+  },
 ]
 
 const planPrices = {
   free: 0,
   basic: 29,
   pro: 99,
-  enterprise: 299
+  enterprise: 299,
 }
 
 export default function BillingPage() {
@@ -112,7 +112,7 @@ export default function BillingPage() {
   const loadBillingInfo = async () => {
     try {
       const supabase = createClient()
-      
+
       // Get tenant info
       const { data: profile } = await supabase
         .from('profiles')
@@ -124,16 +124,8 @@ export default function BillingPage() {
 
       // Get tenant and billing details
       const [tenantResult, billingResult] = await Promise.all([
-        supabase
-          .from('tenants')
-          .select('*')
-          .eq('id', profile.tenant_id)
-          .single(),
-        supabase
-          .from('billing')
-          .select('*')
-          .eq('tenant_id', profile.tenant_id)
-          .single()
+        supabase.from('tenants').select('*').eq('id', profile.tenant_id).single(),
+        supabase.from('billing').select('*').eq('tenant_id', profile.tenant_id).single(),
       ])
 
       if (tenantResult.data) setTenant(tenantResult.data as Tenant)
@@ -141,9 +133,9 @@ export default function BillingPage() {
     } catch (error) {
       console.error('Error loading billing info:', error)
       toast({
-        title: "Error",
-        description: "Failed to load billing information",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to load billing information',
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
@@ -155,12 +147,8 @@ export default function BillingPage() {
 
     try {
       setUpgrading(true)
-      const checkoutUrl = await createCheckoutSession(
-        billing.stripe_customer_id,
-        plan,
-        tenant.id
-      )
-      
+      const checkoutUrl = await createCheckoutSession(billing.stripe_customer_id, plan, tenant.id)
+
       if (checkoutUrl) {
         window.location.href = checkoutUrl
       } else {
@@ -169,9 +157,9 @@ export default function BillingPage() {
     } catch (error) {
       console.error('Error upgrading plan:', error)
       toast({
-        title: "Error",
-        description: "Failed to start upgrade process",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to start upgrade process',
+        variant: 'destructive',
       })
     } finally {
       setUpgrading(false)
@@ -184,19 +172,19 @@ export default function BillingPage() {
     try {
       setCancelling(true)
       await cancelSubscription(billing.stripe_subscription_id)
-      
+
       toast({
-        title: "Subscription Cancelled",
-        description: "Your subscription will end at the end of the current billing period",
+        title: 'Subscription Cancelled',
+        description: 'Your subscription will end at the end of the current billing period',
       })
 
       await loadBillingInfo()
     } catch (error) {
       console.error('Error cancelling subscription:', error)
       toast({
-        title: "Error",
-        description: "Failed to cancel subscription",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to cancel subscription',
+        variant: 'destructive',
       })
     } finally {
       setCancelling(false)
@@ -221,15 +209,16 @@ export default function BillingPage() {
               <Package className="h-6 w-6 mr-2" />
               Current Plan
             </CardTitle>
-            <CardDescription>
-              Your current subscription and usage
-            </CardDescription>
+            <CardDescription>Your current subscription and usage</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-3 gap-6">
               <div>
                 <h3 className="font-medium text-lg mb-2">
-                  {tenant?.plan ? tenant.plan.charAt(0).toUpperCase() + tenant.plan.slice(1) : 'Free'} Plan
+                  {tenant?.plan
+                    ? tenant.plan.charAt(0).toUpperCase() + tenant.plan.slice(1)
+                    : 'Free'}{' '}
+                  Plan
                 </h3>
                 <p className="text-3xl font-bold">
                   ${planPrices[tenant?.plan as keyof typeof planPrices]}/mo
@@ -248,8 +237,8 @@ export default function BillingPage() {
                     <span>{billing?.active_users || 0} active users</span>
                     <span>{tenant?.maxUsers} max</span>
                   </div>
-                  <Progress 
-                    value={((billing?.active_users || 0) / (tenant?.maxUsers || 1)) * 100} 
+                  <Progress
+                    value={((billing?.active_users || 0) / (tenant?.maxUsers || 1)) * 100}
                   />
                 </div>
               </div>
@@ -261,8 +250,8 @@ export default function BillingPage() {
                     <span>{billing?.total_assets || 0} assets</span>
                     <span>{tenant?.maxAssets} max</span>
                   </div>
-                  <Progress 
-                    value={((billing?.total_assets || 0) / (tenant?.maxAssets || 1)) * 100} 
+                  <Progress
+                    value={((billing?.total_assets || 0) / (tenant?.maxAssets || 1)) * 100}
                   />
                 </div>
               </div>
@@ -281,20 +270,17 @@ export default function BillingPage() {
                       Cancelling...
                     </>
                   ) : (
-                    "Cancel Subscription"
+                    'Cancel Subscription'
                   )}
                 </Button>
-                <Button
-                  onClick={() => handleUpgrade('pro')}
-                  disabled={upgrading}
-                >
+                <Button onClick={() => handleUpgrade('pro')} disabled={upgrading}>
                   {upgrading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       Upgrading...
                     </>
                   ) : (
-                    "Upgrade Plan"
+                    'Upgrade Plan'
                   )}
                 </Button>
               </div>
@@ -336,11 +322,7 @@ export default function BillingPage() {
                   </li>
                 ))}
               </ul>
-              <Button 
-                className="w-full mt-6"
-                variant="outline"
-                disabled={tenant?.plan === 'free'}
-              >
+              <Button className="w-full mt-6" variant="outline" disabled={tenant?.plan === 'free'}>
                 Current Plan
               </Button>
             </CardContent>
@@ -378,7 +360,7 @@ export default function BillingPage() {
                   </li>
                 ))}
               </ul>
-              <Button 
+              <Button
                 className="w-full mt-6"
                 onClick={() => handleUpgrade('basic')}
                 disabled={tenant?.plan === 'basic' || upgrading}
@@ -421,7 +403,7 @@ export default function BillingPage() {
                   </li>
                 ))}
               </ul>
-              <Button 
+              <Button
                 className="w-full mt-6"
                 onClick={() => handleUpgrade('pro')}
                 disabled={tenant?.plan === 'pro' || upgrading}
@@ -463,7 +445,7 @@ export default function BillingPage() {
                   </li>
                 ))}
               </ul>
-              <Button 
+              <Button
                 className="w-full mt-6"
                 onClick={() => handleUpgrade('enterprise')}
                 disabled={tenant?.plan === 'enterprise' || upgrading}
@@ -481,9 +463,7 @@ export default function BillingPage() {
               <CreditCard className="h-6 w-6 mr-2" />
               Billing History
             </CardTitle>
-            <CardDescription>
-              Recent invoices and payments
-            </CardDescription>
+            <CardDescription>Recent invoices and payments</CardDescription>
           </CardHeader>
           <CardContent>
             {billing?.billing_history?.length > 0 ? (
@@ -491,7 +471,9 @@ export default function BillingPage() {
                 {billing.billing_history.map((item: any) => (
                   <div key={item.id} className="py-4 flex items-center justify-between">
                     <div>
-                      <p className="font-medium">{new Date(item.created_at).toLocaleDateString()}</p>
+                      <p className="font-medium">
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </p>
                       <p className="text-sm text-gray-500">Invoice #{item.invoice_id}</p>
                     </div>
                     <div className="text-right">
@@ -504,9 +486,7 @@ export default function BillingPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-6 text-gray-500">
-                No billing history available
-              </div>
+              <div className="text-center py-6 text-gray-500">No billing history available</div>
             )}
           </CardContent>
         </Card>
@@ -529,4 +509,4 @@ export default function BillingPage() {
       </div>
     </div>
   )
-} 
+}

@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import ResendConfirmation from "@/components/auth/resend-confirmation"
+import ResendConfirmation from '@/components/auth/resend-confirmation'
 
 export default function ResendPage() {
   return (

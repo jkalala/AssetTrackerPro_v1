@@ -11,31 +11,26 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle
-} from '@/components/ui/dialog'
-import { 
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { 
-  Plus, 
-  Search, 
-  MoreVertical, 
-  Users, 
-  Building, 
+import {
+  Plus,
+  Search,
+  MoreVertical,
+  Users,
+  Building,
   Settings,
   Trash2,
   Edit,
   Eye,
   UserPlus,
   AlertTriangle,
-  TreePine
+  TreePine,
 } from 'lucide-react'
 import { Department, DepartmentHierarchyNode } from '@/lib/types/rbac'
 
@@ -44,9 +39,9 @@ interface DepartmentManagementProps {
   canManageDepartments?: boolean
 }
 
-export function DepartmentManagement({ 
-  tenantId, 
-  canManageDepartments = false 
+export function DepartmentManagement({
+  tenantId,
+  canManageDepartments = false,
 }: DepartmentManagementProps) {
   const [departments, setDepartments] = useState<Department[]>([])
   const [departmentHierarchy, setDepartmentHierarchy] = useState<DepartmentHierarchyNode[]>([])
@@ -55,7 +50,7 @@ export function DepartmentManagement({
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [viewMode, setViewMode] = useState<'list' | 'hierarchy'>('list')
-  
+
   // Dialog states
   const [_showCreateDialog, _setShowCreateDialog] = useState(false)
   const [_showEditDialog, _setShowEditDialog] = useState(false)
@@ -67,11 +62,11 @@ export function DepartmentManagement({
       setLoading(true)
       const response = await fetch(`/api/departments?tenant_id=${tenantId}`)
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       setDepartments(data.departments || [])
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load departments')
@@ -84,14 +79,17 @@ export function DepartmentManagement({
     try {
       const response = await fetch(`/api/departments/hierarchy?tenant_id=${tenantId}`)
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       setDepartmentHierarchy(data.hierarchy || [])
     } catch (err: unknown) {
-      console.error('Error loading department hierarchy:', err instanceof Error ? err.message : 'Unknown error')
+      console.error(
+        'Error loading department hierarchy:',
+        err instanceof Error ? err.message : 'Unknown error'
+      )
     }
   }
 
@@ -100,22 +98,20 @@ export function DepartmentManagement({
     loadDepartmentHierarchy()
   }, [tenantId, loadDepartments, loadDepartmentHierarchy])
 
-
-
   const _handleCreateDepartment = async (departmentData: Record<string, unknown>) => {
     try {
       const response = await fetch('/api/departments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...departmentData, tenant_id: tenantId })
+        body: JSON.stringify({ ...departmentData, tenant_id: tenantId }),
       })
-      
+
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       await loadDepartments()
       await loadDepartmentHierarchy()
       // setShowCreateDialog(false)
@@ -124,20 +120,23 @@ export function DepartmentManagement({
     }
   }
 
-  const _handleUpdateDepartment = async (departmentId: string, updates: Record<string, unknown>) => {
+  const _handleUpdateDepartment = async (
+    departmentId: string,
+    updates: Record<string, unknown>
+  ) => {
     try {
       const response = await fetch(`/api/departments/${departmentId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...updates, tenant_id: tenantId })
+        body: JSON.stringify({ ...updates, tenant_id: tenantId }),
       })
-      
+
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       await loadDepartments()
       await loadDepartmentHierarchy()
       // setShowEditDialog(false)
@@ -149,15 +148,15 @@ export function DepartmentManagement({
   const handleDeleteDepartment = async (departmentId: string) => {
     try {
       const response = await fetch(`/api/departments/${departmentId}?tenant_id=${tenantId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       })
-      
+
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       await loadDepartments()
       await loadDepartmentHierarchy()
       setSelectedDepartment(null)
@@ -167,43 +166,49 @@ export function DepartmentManagement({
     }
   }
 
-  const filteredDepartments = departments.filter(dept =>
-    dept.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dept.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (dept.code && dept.code.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredDepartments = departments.filter(
+    dept =>
+      dept.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      dept.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (dept.code && dept.code.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
   const renderDepartmentHierarchy = (nodes: DepartmentHierarchyNode[], level = 0) => {
-    return nodes.map((node) => (
-      <div key={node.department.id} className={`${level > 0 ? 'ml-6 border-l-2 border-gray-200 pl-4' : ''}`}>
+    return nodes.map(node => (
+      <div
+        key={node.department.id}
+        className={`${level > 0 ? 'ml-6 border-l-2 border-gray-200 pl-4' : ''}`}
+      >
         <Card className="mb-2 hover:shadow-md transition-shadow">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 flex-1">
-                <Building className={`h-5 w-5 ${
-                  node.department.department_type === 'operational' ? 'text-blue-600' :
-                  node.department.department_type === 'administrative' ? 'text-green-600' :
-                  node.department.department_type === 'technical' ? 'text-purple-600' :
-                  node.department.department_type === 'financial' ? 'text-yellow-600' :
-                  'text-red-600'
-                }`} />
-                
+                <Building
+                  className={`h-5 w-5 ${
+                    node.department.department_type === 'operational'
+                      ? 'text-blue-600'
+                      : node.department.department_type === 'administrative'
+                        ? 'text-green-600'
+                        : node.department.department_type === 'technical'
+                          ? 'text-purple-600'
+                          : node.department.department_type === 'financial'
+                            ? 'text-yellow-600'
+                            : 'text-red-600'
+                  }`}
+                />
+
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
-                    <h3 className="font-semibold text-gray-900">
-                      {node.department.display_name}
-                    </h3>
+                    <h3 className="font-semibold text-gray-900">{node.department.display_name}</h3>
                     {node.department.code && (
                       <Badge variant="outline" className="text-xs">
                         {node.department.code}
                       </Badge>
                     )}
                   </div>
-                  
+
                   {node.department.description && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      {node.department.description}
-                    </p>
+                    <p className="text-sm text-gray-600 mt-1">{node.department.description}</p>
                   )}
 
                   <div className="flex items-center space-x-4 mt-2">
@@ -244,21 +249,25 @@ export function DepartmentManagement({
                         <Eye className="h-4 w-4 mr-2" />
                         View Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => {
-                        setSelectedDepartment(node.department)
-                        setShowEditDialog(true)
-                      }}>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedDepartment(node.department)
+                          setShowEditDialog(true)
+                        }}
+                      >
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Department
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => {
-                        setSelectedDepartment(node.department)
-                        setShowAssignUsersDialog(true)
-                      }}>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedDepartment(node.department)
+                          setShowAssignUsersDialog(true)
+                        }}
+                      >
                         <UserPlus className="h-4 w-4 mr-2" />
                         Manage Users
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => {
                           setSelectedDepartment(node.department)
                           setShowDeleteConfirm(true)
@@ -277,9 +286,7 @@ export function DepartmentManagement({
         </Card>
 
         {node.children.length > 0 && (
-          <div className="mt-2">
-            {renderDepartmentHierarchy(node.children, level + 1)}
-          </div>
+          <div className="mt-2">{renderDepartmentHierarchy(node.children, level + 1)}</div>
         )}
       </div>
     ))
@@ -346,7 +353,7 @@ export function DepartmentManagement({
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
@@ -358,7 +365,7 @@ export function DepartmentManagement({
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
@@ -370,7 +377,7 @@ export function DepartmentManagement({
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
@@ -393,7 +400,7 @@ export function DepartmentManagement({
           <Input
             placeholder="Search departments..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
             className="pl-10"
           />
         </div>
@@ -404,9 +411,7 @@ export function DepartmentManagement({
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Department Hierarchy</h3>
           {departmentHierarchy.length > 0 ? (
-            <div className="space-y-2">
-              {renderDepartmentHierarchy(departmentHierarchy)}
-            </div>
+            <div className="space-y-2">{renderDepartmentHierarchy(departmentHierarchy)}</div>
           ) : (
             <div className="text-center py-8">
               <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -416,18 +421,24 @@ export function DepartmentManagement({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredDepartments.map((department) => (
+          {filteredDepartments.map(department => (
             <Card key={department.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Building className={`h-5 w-5 ${
-                      department.department_type === 'operational' ? 'text-blue-600' :
-                      department.department_type === 'administrative' ? 'text-green-600' :
-                      department.department_type === 'technical' ? 'text-purple-600' :
-                      department.department_type === 'financial' ? 'text-yellow-600' :
-                      'text-red-600'
-                    }`} />
+                    <Building
+                      className={`h-5 w-5 ${
+                        department.department_type === 'operational'
+                          ? 'text-blue-600'
+                          : department.department_type === 'administrative'
+                            ? 'text-green-600'
+                            : department.department_type === 'technical'
+                              ? 'text-purple-600'
+                              : department.department_type === 'financial'
+                                ? 'text-yellow-600'
+                                : 'text-red-600'
+                      }`}
+                    />
                     <CardTitle className="text-lg">{department.display_name}</CardTitle>
                   </div>
                   {canManageDepartments && (
@@ -442,21 +453,25 @@ export function DepartmentManagement({
                           <Eye className="h-4 w-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => {
-                          setSelectedDepartment(department)
-                          setShowEditDialog(true)
-                        }}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedDepartment(department)
+                            setShowEditDialog(true)
+                          }}
+                        >
                           <Edit className="h-4 w-4 mr-2" />
                           Edit Department
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => {
-                          setSelectedDepartment(department)
-                          setShowAssignUsersDialog(true)
-                        }}>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedDepartment(department)
+                            setShowAssignUsersDialog(true)
+                          }}
+                        >
                           <UserPlus className="h-4 w-4 mr-2" />
                           Manage Users
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => {
                             setSelectedDepartment(department)
                             setShowDeleteConfirm(true)
@@ -476,7 +491,7 @@ export function DepartmentManagement({
                   <p className="text-sm text-gray-600">
                     {department.description || 'No description'}
                   </p>
-                  
+
                   <div className="flex flex-wrap gap-1">
                     <Badge variant="outline" className="text-xs capitalize">
                       {department.department_type}
@@ -495,7 +510,7 @@ export function DepartmentManagement({
                       Level {department.level}
                     </Badge>
                   </div>
-                  
+
                   <div className="flex items-center justify-between text-sm text-gray-500">
                     <span>Created: {new Date(department.created_at).toLocaleDateString()}</span>
                     {department.budget_limit && (
@@ -525,17 +540,14 @@ export function DepartmentManagement({
             </DialogHeader>
             <div className="space-y-4">
               <p>
-                Are you sure you want to delete the department &quot;{selectedDepartment.display_name}&quot;? 
-                This action cannot be undone.
+                Are you sure you want to delete the department &quot;
+                {selectedDepartment.display_name}&quot;? This action cannot be undone.
               </p>
               <div className="flex justify-end space-x-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowDeleteConfirm(false)}
-                >
+                <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   variant="destructive"
                   onClick={() => handleDeleteDepartment(selectedDepartment.id)}
                 >

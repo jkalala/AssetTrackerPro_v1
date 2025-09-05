@@ -27,4 +27,4 @@ export async function GET(request: Request, { params }: { params: { assetId: str
   } catch (err) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-} 
+}

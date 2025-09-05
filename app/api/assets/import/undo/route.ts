@@ -30,20 +30,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No assets to delete in last import' }, { status: 400 })
     }
     // Delete assets
-    const { error: deleteError } = await supabase
-      .from('assets')
-      .delete()
-      .in('asset_id', assetIds)
+    const { error: deleteError } = await supabase.from('assets').delete().in('asset_id', assetIds)
     if (deleteError) {
       return NextResponse.json({ error: deleteError.message }, { status: 500 })
     }
     // Optionally, mark the import as undone
-    await supabase
-      .from('asset_imports')
-      .update({ undone: true })
-      .eq('id', importLog.id)
-    return NextResponse.json({ success: true, deletedCount: assetIds.length, importId: importLog.id })
+    await supabase.from('asset_imports').update({ undone: true }).eq('id', importLog.id)
+    return NextResponse.json({
+      success: true,
+      deletedCount: assetIds.length,
+      importId: importLog.id,
+    })
   } catch (err) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-} 
+}

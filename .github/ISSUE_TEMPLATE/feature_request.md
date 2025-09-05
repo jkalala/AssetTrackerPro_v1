@@ -28,6 +28,7 @@ A clear and concise description of any alternative solutions or features you've 
 ## Use Cases
 
 Describe the use cases for this feature:
+
 - Use case 1
 - Use case 2
 - Use case 3

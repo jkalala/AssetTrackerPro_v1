@@ -54,13 +54,13 @@ export async function POST(request: Request) {
     let errorCount = 0
     let errorRows: any[] = []
     let importedAssetIds: string[] = []
-    const REQUIRED_COLUMNS = ["asset_id", "name"]
+    const REQUIRED_COLUMNS = ['asset_id', 'name']
     for (const row of rows) {
       // Validate required columns
       const missing = REQUIRED_COLUMNS.filter(col => !row[col])
       if (missing.length > 0) {
         errorCount++
-        errorRows.push({ row, error: `Missing required fields: ${missing.join(", ")}` })
+        errorRows.push({ row, error: `Missing required fields: ${missing.join(', ')}` })
         continue
       }
       // Optionally: validate data types (e.g., value is a number)
@@ -69,12 +69,13 @@ export async function POST(request: Request) {
         errorRows.push({ row, error: 'Value must be a number' })
         continue
       }
-      const { error } = await supabase
-        .from('assets')
-        .upsert({
+      const { error } = await supabase.from('assets').upsert(
+        {
           ...row,
           created_by: user.id,
-        }, { onConflict: 'asset_id' })
+        },
+        { onConflict: 'asset_id' }
+      )
       if (error) {
         errorCount++
         errorRows.push({ row, error: error.message })
@@ -96,4 +97,4 @@ export async function POST(request: Request) {
   } catch (err) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-} 
+}

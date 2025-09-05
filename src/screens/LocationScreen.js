@@ -1,10 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import React, { useState, useEffect } from 'react'
+import { View, ScrollView, StyleSheet, Alert } from 'react-native'
 import {
   Card,
   Title,
@@ -16,88 +11,88 @@ import {
   ActivityIndicator,
   Text,
   Switch,
-} from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme } from 'react-native-paper';
-import * as Location from 'expo-location';
-import { assetAPI, offlineStorage } from '../services/api';
+} from 'react-native-paper'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { useTheme } from 'react-native-paper'
+import * as Location from 'expo-location'
+import { assetAPI, offlineStorage } from '../services/api'
 
 export default function LocationScreen({ navigation }) {
-  const theme = useTheme();
-  const [location, setLocation] = useState(null);
-  const [locationPermission, setLocationPermission] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [nearbyAssets, setNearbyAssets] = useState([]);
-  const [geofencingEnabled, setGeofencingEnabled] = useState(false);
-  const [locationHistory, setLocationHistory] = useState([]);
-  const [offlineMode, setOfflineMode] = useState(false);
+  const theme = useTheme()
+  const [location, setLocation] = useState(null)
+  const [locationPermission, setLocationPermission] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [nearbyAssets, setNearbyAssets] = useState([])
+  const [geofencingEnabled, setGeofencingEnabled] = useState(false)
+  const [locationHistory, setLocationHistory] = useState([])
+  const [offlineMode, setOfflineMode] = useState(false)
 
   useEffect(() => {
-    checkLocationPermission();
-  }, []);
+    checkLocationPermission()
+  }, [])
 
   useEffect(() => {
     if (location) {
-      loadNearbyAssets();
-      loadLocationHistory();
+      loadNearbyAssets()
+      loadLocationHistory()
     }
-  }, [location]);
+  }, [location])
 
   const checkLocationPermission = async () => {
     try {
-      const { status } = await Location.getForegroundPermissionsAsync();
-      setLocationPermission(status);
-      
+      const { status } = await Location.getForegroundPermissionsAsync()
+      setLocationPermission(status)
+
       if (status === 'granted') {
-        getCurrentLocation();
+        getCurrentLocation()
       }
     } catch (error) {
-      console.error('Error checking location permission:', error);
+      console.error('Error checking location permission:', error)
     }
-  };
+  }
 
   const requestLocationPermission = async () => {
     try {
-      setLoading(true);
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      setLocationPermission(status);
-      
+      setLoading(true)
+      const { status } = await Location.requestForegroundPermissionsAsync()
+      setLocationPermission(status)
+
       if (status === 'granted') {
-        getCurrentLocation();
+        getCurrentLocation()
       } else {
         Alert.alert(
           'Location Permission Required',
           'Location access is needed to show nearby assets and enable geofencing features.',
           [{ text: 'OK' }]
-        );
+        )
       }
     } catch (error) {
-      console.error('Error requesting location permission:', error);
+      console.error('Error requesting location permission:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const getCurrentLocation = async () => {
     try {
-      setLoading(true);
-      
+      setLoading(true)
+
       const currentLocation = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
-      });
+      })
 
-      const { latitude, longitude } = currentLocation.coords;
-      
+      const { latitude, longitude } = currentLocation.coords
+
       // Reverse geocode to get address
       const reverseGeocode = await Location.reverseGeocodeAsync({
         latitude,
         longitude,
-      });
+      })
 
-      const address = reverseGeocode[0];
+      const address = reverseGeocode[0]
       const locationString = address
         ? `${address.street || ''} ${address.city || ''} ${address.region || ''}`.trim()
-        : `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+        : `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
 
       const locationData = {
         latitude,
@@ -105,23 +100,23 @@ export default function LocationScreen({ navigation }) {
         address: locationString,
         timestamp: new Date().toISOString(),
         accuracy: currentLocation.coords.accuracy,
-      };
+      }
 
-      setLocation(locationData);
-      
+      setLocation(locationData)
+
       // Store location for offline use
-      await offlineStorage.storeData('lastLocation', locationData);
+      await offlineStorage.storeData('lastLocation', locationData)
     } catch (error) {
-      console.error('Error getting current location:', error);
+      console.error('Error getting current location:', error)
       Alert.alert(
         'Location Error',
         'Failed to get current location. Please check your GPS settings.',
         [{ text: 'OK' }]
-      );
+      )
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const loadNearbyAssets = async () => {
     try {
@@ -131,25 +126,25 @@ export default function LocationScreen({ navigation }) {
           latitude: location.latitude,
           longitude: location.longitude,
           radius: 1000, // 1km radius
-        });
-        
-        setNearbyAssets(response.assets || []);
-        setOfflineMode(false);
-        
+        })
+
+        setNearbyAssets(response.assets || [])
+        setOfflineMode(false)
+
         // Store for offline use
-        await offlineStorage.storeData('nearbyAssets', response.assets || []);
+        await offlineStorage.storeData('nearbyAssets', response.assets || [])
       } catch (error) {
-        console.log('API unavailable, loading from offline storage');
-        setOfflineMode(true);
-        
+        console.log('API unavailable, loading from offline storage')
+        setOfflineMode(true)
+
         // Load from offline storage
-        const offlineAssets = await offlineStorage.getData('nearbyAssets');
-        if (offlineAssets) setNearbyAssets(offlineAssets);
+        const offlineAssets = await offlineStorage.getData('nearbyAssets')
+        if (offlineAssets) setNearbyAssets(offlineAssets)
       }
     } catch (error) {
-      console.error('Error loading nearby assets:', error);
+      console.error('Error loading nearby assets:', error)
     }
-  };
+  }
 
   const loadLocationHistory = async () => {
     try {
@@ -158,25 +153,25 @@ export default function LocationScreen({ navigation }) {
         const response = await assetAPI.getAssets({
           location_history: true,
           limit: 10,
-        });
-        
-        setLocationHistory(response.location_history || []);
-        setOfflineMode(false);
-        
+        })
+
+        setLocationHistory(response.location_history || [])
+        setOfflineMode(false)
+
         // Store for offline use
-        await offlineStorage.storeData('locationHistory', response.location_history || []);
+        await offlineStorage.storeData('locationHistory', response.location_history || [])
       } catch (error) {
-        console.log('API unavailable, loading from offline storage');
-        setOfflineMode(true);
-        
+        console.log('API unavailable, loading from offline storage')
+        setOfflineMode(true)
+
         // Load from offline storage
-        const offlineHistory = await offlineStorage.getData('locationHistory');
-        if (offlineHistory) setLocationHistory(offlineHistory);
+        const offlineHistory = await offlineStorage.getData('locationHistory')
+        if (offlineHistory) setLocationHistory(offlineHistory)
       }
     } catch (error) {
-      console.error('Error loading location history:', error);
+      console.error('Error loading location history:', error)
     }
-  };
+  }
 
   const toggleGeofencing = () => {
     if (!geofencingEnabled) {
@@ -188,64 +183,57 @@ export default function LocationScreen({ navigation }) {
           {
             text: 'Enable',
             onPress: () => {
-              setGeofencingEnabled(true);
+              setGeofencingEnabled(true)
               // Here you would implement actual geofencing logic
-              Alert.alert('Geofencing Enabled', 'You will now receive notifications when assets move in or out of designated areas.');
+              Alert.alert(
+                'Geofencing Enabled',
+                'You will now receive notifications when assets move in or out of designated areas.'
+              )
             },
           },
         ]
-      );
+      )
     } else {
-      setGeofencingEnabled(false);
-      Alert.alert('Geofencing Disabled', 'You will no longer receive geofencing notifications.');
+      setGeofencingEnabled(false)
+      Alert.alert('Geofencing Disabled', 'You will no longer receive geofencing notifications.')
     }
-  };
+  }
 
   const renderNearbyAsset = ({ item }) => (
     <List.Item
       title={item.name || `Asset ${item.id}`}
       description={`${item.asset_id || item.id} • ${item.category || 'No category'}`}
-      left={(props) => (
+      left={props => (
         <List.Icon
           {...props}
           icon={
             item.status === 'available'
               ? 'check-circle'
               : item.status === 'checked_out'
-              ? 'account-arrow-right'
-              : 'wrench'
+                ? 'account-arrow-right'
+                : 'wrench'
           }
         />
       )}
       right={() => (
-        <Chip
-          mode="outlined"
-          textStyle={{ fontSize: 12 }}
-        >
+        <Chip mode="outlined" textStyle={{ fontSize: 12 }}>
           {item.status || 'Unknown'}
         </Chip>
       )}
       onPress={() => navigation.navigate('Assets')}
     />
-  );
+  )
 
   const renderLocationHistoryItem = ({ item }) => (
     <List.Item
       title={item.asset_name || `Asset ${item.asset_id}`}
       description={`${item.location} • ${new Date(item.timestamp).toLocaleDateString()}`}
-      left={(props) => (
-        <List.Icon
-          {...props}
-          icon="map-marker"
-        />
-      )}
+      left={props => <List.Icon {...props} icon="map-marker" />}
       right={() => (
-        <Text style={styles.historyTime}>
-          {new Date(item.timestamp).toLocaleTimeString()}
-        </Text>
+        <Text style={styles.historyTime}>{new Date(item.timestamp).toLocaleTimeString()}</Text>
       )}
     />
-  );
+  )
 
   return (
     <ScrollView style={styles.container}>
@@ -268,14 +256,11 @@ export default function LocationScreen({ navigation }) {
         <Card style={styles.card}>
           <Card.Content>
             <View style={styles.permissionHeader}>
-              <MaterialCommunityIcons
-                name="map-marker-off"
-                size={48}
-                color={theme.colors.error}
-              />
+              <MaterialCommunityIcons name="map-marker-off" size={48} color={theme.colors.error} />
               <Title style={styles.permissionTitle}>Location Access Required</Title>
               <Paragraph style={styles.permissionText}>
-                Enable location access to see nearby assets, track locations, and use geofencing features.
+                Enable location access to see nearby assets, track locations, and use geofencing
+                features.
               </Paragraph>
               <Button
                 mode="contained"
@@ -296,11 +281,7 @@ export default function LocationScreen({ navigation }) {
           <Card.Content>
             <Title>Current Location</Title>
             <View style={styles.locationInfo}>
-              <MaterialCommunityIcons
-                name="map-marker"
-                size={24}
-                color={theme.colors.primary}
-              />
+              <MaterialCommunityIcons name="map-marker" size={24} color={theme.colors.primary} />
               <View style={styles.locationDetails}>
                 <Text style={styles.locationAddress}>{location.address}</Text>
                 <Text style={styles.locationCoords}>
@@ -341,11 +322,7 @@ export default function LocationScreen({ navigation }) {
           </View>
           {geofencingEnabled && (
             <View style={styles.geofencingInfo}>
-              <MaterialCommunityIcons
-                name="information"
-                size={16}
-                color={theme.colors.primary}
-              />
+              <MaterialCommunityIcons name="information" size={16} color={theme.colors.primary} />
               <Text style={styles.geofencingInfoText}>
                 Geofencing is active. You'll receive notifications for asset movements.
               </Text>
@@ -387,9 +364,7 @@ export default function LocationScreen({ navigation }) {
       <Card style={styles.card}>
         <Card.Content>
           <Title>Recent Location Updates</Title>
-          <Paragraph style={styles.historyText}>
-            Recent asset location changes
-          </Paragraph>
+          <Paragraph style={styles.historyText}>Recent asset location changes</Paragraph>
           {locationHistory.length > 0 ? (
             locationHistory.map((item, index) => (
               <View key={index}>
@@ -416,42 +391,26 @@ export default function LocationScreen({ navigation }) {
           <Title>Coming Soon</Title>
           <View style={styles.featuresList}>
             <View style={styles.featureItem}>
-              <MaterialCommunityIcons
-                name="map"
-                size={20}
-                color={theme.colors.primary}
-              />
+              <MaterialCommunityIcons name="map" size={20} color={theme.colors.primary} />
               <Text style={styles.featureText}>Interactive Map View</Text>
             </View>
             <View style={styles.featureItem}>
-              <MaterialCommunityIcons
-                name="routes"
-                size={20}
-                color={theme.colors.primary}
-              />
+              <MaterialCommunityIcons name="routes" size={20} color={theme.colors.primary} />
               <Text style={styles.featureText}>Asset Movement Tracking</Text>
             </View>
             <View style={styles.featureItem}>
-              <MaterialCommunityIcons
-                name="bell-ring"
-                size={20}
-                color={theme.colors.primary}
-              />
+              <MaterialCommunityIcons name="bell-ring" size={20} color={theme.colors.primary} />
               <Text style={styles.featureText}>Smart Location Alerts</Text>
             </View>
             <View style={styles.featureItem}>
-              <MaterialCommunityIcons
-                name="chart-line"
-                size={20}
-                color={theme.colors.primary}
-              />
+              <MaterialCommunityIcons name="chart-line" size={20} color={theme.colors.primary} />
               <Text style={styles.featureText}>Location Analytics</Text>
             </View>
           </View>
         </Card.Content>
       </Card>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -574,4 +533,4 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontSize: 14,
   },
-});
+})

@@ -1,71 +1,71 @@
-'use client';
-import { useEffect, useState } from 'react';
+'use client'
+import { useEffect, useState } from 'react'
 
 interface ApiKey {
-  id: string;
-  name: string;
-  created_at: string;
-  revoked: boolean;
-  user_id: string;
-  user_email?: string;
+  id: string
+  name: string
+  created_at: string
+  revoked: boolean
+  user_id: string
+  user_email?: string
 }
 
 export default function ApiKeysPage() {
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-  const [newKeyName, setNewKeyName] = useState('');
-  const [creating, setCreating] = useState(false);
-  const [newKey, setNewKey] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [editingKeyId, setEditingKeyId] = useState<string | null>(null);
-  const [editingKeyName, setEditingKeyName] = useState('');
-  const [renaming, setRenaming] = useState(false);
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([])
+  const [newKeyName, setNewKeyName] = useState('')
+  const [creating, setCreating] = useState(false)
+  const [newKey, setNewKey] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [editingKeyId, setEditingKeyId] = useState<string | null>(null)
+  const [editingKeyName, setEditingKeyName] = useState('')
+  const [renaming, setRenaming] = useState(false)
 
   async function fetchKeys() {
-    const res = await fetch('/api/settings/api-keys');
-    const data = await res.json();
-    setApiKeys(data.keys || []);
+    const res = await fetch('/api/settings/api-keys')
+    const data = await res.json()
+    setApiKeys(data.keys || [])
   }
 
   useEffect(() => {
-    fetchKeys();
-  }, []);
+    fetchKeys()
+  }, [])
 
   async function handleCreate() {
-    setCreating(true);
-    setError(null);
-    setNewKey(null);
+    setCreating(true)
+    setError(null)
+    setNewKey(null)
     const res = await fetch('/api/settings/api-keys', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: newKeyName }),
-    });
-    const data = await res.json();
-    setCreating(false);
+    })
+    const data = await res.json()
+    setCreating(false)
     if (data.apiKey) {
-      setNewKey(data.apiKey);
-      fetchKeys();
+      setNewKey(data.apiKey)
+      fetchKeys()
     } else {
-      setError(data.error || 'Failed to create API key');
+      setError(data.error || 'Failed to create API key')
     }
   }
 
   async function handleRevoke(id: string) {
-    await fetch(`/api/settings/api-keys/${id}`, { method: 'DELETE' });
-    fetchKeys();
+    await fetch(`/api/settings/api-keys/${id}`, { method: 'DELETE' })
+    fetchKeys()
   }
 
   async function handleRename(id: string) {
-    setRenaming(true);
-    setError(null);
+    setRenaming(true)
+    setError(null)
     const res = await fetch(`/api/settings/api-keys/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: editingKeyName }),
-    });
-    setRenaming(false);
-    setEditingKeyId(null);
-    setEditingKeyName('');
-    fetchKeys();
+    })
+    setRenaming(false)
+    setEditingKeyId(null)
+    setEditingKeyName('')
+    fetchKeys()
   }
 
   return (
@@ -134,7 +134,10 @@ export default function ApiKeysPage() {
                         </button>
                         <button
                           className="text-gray-600 underline"
-                          onClick={() => { setEditingKeyId(null); setEditingKeyName(''); }}
+                          onClick={() => {
+                            setEditingKeyId(null)
+                            setEditingKeyName('')
+                          }}
                           disabled={renaming}
                         >
                           Cancel
@@ -143,7 +146,10 @@ export default function ApiKeysPage() {
                     ) : (
                       <button
                         className="text-blue-600 underline"
-                        onClick={() => { setEditingKeyId(key.id); setEditingKeyName(key.name); }}
+                        onClick={() => {
+                          setEditingKeyId(key.id)
+                          setEditingKeyName(key.name)
+                        }}
                       >
                         Edit
                       </button>
@@ -156,5 +162,5 @@ export default function ApiKeysPage() {
         </tbody>
       </table>
     </div>
-  );
-} 
+  )
+}

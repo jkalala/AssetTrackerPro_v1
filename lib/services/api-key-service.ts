@@ -4,12 +4,12 @@
 // Service for managing API keys, permissions, and rate limiting
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  ApiKey, 
-  ApiKeyInsert, 
+import {
+  ApiKey,
+  ApiKeyInsert,
   ApiKeyUpdate,
   ApiKeyUsage,
-  SecurityEventInsert
+  SecurityEventInsert,
 } from '@/lib/types/database'
 import crypto from 'crypto'
 
@@ -121,7 +121,7 @@ export class ApiKeyService {
         allowed_ips: options.allowedIps || [],
         rate_limit_requests: options.rateLimitRequests || 1000,
         rate_limit_window_seconds: options.rateLimitWindowSeconds || 3600,
-        expires_at: expiresAt
+        expires_at: expiresAt,
       }
 
       const { data: apiKey, error } = await supabase
@@ -141,19 +141,19 @@ export class ApiKeyService {
         key_name: keyName,
         permissions,
         scopes,
-        expires_at: expiresAt
+        expires_at: expiresAt,
       })
 
       return {
         success: true,
         apiKey,
-        keyValue
+        keyValue,
       }
     } catch (error) {
       console.error('Error creating API key:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -201,10 +201,10 @@ export class ApiKeyService {
       // Check rate limiting
       const rateLimitStatus = await this.checkRateLimit(apiKey)
       if (!rateLimitStatus.allowed) {
-        return { 
-          valid: false, 
+        return {
+          valid: false,
           rateLimitExceeded: true,
-          error: 'Rate limit exceeded' 
+          error: 'Rate limit exceeded',
         }
       }
 
@@ -226,13 +226,13 @@ export class ApiKeyService {
 
       return {
         valid: true,
-        apiKey
+        apiKey,
       }
     } catch (error) {
       console.error('Error validating API key:', error)
       return {
         valid: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -258,13 +258,14 @@ export class ApiKeyService {
       const supabase = await this.getSupabase()
 
       const updateData: ApiKeyUpdate = {}
-      
+
       if (updates.keyName) updateData.key_name = updates.keyName
       if (updates.permissions) updateData.permissions = updates.permissions
       if (updates.scopes) updateData.scopes = updates.scopes
       if (updates.allowedIps) updateData.allowed_ips = updates.allowedIps
       if (updates.rateLimitRequests) updateData.rate_limit_requests = updates.rateLimitRequests
-      if (updates.rateLimitWindowSeconds) updateData.rate_limit_window_seconds = updates.rateLimitWindowSeconds
+      if (updates.rateLimitWindowSeconds)
+        updateData.rate_limit_window_seconds = updates.rateLimitWindowSeconds
       if (updates.expiresAt) updateData.expires_at = updates.expiresAt
 
       const { data: apiKey, error } = await supabase
@@ -286,7 +287,7 @@ export class ApiKeyService {
       console.error('Error updating API key:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -308,7 +309,7 @@ export class ApiKeyService {
         .update({
           is_active: false,
           revoked_at: new Date().toISOString(),
-          revoked_reason: reason
+          revoked_reason: reason,
         })
         .eq('id', keyId)
         .eq('tenant_id', tenantId)
@@ -325,7 +326,7 @@ export class ApiKeyService {
       await this.logSecurityEvent(tenantId, userId, 'api_key_revoked', {
         api_key_id: keyId,
         key_name: apiKey.key_name,
-        revoked_reason: reason
+        revoked_reason: reason,
       })
 
       return { success: true }
@@ -333,7 +334,7 @@ export class ApiKeyService {
       console.error('Error revoking API key:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -372,7 +373,7 @@ export class ApiKeyService {
       console.error('Error getting API keys:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -388,7 +389,7 @@ export class ApiKeyService {
     try {
       const supabase = await this.getSupabase()
       const now = new Date()
-      const windowStart = new Date(now.getTime() - (apiKey.rate_limit_window_seconds * 1000))
+      const windowStart = new Date(now.getTime() - apiKey.rate_limit_window_seconds * 1000)
 
       // Get or create rate limit bucket
       const { data: bucket, error } = await supabase
@@ -401,24 +402,22 @@ export class ApiKeyService {
         .single()
 
       let currentCount = 0
-      let resetTime = new Date(now.getTime() + (apiKey.rate_limit_window_seconds * 1000))
+      let resetTime = new Date(now.getTime() + apiKey.rate_limit_window_seconds * 1000)
 
       if (bucket && !error) {
         currentCount = bucket.request_count
         resetTime = new Date(bucket.window_end)
       } else {
         // Create new bucket
-        const windowEnd = new Date(now.getTime() + (apiKey.rate_limit_window_seconds * 1000))
-        
-        await supabase
-          .from('rate_limit_buckets')
-          .insert({
-            tenant_id: apiKey.tenant_id,
-            api_key_id: apiKey.id,
-            window_start: windowStart.toISOString(),
-            window_end: windowEnd.toISOString(),
-            request_count: 0
-          })
+        const windowEnd = new Date(now.getTime() + apiKey.rate_limit_window_seconds * 1000)
+
+        await supabase.from('rate_limit_buckets').insert({
+          tenant_id: apiKey.tenant_id,
+          api_key_id: apiKey.id,
+          window_start: windowStart.toISOString(),
+          window_end: windowEnd.toISOString(),
+          request_count: 0,
+        })
 
         resetTime = windowEnd
       }
@@ -430,7 +429,7 @@ export class ApiKeyService {
         allowed,
         remaining,
         resetTime,
-        limit: apiKey.rate_limit_requests
+        limit: apiKey.rate_limit_requests,
       }
     } catch (error) {
       console.error('Error checking rate limit:', error)
@@ -438,8 +437,8 @@ export class ApiKeyService {
       return {
         allowed: true,
         remaining: apiKey.rate_limit_requests,
-        resetTime: new Date(Date.now() + (apiKey.rate_limit_window_seconds * 1000)),
-        limit: apiKey.rate_limit_requests
+        resetTime: new Date(Date.now() + apiKey.rate_limit_window_seconds * 1000),
+        limit: apiKey.rate_limit_requests,
       }
     }
   }
@@ -466,9 +465,9 @@ export class ApiKeyService {
         // Increment existing bucket
         await supabase
           .from('rate_limit_buckets')
-          .update({ 
+          .update({
             request_count: bucket.request_count + 1,
-            updated_at: now.toISOString()
+            updated_at: now.toISOString(),
           })
           .eq('id', bucket.id)
       }
@@ -510,12 +509,10 @@ export class ApiKeyService {
         ip_address: options.ipAddress,
         user_agent: options.userAgent,
         request_size_bytes: options.requestSizeBytes,
-        response_size_bytes: options.responseSizeBytes
+        response_size_bytes: options.responseSizeBytes,
       }
 
-      await supabase
-        .from('api_key_usage')
-        .insert(usageData)
+      await supabase.from('api_key_usage').insert(usageData)
 
       // Increment rate limit counter
       await this.incrementRateLimit(apiKey)
@@ -570,26 +567,32 @@ export class ApiKeyService {
             errorRequests: 0,
             averageResponseTime: 0,
             topEndpoints: [],
-            dailyUsage: []
-          }
+            dailyUsage: [],
+          },
         }
       }
 
       // Calculate statistics
       const totalRequests = usage.length
-      const successfulRequests = usage.filter(u => u.status_code >= 200 && u.status_code < 400).length
+      const successfulRequests = usage.filter(
+        u => u.status_code >= 200 && u.status_code < 400
+      ).length
       const errorRequests = totalRequests - successfulRequests
-      
+
       const responseTimes = usage.filter(u => u.response_time_ms).map(u => u.response_time_ms!)
-      const averageResponseTime = responseTimes.length > 0 
-        ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length 
-        : 0
+      const averageResponseTime =
+        responseTimes.length > 0
+          ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
+          : 0
 
       // Top endpoints
-      const endpointCounts = usage.reduce((acc, u) => {
-        acc[u.endpoint] = (acc[u.endpoint] || 0) + 1
-        return acc
-      }, {} as Record<string, number>)
+      const endpointCounts = usage.reduce(
+        (acc, u) => {
+          acc[u.endpoint] = (acc[u.endpoint] || 0) + 1
+          return acc
+        },
+        {} as Record<string, number>
+      )
 
       const topEndpoints = Object.entries(endpointCounts)
         .sort(([, a], [, b]) => (b as number) - (a as number))
@@ -597,11 +600,14 @@ export class ApiKeyService {
         .map(([endpoint, count]) => ({ endpoint, count: count as number }))
 
       // Daily usage
-      const dailyUsage = usage.reduce((acc, u) => {
-        const date = new Date(u.created_at).toISOString().split('T')[0]
-        acc[date] = (acc[date] || 0) + 1
-        return acc
-      }, {} as Record<string, number>)
+      const dailyUsage = usage.reduce(
+        (acc, u) => {
+          const date = new Date(u.created_at).toISOString().split('T')[0]
+          acc[date] = (acc[date] || 0) + 1
+          return acc
+        },
+        {} as Record<string, number>
+      )
 
       const dailyUsageArray = Object.entries(dailyUsage)
         .sort(([a], [b]) => a.localeCompare(b))
@@ -615,14 +621,14 @@ export class ApiKeyService {
           errorRequests,
           averageResponseTime,
           topEndpoints,
-          dailyUsage: dailyUsageArray
-        }
+          dailyUsage: dailyUsageArray,
+        },
       }
     } catch (error) {
       console.error('Error getting API key usage stats:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -673,10 +679,13 @@ export class ApiKeyService {
   /**
    * Disable MFA for user
    */
-  async disableMfa(tenantId: string, userId: string): Promise<{ success: boolean; error?: string }> {
+  async disableMfa(
+    tenantId: string,
+    userId: string
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { error } = await supabase
         .from('mfa_methods')
         .update({ is_active: false })
@@ -689,9 +698,9 @@ export class ApiKeyService {
 
       return { success: true }
     } catch (error) {
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -714,15 +723,15 @@ export class ApiKeyService {
   private hasPermission(apiKey: ApiKey, permission: string): boolean
   private hasPermission(permissions: ApiKeyPermissions, resource: string, action: string): boolean
   private hasPermission(
-    apiKeyOrPermissions: ApiKey | ApiKeyPermissions, 
-    permissionOrResource: string, 
+    apiKeyOrPermissions: ApiKey | ApiKeyPermissions,
+    permissionOrResource: string,
     action?: string
   ): boolean {
     if (action !== undefined) {
       // New signature: hasPermission(permissions, resource, action)
       const permissions = apiKeyOrPermissions as ApiKeyPermissions
       const resource = permissionOrResource
-      
+
       switch (resource) {
         case 'assets':
           return permissions.assets?.[action as keyof typeof permissions.assets] === true
@@ -764,20 +773,20 @@ export class ApiKeyService {
   private matchesIpPattern(ip: string, pattern: string): boolean {
     // Simple IP matching - in production, use a proper CIDR matching library
     if (pattern === ip) return true
-    
+
     // Support for CIDR notation (simplified)
     if (pattern.includes('/')) {
       const [network, prefixLength] = pattern.split('/')
       const prefix = parseInt(prefixLength)
-      
+
       // Convert IPs to integers for comparison (IPv4 only)
       const ipInt = this.ipToInt(ip)
       const networkInt = this.ipToInt(network)
-      const mask = (0xFFFFFFFF << (32 - prefix)) >>> 0
-      
+      const mask = (0xffffffff << (32 - prefix)) >>> 0
+
       return (ipInt & mask) === (networkInt & mask)
     }
-    
+
     return false
   }
 
@@ -800,12 +809,10 @@ export class ApiKeyService {
         event_type: eventType,
         severity: 'low',
         description: `API key ${eventType.replace('_', ' ')}`,
-        details
+        details,
       }
 
-      await supabase
-        .from('security_events')
-        .insert(eventData)
+      await supabase.from('security_events').insert(eventData)
     } catch (error) {
       console.error('Error logging security event:', error)
     }

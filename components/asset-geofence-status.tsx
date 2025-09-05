@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertTriangle, CheckCircle } from 'lucide-react'
 
-export default function AssetGeofenceStatus({ lat, lng }: { lat: number | null, lng: number | null }) {
+export default function AssetGeofenceStatus({
+  lat,
+  lng,
+}: {
+  lat: number | null
+  lng: number | null
+}) {
   const [status, setStatus] = useState<'inside' | 'outside' | 'unknown'>('unknown')
   const [zones, setZones] = useState<any[]>([])
   useEffect(() => {
@@ -10,7 +16,7 @@ export default function AssetGeofenceStatus({ lat, lng }: { lat: number | null, 
       fetch('/api/geofence/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lat, lng })
+        body: JSON.stringify({ lat, lng }),
       })
         .then(res => res.json())
         .then(data => {
@@ -32,7 +38,8 @@ export default function AssetGeofenceStatus({ lat, lng }: { lat: number | null, 
     <Alert className="border-green-200 bg-green-50">
       <CheckCircle className="h-4 w-4 text-green-600" />
       <AlertDescription>
-        Asset is <strong>inside</strong> geofence zone{zones.length > 1 ? 's' : ''}: {zones.map(z => z.name).join(', ')}
+        Asset is <strong>inside</strong> geofence zone{zones.length > 1 ? 's' : ''}:{' '}
+        {zones.map(z => z.name).join(', ')}
       </AlertDescription>
     </Alert>
   ) : (
@@ -43,4 +50,4 @@ export default function AssetGeofenceStatus({ lat, lng }: { lat: number | null, 
       </AlertDescription>
     </Alert>
   )
-} 
+}

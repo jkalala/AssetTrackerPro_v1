@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { useAuth } from "@/components/auth/auth-provider"
-import AddAssetForm from "@/components/add-asset-form"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Loader2, LogIn } from "lucide-react"
-import Link from "next/link"
+import { useAuth } from '@/components/auth/auth-provider'
+import AddAssetForm from '@/components/add-asset-form'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Loader2, LogIn } from 'lucide-react'
+import Link from 'next/link'
 
 export default function AddAssetPage() {
   const { user, loading, error } = useAuth()
@@ -35,7 +35,7 @@ export default function AddAssetPage() {
             <CardDescription>
               {error
                 ? `Authentication error: ${error}`
-                : "You must be logged in to add assets. Please sign in to continue."}
+                : 'You must be logged in to add assets. Please sign in to continue.'}
             </CardDescription>
           </CardHeader>
           <CardContent>

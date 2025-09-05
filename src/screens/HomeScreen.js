@@ -1,10 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  ScrollView,
-  RefreshControl,
-  StyleSheet,
-} from 'react-native';
+import React, { useState, useEffect } from 'react'
+import { View, ScrollView, RefreshControl, StyleSheet } from 'react-native'
 import {
   Card,
   Title,
@@ -15,69 +10,69 @@ import {
   Divider,
   ActivityIndicator,
   Text,
-} from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme } from 'react-native-paper';
-import { assetAPI, analyticsAPI, offlineStorage } from '../services/api';
+} from 'react-native-paper'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { useTheme } from 'react-native-paper'
+import { assetAPI, analyticsAPI, offlineStorage } from '../services/api'
 
 export default function HomeScreen({ navigation }) {
-  const theme = useTheme();
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const theme = useTheme()
+  const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [stats, setStats] = useState({
     totalAssets: 0,
     checkedOut: 0,
     available: 0,
     maintenance: 0,
-  });
-  const [recentActivity, setRecentActivity] = useState([]);
-  const [offlineMode, setOfflineMode] = useState(false);
+  })
+  const [recentActivity, setRecentActivity] = useState([])
+  const [offlineMode, setOfflineMode] = useState(false)
 
   useEffect(() => {
-    loadDashboardData();
-  }, []);
+    loadDashboardData()
+  }, [])
 
   const loadDashboardData = async () => {
     try {
-      setLoading(true);
-      
+      setLoading(true)
+
       // Try to load from API first
       try {
         const [statsData, activityData] = await Promise.all([
           analyticsAPI.getDashboardStats(),
           assetAPI.getAssets({ limit: 5, sort: 'updated_at' }),
-        ]);
-        
-        setStats(statsData);
-        setRecentActivity(activityData.assets || []);
-        setOfflineMode(false);
-        
+        ])
+
+        setStats(statsData)
+        setRecentActivity(activityData.assets || [])
+        setOfflineMode(false)
+
         // Store data for offline use
-        await offlineStorage.storeData('dashboardStats', statsData);
-        await offlineStorage.storeData('recentActivity', activityData.assets || []);
+        await offlineStorage.storeData('dashboardStats', statsData)
+        await offlineStorage.storeData('recentActivity', activityData.assets || [])
       } catch (error) {
-        console.log('API unavailable, loading from offline storage');
-        setOfflineMode(true);
-        
+        console.log('API unavailable, loading from offline storage')
+        setOfflineMode(true)
+
         // Load from offline storage
-        const offlineStats = await offlineStorage.getData('dashboardStats');
-        const offlineActivity = await offlineStorage.getData('recentActivity');
-        
-        if (offlineStats) setStats(offlineStats);
-        if (offlineActivity) setRecentActivity(offlineActivity);
+        const offlineStats = await offlineStorage.getData('dashboardStats')
+        const offlineActivity = await offlineStorage.getData('recentActivity')
+
+        if (offlineStats) setStats(offlineStats)
+        if (offlineActivity) setRecentActivity(offlineActivity)
       }
     } catch (error) {
-      console.error('Error loading dashboard data:', error);
+      console.error('Error loading dashboard data:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const onRefresh = async () => {
-    setRefreshing(true);
-    await loadDashboardData();
-    setRefreshing(false);
-  };
+    setRefreshing(true)
+    await loadDashboardData()
+    setRefreshing(false)
+  }
 
   const QuickActionButton = ({ icon, title, onPress, color }) => (
     <Button
@@ -89,7 +84,7 @@ export default function HomeScreen({ navigation }) {
     >
       {title}
     </Button>
-  );
+  )
 
   if (loading) {
     return (
@@ -97,15 +92,13 @@ export default function HomeScreen({ navigation }) {
         <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>Loading dashboard...</Text>
       </View>
-    );
+    )
   }
 
   return (
     <ScrollView
       style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       {offlineMode && (
         <Card style={[styles.offlineCard, { backgroundColor: theme.colors.tertiaryContainer }]}>
@@ -200,23 +193,20 @@ export default function HomeScreen({ navigation }) {
                 <List.Item
                   title={asset.name || `Asset ${asset.id}`}
                   description={asset.status || 'Unknown status'}
-                  left={(props) => (
+                  left={props => (
                     <List.Icon
                       {...props}
                       icon={
                         asset.status === 'available'
                           ? 'check-circle'
                           : asset.status === 'checked_out'
-                          ? 'account-arrow-right'
-                          : 'wrench'
+                            ? 'account-arrow-right'
+                            : 'wrench'
                       }
                     />
                   )}
                   right={() => (
-                    <Chip
-                      mode="outlined"
-                      textStyle={{ fontSize: 12 }}
-                    >
+                    <Chip mode="outlined" textStyle={{ fontSize: 12 }}>
                       {asset.status || 'Unknown'}
                     </Chip>
                   )}
@@ -226,14 +216,12 @@ export default function HomeScreen({ navigation }) {
               </View>
             ))
           ) : (
-            <Paragraph style={styles.noActivityText}>
-              No recent activity
-            </Paragraph>
+            <Paragraph style={styles.noActivityText}>No recent activity</Paragraph>
           )}
         </Card.Content>
       </Card>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -301,4 +289,4 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: '#666',
   },
-});
+})

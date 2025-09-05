@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
 import {
   QrCode,
   Shield,
@@ -29,65 +29,74 @@ import {
   Laptop,
   Printer,
   Trash2,
-} from "lucide-react"
-import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useRouter } from "next/navigation";
+} from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { useRouter } from 'next/navigation'
 
 export default function PreviewDashboard() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; asset: any | null }>({ open: false, asset: null });
-  const { toast } = useToast();
-  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState('')
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; asset: any | null }>({
+    open: false,
+    asset: null,
+  })
+  const { toast } = useToast()
+  const router = useRouter()
 
   // Mock data for preview
   const mockAssets = [
     {
-      id: "1",
-      asset_id: "AT-001",
+      id: '1',
+      asset_id: 'AT-001',
       name: 'MacBook Pro 16"',
-      category: "it-equipment",
-      status: "active",
-      location: "Office A - Desk 12",
+      category: 'it-equipment',
+      status: 'active',
+      location: 'Office A - Desk 12',
       value: 2499.99,
-      assignee: { full_name: "John Doe" },
-      created_at: "2024-01-15T10:00:00Z",
-      qr_code: "generated",
+      assignee: { full_name: 'John Doe' },
+      created_at: '2024-01-15T10:00:00Z',
+      qr_code: 'generated',
     },
     {
-      id: "2",
-      asset_id: "AT-002",
-      name: "iPhone 14 Pro",
-      category: "mobile-device",
-      status: "active",
-      location: "Office B - Mobile Pool",
+      id: '2',
+      asset_id: 'AT-002',
+      name: 'iPhone 14 Pro',
+      category: 'mobile-device',
+      status: 'active',
+      location: 'Office B - Mobile Pool',
       value: 999.99,
-      assignee: { full_name: "Jane Smith" },
-      created_at: "2024-01-20T14:30:00Z",
-      qr_code: "generated",
+      assignee: { full_name: 'Jane Smith' },
+      created_at: '2024-01-20T14:30:00Z',
+      qr_code: 'generated',
     },
     {
-      id: "3",
-      asset_id: "AT-003",
+      id: '3',
+      asset_id: 'AT-003',
       name: 'Dell Monitor 27"',
-      category: "it-equipment",
-      status: "maintenance",
-      location: "IT Storage",
+      category: 'it-equipment',
+      status: 'maintenance',
+      location: 'IT Storage',
       value: 299.99,
       assignee: null,
-      created_at: "2024-01-10T09:15:00Z",
-      qr_code: "generated",
+      created_at: '2024-01-10T09:15:00Z',
+      qr_code: 'generated',
     },
     {
-      id: "4",
-      asset_id: "AT-004",
-      name: "Office Chair",
-      category: "furniture",
-      status: "active",
-      location: "Office A - Desk 5",
+      id: '4',
+      asset_id: 'AT-004',
+      name: 'Office Chair',
+      category: 'furniture',
+      status: 'active',
+      location: 'Office A - Desk 5',
       value: 199.99,
-      assignee: { full_name: "Mike Johnson" },
-      created_at: "2024-01-25T11:45:00Z",
+      assignee: { full_name: 'Mike Johnson' },
+      created_at: '2024-01-25T11:45:00Z',
       qr_code: null,
     },
   ]
@@ -95,72 +104,82 @@ export default function PreviewDashboard() {
   // Calculate analytics
   const analytics = {
     totalAssets: mockAssets.length,
-    activeAssets: mockAssets.filter((asset) => asset.status === "active").length,
-    maintenanceAssets: mockAssets.filter((asset) => asset.status === "maintenance").length,
+    activeAssets: mockAssets.filter(asset => asset.status === 'active').length,
+    maintenanceAssets: mockAssets.filter(asset => asset.status === 'maintenance').length,
     totalValue: mockAssets.reduce((sum, asset) => sum + asset.value, 0),
     utilizationRate: Math.round(
-      (mockAssets.filter((asset) => asset.status === "active").length / mockAssets.length) * 100,
+      (mockAssets.filter(asset => asset.status === 'active').length / mockAssets.length) * 100
     ),
-    qrCoverage: Math.round((mockAssets.filter((asset) => asset.qr_code).length / mockAssets.length) * 100),
+    qrCoverage: Math.round(
+      (mockAssets.filter(asset => asset.qr_code).length / mockAssets.length) * 100
+    ),
   }
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(value)
   }
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case "active":
-        return "default"
-      case "maintenance":
-        return "destructive"
-      case "retired":
-        return "secondary"
+      case 'active':
+        return 'default'
+      case 'maintenance':
+        return 'destructive'
+      case 'retired':
+        return 'secondary'
       default:
-        return "outline"
+        return 'outline'
     }
   }
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case "it-equipment":
+      case 'it-equipment':
         return <Laptop className="h-4 w-4" />
-      case "mobile-device":
+      case 'mobile-device':
         return <Smartphone className="h-4 w-4" />
-      case "office-equipment":
+      case 'office-equipment':
         return <Printer className="h-4 w-4" />
-      case "furniture":
+      case 'furniture':
         return <Package className="h-4 w-4" />
       default:
         return <Package className="h-4 w-4" />
     }
   }
 
-  const [assets, setAssets] = useState<any[]>(mockAssets);
+  const [assets, setAssets] = useState<any[]>(mockAssets)
   const filteredAssets = assets.filter(
-    (asset) =>
+    asset =>
       asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.asset_id.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+      asset.asset_id.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   const handleDelete = async (asset: any) => {
-    setDeleteDialog({ open: false, asset: null });
+    setDeleteDialog({ open: false, asset: null })
     try {
-      const res = await fetch(`/api/assets/${asset.id}`, { method: "DELETE" });
-      const data = await res.json();
+      const res = await fetch(`/api/assets/${asset.id}`, { method: 'DELETE' })
+      const data = await res.json()
       if (!res.ok) {
-        toast({ title: "Delete Failed", description: data.error || "Failed to delete asset", variant: "destructive" });
+        toast({
+          title: 'Delete Failed',
+          description: data.error || 'Failed to delete asset',
+          variant: 'destructive',
+        })
       } else {
-        toast({ title: "Asset Deleted", description: `${asset.name} has been deleted.` });
-        setAssets((prev) => prev.filter((a) => a.id !== asset.id));
+        toast({ title: 'Asset Deleted', description: `${asset.name} has been deleted.` })
+        setAssets(prev => prev.filter(a => a.id !== asset.id))
       }
     } catch (e) {
-      toast({ title: "Delete Failed", description: "An unexpected error occurred", variant: "destructive" });
+      toast({
+        title: 'Delete Failed',
+        description: 'An unexpected error occurred',
+        variant: 'destructive',
+      })
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -269,7 +288,7 @@ export default function PreviewDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{analytics.qrCoverage}%</div>
               <p className="text-xs text-muted-foreground">
-                {mockAssets.filter((a) => a.qr_code).length} of {analytics.totalAssets} assets
+                {mockAssets.filter(a => a.qr_code).length} of {analytics.totalAssets} assets
               </p>
             </CardContent>
           </Card>
@@ -291,14 +310,14 @@ export default function PreviewDashboard() {
             <Input
               placeholder="Search assets..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
 
           {/* Assets Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredAssets.map((asset) => (
+            {filteredAssets.map(asset => (
               <Card key={asset.id} className="hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -327,7 +346,7 @@ export default function PreviewDashboard() {
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-gray-600">Assignee:</span>
-                    <span className="truncate">{asset.assignee?.full_name || "Unassigned"}</span>
+                    <span className="truncate">{asset.assignee?.full_name || 'Unassigned'}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-gray-600">QR Code:</span>
@@ -342,14 +361,29 @@ export default function PreviewDashboard() {
                     )}
                   </div>
                   <div className="flex space-x-1 pt-2">
-                    <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => router.push(`/asset/${asset.id}`)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 text-xs"
+                      onClick={() => router.push(`/asset/${asset.id}`)}
+                    >
                       <Eye className="h-3 w-3 mr-1" />
                       View
                     </Button>
-                    <Button variant="outline" size="sm" className="text-xs" onClick={() => router.push(`/asset/${asset.id}/edit`)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => router.push(`/asset/${asset.id}/edit`)}
+                    >
                       <Edit className="h-3 w-3" />
                     </Button>
-                    <Button variant="destructive" size="sm" className="text-xs" onClick={() => setDeleteDialog({ open: true, asset })}>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => setDeleteDialog({ open: true, asset })}
+                    >
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
@@ -369,7 +403,9 @@ export default function PreviewDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-blue-700 mb-3">Generate and manage QR codes for your assets</p>
+              <p className="text-sm text-blue-700 mb-3">
+                Generate and manage QR codes for your assets
+              </p>
               <Button size="sm" variant="outline" className="border-blue-300 text-blue-700">
                 Open QR Tools
               </Button>
@@ -399,7 +435,9 @@ export default function PreviewDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-purple-700 mb-3">View security settings and generate reports</p>
+              <p className="text-sm text-purple-700 mb-3">
+                View security settings and generate reports
+              </p>
               <Button size="sm" variant="outline" className="border-purple-300 text-purple-700">
                 View Security
               </Button>
@@ -432,7 +470,9 @@ export default function PreviewDashboard() {
               <div className="flex items-center space-x-3">
                 <AlertTriangle className="h-5 w-5 text-blue-500" />
                 <div>
-                  <p className="font-medium">{mockAssets.filter((a) => !a.qr_code).length} Missing QR Codes</p>
+                  <p className="font-medium">
+                    {mockAssets.filter(a => !a.qr_code).length} Missing QR Codes
+                  </p>
                   <p className="text-sm text-gray-500">Assets without QR codes</p>
                 </div>
               </div>
@@ -440,14 +480,24 @@ export default function PreviewDashboard() {
           </CardContent>
         </Card>
       </div>
-      <Dialog open={deleteDialog.open} onOpenChange={open => setDeleteDialog({ open, asset: deleteDialog.asset })}>
+      <Dialog
+        open={deleteDialog.open}
+        onOpenChange={open => setDeleteDialog({ open, asset: deleteDialog.asset })}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Asset</DialogTitle>
           </DialogHeader>
-          <div>Are you sure you want to delete <b>{deleteDialog.asset?.name}</b>?</div>
+          <div>
+            Are you sure you want to delete <b>{deleteDialog.asset?.name}</b>?
+          </div>
           <DialogFooter>
-            <Button variant="destructive" onClick={() => deleteDialog.asset && handleDelete(deleteDialog.asset)}>Delete</Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteDialog.asset && handleDelete(deleteDialog.asset)}
+            >
+              Delete
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

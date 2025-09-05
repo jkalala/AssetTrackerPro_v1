@@ -13,4 +13,4 @@ export async function GET(request: Request, { params }: { params: { assetId: str
     .order('updated_at', { ascending: false })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ history: data })
-} 
+}

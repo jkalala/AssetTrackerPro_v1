@@ -1,10 +1,10 @@
-"use server"
+'use server'
 
-import { createClient } from "@/lib/supabase/server"
-import { revalidatePath } from "next/cache"
+import { createClient } from '@/lib/supabase/server'
+import { revalidatePath } from 'next/cache'
 import { logAuditEvent } from './audit-log'
-import { deliverWebhooks } from './webhook-utils';
-import { sendIntegrationNotification } from './integration-utils';
+import { deliverWebhooks } from './webhook-utils'
+import { sendIntegrationNotification } from './integration-utils'
 
 export interface Asset {
   id?: string
@@ -49,13 +49,13 @@ export interface BulkOperation {
 
 export async function addAsset(assetData: Omit<Asset, 'id' | 'created_at' | 'updated_at'>) {
   const supabase = await createClient()
-  
+
   try {
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser()
-    
+
     if (userError || !user) {
       return { error: 'Unauthorized' }
     }
@@ -73,12 +73,14 @@ export async function addAsset(assetData: Omit<Asset, 'id' | 'created_at' | 'upd
 
     const { data, error } = await supabase
       .from('assets')
-      .insert([{
-        ...assetData,
-        created_by: user.id,
-        tags: assetData.tags || [],
-        notes: assetData.notes || null
-      }])
+      .insert([
+        {
+          ...assetData,
+          created_by: user.id,
+          tags: assetData.tags || [],
+          notes: assetData.notes || null,
+        },
+      ])
       .select()
       .single()
 
@@ -89,7 +91,7 @@ export async function addAsset(assetData: Omit<Asset, 'id' | 'created_at' | 'upd
 
     revalidatePath('/assets')
     revalidatePath('/dashboard')
-    
+
     // Audit log: asset created
     await logAuditEvent({
       user_id: user.id,
@@ -102,10 +104,13 @@ export async function addAsset(assetData: Omit<Asset, 'id' | 'created_at' | 'upd
     })
     // Trigger webhooks
     if (data.tenant_id) {
-      await deliverWebhooks({ tenant_id: data.tenant_id, event: 'asset.created', payload: data });
-      await sendIntegrationNotification({ tenant_id: data.tenant_id, message: `Asset created: ${data.name}` });
+      await deliverWebhooks({ tenant_id: data.tenant_id, event: 'asset.created', payload: data })
+      await sendIntegrationNotification({
+        tenant_id: data.tenant_id,
+        message: `Asset created: ${data.name}`,
+      })
     }
-    
+
     return { data }
   } catch (error) {
     console.error('Error in addAsset:', error)
@@ -115,13 +120,13 @@ export async function addAsset(assetData: Omit<Asset, 'id' | 'created_at' | 'upd
 
 export async function updateAsset(assetId: string, updates: Partial<Asset>) {
   const supabase = await createClient()
-  
+
   try {
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser()
-    
+
     if (userError || !user) {
       return { error: 'Unauthorized' }
     }
@@ -145,7 +150,7 @@ export async function updateAsset(assetId: string, updates: Partial<Asset>) {
       .from('assets')
       .update({
         ...updates,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq('id', assetId)
       .select()
@@ -159,7 +164,7 @@ export async function updateAsset(assetId: string, updates: Partial<Asset>) {
     revalidatePath('/assets')
     revalidatePath(`/asset/${assetId}`)
     revalidatePath('/dashboard')
-    
+
     // Audit log: asset updated
     await logAuditEvent({
       user_id: user.id,
@@ -174,10 +179,13 @@ export async function updateAsset(assetId: string, updates: Partial<Asset>) {
     })
     // Trigger webhooks
     if (data?.tenant_id) {
-      await deliverWebhooks({ tenant_id: data.tenant_id, event: 'asset.updated', payload: data });
-      await sendIntegrationNotification({ tenant_id: data.tenant_id, message: `Asset updated: ${data.name}` });
+      await deliverWebhooks({ tenant_id: data.tenant_id, event: 'asset.updated', payload: data })
+      await sendIntegrationNotification({
+        tenant_id: data.tenant_id,
+        message: `Asset updated: ${data.name}`,
+      })
     }
-    
+
     return { data }
   } catch (error) {
     console.error('Error in updateAsset:', error)
@@ -187,13 +195,13 @@ export async function updateAsset(assetId: string, updates: Partial<Asset>) {
 
 export async function deleteAsset(assetId: string) {
   const supabase = await createClient()
-  
+
   try {
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser()
-    
+
     if (userError || !user) {
       return { error: 'Unauthorized' }
     }
@@ -213,10 +221,7 @@ export async function deleteAsset(assetId: string) {
       return { error: 'Unauthorized to delete this asset' }
     }
 
-    const { error } = await supabase
-      .from('assets')
-      .delete()
-      .eq('id', assetId)
+    const { error } = await supabase.from('assets').delete().eq('id', assetId)
 
     if (error) {
       console.error('Error deleting asset:', error)
@@ -225,7 +230,7 @@ export async function deleteAsset(assetId: string) {
 
     revalidatePath('/assets')
     revalidatePath('/dashboard')
-    
+
     // Audit log: asset deleted
     await logAuditEvent({
       user_id: user.id,
@@ -239,10 +244,17 @@ export async function deleteAsset(assetId: string) {
     })
     // Trigger webhooks
     if (existingAsset.tenant_id) {
-      await deliverWebhooks({ tenant_id: existingAsset.tenant_id, event: 'asset.deleted', payload: { assetId } });
-      await sendIntegrationNotification({ tenant_id: existingAsset.tenant_id, message: `Asset deleted: ${assetId}` });
+      await deliverWebhooks({
+        tenant_id: existingAsset.tenant_id,
+        event: 'asset.deleted',
+        payload: { assetId },
+      })
+      await sendIntegrationNotification({
+        tenant_id: existingAsset.tenant_id,
+        message: `Asset deleted: ${assetId}`,
+      })
     }
-    
+
     return { success: true }
   } catch (error) {
     console.error('Error in deleteAsset:', error)
@@ -252,13 +264,13 @@ export async function deleteAsset(assetId: string) {
 
 export async function getAsset(assetId: string) {
   const supabase = await createClient()
-  
+
   try {
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser()
-    
+
     if (userError || !user) {
       return { error: 'Unauthorized' }
     }
@@ -284,13 +296,13 @@ export async function getAsset(assetId: string) {
 
 export async function getAssets(filters?: AssetFilters) {
   const supabase = await createClient()
-  
+
   try {
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser()
-    
+
     if (userError || !user) {
       return { error: 'Unauthorized' }
     }
@@ -305,31 +317,31 @@ export async function getAssets(filters?: AssetFilters) {
     if (filters?.status && filters.status !== 'all') {
       query = query.eq('status', filters.status)
     }
-    
+
     if (filters?.category) {
       query = query.eq('category', filters.category)
     }
-    
+
     if (filters?.location) {
       query = query.eq('location', filters.location)
     }
-    
+
     if (filters?.assigned_to) {
       query = query.eq('assigned_to', filters.assigned_to)
     }
-    
+
     if (filters?.date_from) {
       query = query.gte('created_at', filters.date_from)
     }
-    
+
     if (filters?.date_to) {
       query = query.lte('created_at', filters.date_to)
     }
-    
+
     if (filters?.value_min) {
       query = query.gte('purchase_value', filters.value_min)
     }
-    
+
     if (filters?.value_max) {
       query = query.lte('purchase_value', filters.value_max)
     }
@@ -345,12 +357,13 @@ export async function getAssets(filters?: AssetFilters) {
     let filteredData = data || []
     if (filters?.search) {
       const searchTerm = filters.search.toLowerCase()
-      filteredData = filteredData.filter(asset =>
-        asset.name.toLowerCase().includes(searchTerm) ||
-        asset.description?.toLowerCase().includes(searchTerm) ||
-        asset.category.toLowerCase().includes(searchTerm) ||
-        asset.location?.toLowerCase().includes(searchTerm) ||
-        asset.asset_id.toLowerCase().includes(searchTerm)
+      filteredData = filteredData.filter(
+        asset =>
+          asset.name.toLowerCase().includes(searchTerm) ||
+          asset.description?.toLowerCase().includes(searchTerm) ||
+          asset.category.toLowerCase().includes(searchTerm) ||
+          asset.location?.toLowerCase().includes(searchTerm) ||
+          asset.asset_id.toLowerCase().includes(searchTerm)
       )
     }
 
@@ -363,13 +376,13 @@ export async function getAssets(filters?: AssetFilters) {
 
 export async function bulkUpdateAssets(operation: BulkOperation) {
   const supabase = await createClient()
-  
+
   try {
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser()
-    
+
     if (userError || !user) {
       return { error: 'Unauthorized' }
     }
@@ -386,7 +399,7 @@ export async function bulkUpdateAssets(operation: BulkOperation) {
     }
 
     let updateData: any = {}
-    
+
     switch (operation.operation) {
       case 'update_status':
         updateData.status = operation.value
@@ -406,10 +419,7 @@ export async function bulkUpdateAssets(operation: BulkOperation) {
 
     updateData.updated_at = new Date().toISOString()
 
-    const { error } = await supabase
-      .from('assets')
-      .update(updateData)
-      .in('id', operation.asset_ids)
+    const { error } = await supabase.from('assets').update(updateData).in('id', operation.asset_ids)
 
     if (error) {
       console.error('Error in bulk update:', error)
@@ -418,7 +428,7 @@ export async function bulkUpdateAssets(operation: BulkOperation) {
 
     revalidatePath('/assets')
     revalidatePath('/dashboard')
-    
+
     return { success: true, updatedCount: operation.asset_ids.length }
   } catch (error) {
     console.error('Error in bulkUpdateAssets:', error)
@@ -428,13 +438,13 @@ export async function bulkUpdateAssets(operation: BulkOperation) {
 
 export async function bulkDeleteAssets(assetIds: string[]) {
   const supabase = await createClient()
-  
+
   try {
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser()
-    
+
     if (userError || !user) {
       return { error: 'Unauthorized' }
     }
@@ -450,10 +460,7 @@ export async function bulkDeleteAssets(assetIds: string[]) {
       return { error: 'Unauthorized to delete some assets' }
     }
 
-    const { error } = await supabase
-      .from('assets')
-      .delete()
-      .in('id', assetIds)
+    const { error } = await supabase.from('assets').delete().in('id', assetIds)
 
     if (error) {
       console.error('Error in bulk delete:', error)
@@ -462,7 +469,7 @@ export async function bulkDeleteAssets(assetIds: string[]) {
 
     revalidatePath('/assets')
     revalidatePath('/dashboard')
-    
+
     return { success: true, deletedCount: assetIds.length }
   } catch (error) {
     console.error('Error in bulkDeleteAssets:', error)
@@ -472,13 +479,13 @@ export async function bulkDeleteAssets(assetIds: string[]) {
 
 export async function getAssetStats() {
   const supabase = await createClient()
-  
+
   try {
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser()
-    
+
     if (userError || !user) {
       return { error: 'Unauthorized' }
     }
@@ -497,29 +504,36 @@ export async function getAssetStats() {
       byStatus: {} as Record<string, number>,
       byCategory: {} as Record<string, number>,
       totalValue: 0,
-      recentAdditions: 0
+      recentAdditions: 0,
     }
 
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-    assets.forEach((asset: { status: string; category: string; purchase_value?: number; created_at?: string }) => {
-      // Status counts
-      stats.byStatus[asset.status] = (stats.byStatus[asset.status] || 0) + 1
-      
-      // Category counts
-      stats.byCategory[asset.category] = (stats.byCategory[asset.category] || 0) + 1
-      
-      // Total value
-      if (asset.purchase_value) {
-        stats.totalValue += asset.purchase_value
+    assets.forEach(
+      (asset: {
+        status: string
+        category: string
+        purchase_value?: number
+        created_at?: string
+      }) => {
+        // Status counts
+        stats.byStatus[asset.status] = (stats.byStatus[asset.status] || 0) + 1
+
+        // Category counts
+        stats.byCategory[asset.category] = (stats.byCategory[asset.category] || 0) + 1
+
+        // Total value
+        if (asset.purchase_value) {
+          stats.totalValue += asset.purchase_value
+        }
+
+        // Recent additions
+        if (asset.created_at && new Date(asset.created_at) > thirtyDaysAgo) {
+          stats.recentAdditions++
+        }
       }
-      
-      // Recent additions
-      if (asset.created_at && new Date(asset.created_at) > thirtyDaysAgo) {
-        stats.recentAdditions++
-      }
-    })
+    )
 
     return { data: stats }
   } catch (error) {
@@ -529,15 +543,17 @@ export async function getAssetStats() {
 }
 
 export async function generateAssetId(category?: string) {
-  const prefix = category ? category.toUpperCase().slice(0, 3) : "AST"
+  const prefix = category ? category.toUpperCase().slice(0, 3) : 'AST'
   const timestamp = Date.now().toString().slice(-6)
-  const randomNum = Math.floor(Math.random() * 100).toString().padStart(2, "0")
+  const randomNum = Math.floor(Math.random() * 100)
+    .toString()
+    .padStart(2, '0')
   return `${prefix}-${timestamp}-${randomNum}`
 }
 
 export async function checkAssetIdExists(assetId: string) {
   const supabase = await createClient()
-  
+
   try {
     const { data, error } = await supabase
       .from('assets')

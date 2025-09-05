@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Loader2 } from 'lucide-react'
 
 interface LocationHistoryEntry {
@@ -39,7 +46,9 @@ export default function AssetLocationHistory({ assetId }: { assetId: string }) {
       </CardHeader>
       <CardContent>
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500"><Loader2 className="h-4 w-4 animate-spin" /> Loading...</div>
+          <div className="flex items-center gap-2 text-gray-500">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading...
+          </div>
         ) : history.length === 0 ? (
           <div className="text-gray-500">No location changes recorded.</div>
         ) : (
@@ -57,17 +66,23 @@ export default function AssetLocationHistory({ assetId }: { assetId: string }) {
               {history.map(h => (
                 <TableRow key={h.id}>
                   <TableCell>{new Date(h.updated_at).toLocaleString()}</TableCell>
-                  <TableCell>{h.updated_by_profile?.full_name || h.updated_by || 'Unknown'}</TableCell>
+                  <TableCell>
+                    {h.updated_by_profile?.full_name || h.updated_by || 'Unknown'}
+                  </TableCell>
                   <TableCell>
                     {h.location_text || ''}
                     {h.location_lat && h.location_lng && (
-                      <div className="text-xs text-gray-500">{h.location_lat}, {h.location_lng}</div>
+                      <div className="text-xs text-gray-500">
+                        {h.location_lat}, {h.location_lng}
+                      </div>
                     )}
                   </TableCell>
                   <TableCell>
                     {h.prev_location_text || ''}
                     {h.prev_location_lat && h.prev_location_lng && (
-                      <div className="text-xs text-gray-500">{h.prev_location_lat}, {h.prev_location_lng}</div>
+                      <div className="text-xs text-gray-500">
+                        {h.prev_location_lat}, {h.prev_location_lng}
+                      </div>
                     )}
                   </TableCell>
                   <TableCell>{h.location_source || ''}</TableCell>
@@ -79,4 +94,4 @@ export default function AssetLocationHistory({ assetId }: { assetId: string }) {
       </CardContent>
     </Card>
   )
-} 
+}

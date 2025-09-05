@@ -2,15 +2,18 @@ import { createClient } from '@/lib/supabase/server'
 import { SecurityEvent, SecurityEventInsert } from '@/lib/types/database'
 
 export class SecurityEventService {
-
   // Helper method to log login success events
-  async logLoginSuccess(userId: string, tenantId: string, metadata: {
-    ip_address?: string
-    user_agent?: string
-    location_country?: string
-    location_city?: string
-    session_id?: string
-  }): Promise<SecurityEvent | null> {
+  async logLoginSuccess(
+    userId: string,
+    tenantId: string,
+    metadata: {
+      ip_address?: string
+      user_agent?: string
+      location_country?: string
+      location_city?: string
+      session_id?: string
+    }
+  ): Promise<SecurityEvent | null> {
     return this.logSecurityEvent({
       tenant_id: tenantId,
       user_id: userId,
@@ -20,24 +23,27 @@ export class SecurityEventService {
       description: 'User successfully logged in',
       details: {
         login_method: 'password',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       ip_address: metadata.ip_address,
       user_agent: metadata.user_agent,
       location_country: metadata.location_country,
-      location_city: metadata.location_city
+      location_city: metadata.location_city,
     })
   }
 
   // Helper method to log login failure events
-  async logLoginFailure(tenantId: string, metadata: {
-    email?: string
-    ip_address?: string
-    user_agent?: string
-    location_country?: string
-    location_city?: string
-    reason?: string
-  }): Promise<SecurityEvent | null> {
+  async logLoginFailure(
+    tenantId: string,
+    metadata: {
+      email?: string
+      ip_address?: string
+      user_agent?: string
+      location_country?: string
+      location_city?: string
+      reason?: string
+    }
+  ): Promise<SecurityEvent | null> {
     return this.logSecurityEvent({
       tenant_id: tenantId,
       event_type: 'login_failure',
@@ -46,22 +52,26 @@ export class SecurityEventService {
       details: {
         email: metadata.email,
         reason: metadata.reason || 'Invalid credentials',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       ip_address: metadata.ip_address,
       user_agent: metadata.user_agent,
       location_country: metadata.location_country,
-      location_city: metadata.location_city
+      location_city: metadata.location_city,
     })
   }
 
   // Helper method to log MFA success events
-  async logMfaSuccess(userId: string, tenantId: string, metadata: {
-    ip_address?: string
-    user_agent?: string
-    session_id?: string
-    mfa_method?: string
-  }): Promise<SecurityEvent | null> {
+  async logMfaSuccess(
+    userId: string,
+    tenantId: string,
+    metadata: {
+      ip_address?: string
+      user_agent?: string
+      session_id?: string
+      mfa_method?: string
+    }
+  ): Promise<SecurityEvent | null> {
     return this.logSecurityEvent({
       tenant_id: tenantId,
       user_id: userId,
@@ -71,21 +81,25 @@ export class SecurityEventService {
       description: 'Multi-factor authentication successful',
       details: {
         mfa_method: metadata.mfa_method || 'totp',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       ip_address: metadata.ip_address,
-      user_agent: metadata.user_agent
+      user_agent: metadata.user_agent,
     })
   }
 
   // Helper method to log MFA failure events
-  async logMfaFailure(userId: string, tenantId: string, metadata: {
-    ip_address?: string
-    user_agent?: string
-    session_id?: string
-    mfa_method?: string
-    reason?: string
-  }): Promise<SecurityEvent | null> {
+  async logMfaFailure(
+    userId: string,
+    tenantId: string,
+    metadata: {
+      ip_address?: string
+      user_agent?: string
+      session_id?: string
+      mfa_method?: string
+      reason?: string
+    }
+  ): Promise<SecurityEvent | null> {
     return this.logSecurityEvent({
       tenant_id: tenantId,
       user_id: userId,
@@ -96,20 +110,24 @@ export class SecurityEventService {
       details: {
         mfa_method: metadata.mfa_method || 'totp',
         reason: metadata.reason || 'Invalid code',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       ip_address: metadata.ip_address,
-      user_agent: metadata.user_agent
+      user_agent: metadata.user_agent,
     })
   }
 
   // Helper method to log API key creation events
-  async logApiKeyCreated(userId: string, tenantId: string, metadata: {
-    api_key_name: string
-    permissions: Record<string, unknown>
-    ip_address?: string
-    user_agent?: string
-  }): Promise<SecurityEvent | null> {
+  async logApiKeyCreated(
+    userId: string,
+    tenantId: string,
+    metadata: {
+      api_key_name: string
+      permissions: Record<string, unknown>
+      ip_address?: string
+      user_agent?: string
+    }
+  ): Promise<SecurityEvent | null> {
     return this.logSecurityEvent({
       tenant_id: tenantId,
       user_id: userId,
@@ -119,21 +137,25 @@ export class SecurityEventService {
       details: {
         api_key_name: metadata.api_key_name,
         permissions: metadata.permissions,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       ip_address: metadata.ip_address,
-      user_agent: metadata.user_agent
+      user_agent: metadata.user_agent,
     })
   }
 
   // Helper method to log session termination events
-  async logSessionTerminated(userId: string, tenantId: string, metadata: {
-    session_id: string
-    terminated_by?: string
-    reason?: string
-    ip_address?: string
-    user_agent?: string
-  }): Promise<SecurityEvent | null> {
+  async logSessionTerminated(
+    userId: string,
+    tenantId: string,
+    metadata: {
+      session_id: string
+      terminated_by?: string
+      reason?: string
+      ip_address?: string
+      user_agent?: string
+    }
+  ): Promise<SecurityEvent | null> {
     return this.logSecurityEvent({
       tenant_id: tenantId,
       user_id: userId,
@@ -144,21 +166,17 @@ export class SecurityEventService {
       details: {
         terminated_by: metadata.terminated_by || userId,
         reason: metadata.reason || 'User logout',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       ip_address: metadata.ip_address,
-      user_agent: metadata.user_agent
+      user_agent: metadata.user_agent,
     })
   }
 
   async logSecurityEvent(event: SecurityEventInsert): Promise<SecurityEvent | null> {
     try {
       const supabase = await createClient()
-      const { data, error } = await supabase
-        .from('security_events')
-        .insert(event)
-        .select()
-        .single()
+      const { data, error } = await supabase.from('security_events').insert(event).select().single()
 
       if (error) {
         console.error('Error logging security event:', error)
@@ -182,7 +200,7 @@ export class SecurityEventService {
     isResolved?: boolean
     limit?: number
     offset?: number
-  }): Promise<{ events: SecurityEvent[], total: number }> {
+  }): Promise<{ events: SecurityEvent[]; total: number }> {
     try {
       const supabase = await createClient()
       let query = supabase
@@ -223,7 +241,7 @@ export class SecurityEventService {
       }
 
       if (filters?.offset) {
-        query = query.range(filters.offset, (filters.offset + (filters.limit || 50)) - 1)
+        query = query.range(filters.offset, filters.offset + (filters.limit || 50) - 1)
       }
 
       const { data, error, count } = await query
@@ -253,12 +271,16 @@ export class SecurityEventService {
       'api_key_created',
       'api_key_revoked',
       'session_terminated',
-      'concurrent_session_limit'
+      'concurrent_session_limit',
     ]
   }
 
   // Get event statistics for dashboard/analytics
-  async getEventStatistics(tenantId: string, dateFrom?: string, dateTo?: string): Promise<{
+  async getEventStatistics(
+    tenantId: string,
+    dateFrom?: string,
+    dateTo?: string
+  ): Promise<{
     totalEvents: number
     eventsByType: Record<string, number>
     eventsBySeverity: Record<string, number>
@@ -267,12 +289,9 @@ export class SecurityEventService {
   }> {
     try {
       const supabase = await createClient()
-      
+
       // Base query with tenant filtering
-      let baseQuery = supabase
-        .from('security_events')
-        .select('*')
-        .eq('tenant_id', tenantId)
+      let baseQuery = supabase.from('security_events').select('*').eq('tenant_id', tenantId)
 
       if (dateFrom) {
         baseQuery = baseQuery.gte('created_at', dateFrom)
@@ -291,7 +310,7 @@ export class SecurityEventService {
           eventsByType: {},
           eventsBySeverity: {},
           recentEvents: [],
-          unresolvedEvents: 0
+          unresolvedEvents: 0,
         }
       }
 
@@ -302,10 +321,10 @@ export class SecurityEventService {
       events?.forEach(event => {
         // Count by type
         eventsByType[event.event_type] = (eventsByType[event.event_type] || 0) + 1
-        
+
         // Count by severity
         eventsBySeverity[event.severity] = (eventsBySeverity[event.severity] || 0) + 1
-        
+
         // Count unresolved
         if (!event.is_resolved) {
           unresolvedEvents++
@@ -313,16 +332,17 @@ export class SecurityEventService {
       })
 
       // Get recent events (last 10)
-      const recentEvents = events
-        ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        .slice(0, 10) || []
+      const recentEvents =
+        events
+          ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 10) || []
 
       return {
         totalEvents: events?.length || 0,
         eventsByType,
         eventsBySeverity,
         recentEvents,
-        unresolvedEvents
+        unresolvedEvents,
       }
     } catch (error) {
       console.error('Error fetching event statistics:', error)
@@ -331,13 +351,17 @@ export class SecurityEventService {
         eventsByType: {},
         eventsBySeverity: {},
         recentEvents: [],
-        unresolvedEvents: 0
+        unresolvedEvents: 0,
       }
     }
   }
 
   // Get events for a specific user
-  async getUserSecurityEvents(userId: string, tenantId: string, limit: number = 50): Promise<SecurityEvent[]> {
+  async getUserSecurityEvents(
+    userId: string,
+    tenantId: string,
+    limit: number = 50
+  ): Promise<SecurityEvent[]> {
     try {
       const supabase = await createClient()
       const { data, error } = await supabase
@@ -361,7 +385,11 @@ export class SecurityEventService {
   }
 
   // Bulk resolve events
-  async bulkResolveEvents(eventIds: string[], resolvedBy: string, notes?: string): Promise<boolean> {
+  async bulkResolveEvents(
+    eventIds: string[],
+    resolvedBy: string,
+    notes?: string
+  ): Promise<boolean> {
     try {
       const supabase = await createClient()
       const { error } = await supabase
@@ -370,7 +398,7 @@ export class SecurityEventService {
           is_resolved: true,
           resolved_at: new Date().toISOString(),
           resolved_by: resolvedBy,
-          resolution_notes: notes
+          resolution_notes: notes,
         })
         .in('id', eventIds)
 
@@ -386,7 +414,11 @@ export class SecurityEventService {
     }
   }
 
-  async resolveSecurityEvent(eventId: string, resolvedBy: string, notes?: string): Promise<boolean> {
+  async resolveSecurityEvent(
+    eventId: string,
+    resolvedBy: string,
+    notes?: string
+  ): Promise<boolean> {
     try {
       const supabase = await createClient()
       const { error } = await supabase
@@ -395,7 +427,7 @@ export class SecurityEventService {
           is_resolved: true,
           resolved_at: new Date().toISOString(),
           resolved_by: resolvedBy,
-          resolution_notes: notes
+          resolution_notes: notes,
         })
         .eq('id', eventId)
 

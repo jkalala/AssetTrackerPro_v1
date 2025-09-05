@@ -1,12 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -22,19 +17,19 @@ interface EditRoleDialogProps {
   existingRoles: Role[]
 }
 
-export function EditRoleDialog({ 
-  open, 
-  onOpenChange, 
-  role, 
-  onUpdateRole, 
-  existingRoles 
+export function EditRoleDialog({
+  open,
+  onOpenChange,
+  role,
+  onUpdateRole,
+  existingRoles,
 }: EditRoleDialogProps) {
   const [formData, setFormData] = useState({
     name: '',
     display_name: '',
     description: '',
     is_active: true,
-    max_users: ''
+    max_users: '',
   })
   const [isLoading, setIsLoading] = useState(false)
 
@@ -45,7 +40,7 @@ export function EditRoleDialog({
         display_name: role.display_name || '',
         description: role.description || '',
         is_active: role.is_active ?? true,
-        max_users: role.max_users?.toString() || ''
+        max_users: role.max_users?.toString() || '',
       })
     }
   }, [role])
@@ -57,9 +52,9 @@ export function EditRoleDialog({
     try {
       const updates = {
         ...formData,
-        max_users: formData.max_users ? parseInt(formData.max_users) : null
+        max_users: formData.max_users ? parseInt(formData.max_users) : null,
       }
-      
+
       await onUpdateRole(role.id, updates)
       onOpenChange(false)
     } catch (error) {
@@ -75,14 +70,14 @@ export function EditRoleDialog({
         <DialogHeader>
           <DialogTitle>Edit Role</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Role Name</Label>
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Enter role name"
               required
             />
@@ -93,7 +88,7 @@ export function EditRoleDialog({
             <Input
               id="display_name"
               value={formData.display_name}
-              onChange={(e) => setFormData(prev => ({ ...prev, display_name: e.target.value }))}
+              onChange={e => setFormData(prev => ({ ...prev, display_name: e.target.value }))}
               placeholder="Enter display name"
             />
           </div>
@@ -103,7 +98,7 @@ export function EditRoleDialog({
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Enter role description"
               rows={3}
             />
@@ -115,7 +110,7 @@ export function EditRoleDialog({
               id="max_users"
               type="number"
               value={formData.max_users}
-              onChange={(e) => setFormData(prev => ({ ...prev, max_users: e.target.value }))}
+              onChange={e => setFormData(prev => ({ ...prev, max_users: e.target.value }))}
               placeholder="Leave empty for unlimited"
               min="1"
             />
@@ -125,7 +120,7 @@ export function EditRoleDialog({
             <Switch
               id="is_active"
               checked={formData.is_active}
-              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+              onCheckedChange={checked => setFormData(prev => ({ ...prev, is_active: checked }))}
             />
             <Label htmlFor="is_active">Active</Label>
           </div>

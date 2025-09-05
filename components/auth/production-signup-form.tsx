@@ -1,36 +1,48 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, Mail, Lock, User, AlertTriangle, Package, Shield, Github, CheckCircle, Building2 } from "lucide-react"
-import Link from "next/link"
-import { signUpWithEmail, signInWithGitHub } from "@/lib/auth-actions"
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  AlertTriangle,
+  Package,
+  Shield,
+  Github,
+  CheckCircle,
+  Building2,
+} from 'lucide-react'
+import Link from 'next/link'
+import { signUpWithEmail, signInWithGitHub } from '@/lib/auth-actions'
 
 export default function ProductionSignupForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [fullName, setFullName] = useState("")
-  const [orgName, setOrgName] = useState("")
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [orgName, setOrgName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const router = useRouter()
-  const [successMessage, setSuccessMessage] = useState("")
+  const [successMessage, setSuccessMessage] = useState('')
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError("")
+    setError('')
 
     if (!orgName.trim()) {
-      setError("Organization name is required")
+      setError('Organization name is required')
       setLoading(false)
       return
     }
@@ -41,13 +53,13 @@ export default function ProductionSignupForm() {
         setError(result.error)
       } else if (result.needsConfirmation) {
         setSuccess(true)
-        setSuccessMessage(result.message || "Please check your email for a confirmation link.")
+        setSuccessMessage(result.message || 'Please check your email for a confirmation link.')
       } else {
         // Auto-confirmed, redirect to login
-        router.push("/login?message=Account created successfully! Please sign in.")
+        router.push('/login?message=Account created successfully! Please sign in.')
       }
     } catch (err) {
-      setError("An unexpected error occurred")
+      setError('An unexpected error occurred')
     } finally {
       setLoading(false)
     }
@@ -55,26 +67,26 @@ export default function ProductionSignupForm() {
 
   const handleGitHubSignup = async () => {
     if (!orgName.trim()) {
-      setError("Organization name is required")
+      setError('Organization name is required')
       return
     }
 
     setLoading(true)
-    setError("")
+    setError('')
 
     try {
       // Store org name in a cookie before GitHub OAuth
       document.cookie = `signup_org_name=${encodeURIComponent(orgName)}; path=/; max-age=300` // 5 minutes expiry
-      
+
       const result = await signInWithGitHub()
       if (result.error) {
         setError(result.error)
-        document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+        document.cookie = 'signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
       }
       // GitHub OAuth will handle the redirect
     } catch (err) {
-      setError("Failed to sign up with GitHub")
-      document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+      setError('Failed to sign up with GitHub')
+      document.cookie = 'signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
       setLoading(false)
     }
   }
@@ -96,7 +108,8 @@ export default function ProductionSignupForm() {
             <Alert className="border-green-200 bg-green-50">
               <CheckCircle className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800">
-                {successMessage || `Please check your email and click the confirmation link to activate your account.`}
+                {successMessage ||
+                  `Please check your email and click the confirmation link to activate your account.`}
               </AlertDescription>
             </Alert>
             <div className="text-center space-y-2">
@@ -147,7 +160,9 @@ export default function ProductionSignupForm() {
           <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
-              <CardDescription className="text-center">Start managing your assets professionally</CardDescription>
+              <CardDescription className="text-center">
+                Start managing your assets professionally
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {error && (
@@ -170,14 +185,19 @@ export default function ProductionSignupForm() {
                       type="text"
                       placeholder="Enter your organization name"
                       value={orgName}
-                      onChange={(e) => setOrgName(e.target.value)}
+                      onChange={e => setOrgName(e.target.value)}
                       className="pl-10"
                       required
                     />
                   </div>
                 </div>
 
-                <Button onClick={handleGitHubSignup} variant="outline" className="w-full" disabled={loading}>
+                <Button
+                  onClick={handleGitHubSignup}
+                  variant="outline"
+                  className="w-full"
+                  disabled={loading}
+                >
                   <Github className="h-4 w-4 mr-2" />
                   Continue with GitHub
                 </Button>
@@ -204,7 +224,7 @@ export default function ProductionSignupForm() {
                       type="text"
                       placeholder="Enter your full name"
                       value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
+                      onChange={e => setFullName(e.target.value)}
                       className="pl-10"
                       required
                     />
@@ -222,7 +242,7 @@ export default function ProductionSignupForm() {
                       type="email"
                       placeholder="Enter your email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={e => setEmail(e.target.value)}
                       className="pl-10"
                       required
                     />
@@ -237,10 +257,10 @@ export default function ProductionSignupForm() {
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                       id="password"
-                      type={showPassword ? "text" : "password"}
+                      type={showPassword ? 'text' : 'password'}
                       placeholder="Create a password"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={e => setPassword(e.target.value)}
                       className="pl-10 pr-10"
                       required
                       minLength={6}
@@ -261,23 +281,23 @@ export default function ProductionSignupForm() {
                 </div>
 
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Creating account..." : "Create account"}
+                  {loading ? 'Creating account...' : 'Create account'}
                 </Button>
               </form>
 
               <div className="text-center text-sm">
-                {"Already have an account? "}
+                {'Already have an account? '}
                 <Link href="/login" className="text-blue-600 hover:text-blue-500 font-medium">
                   Sign in
                 </Link>
               </div>
 
               <div className="text-xs text-gray-500 text-center">
-                By creating an account, you agree to our{" "}
+                By creating an account, you agree to our{' '}
                 <Link href="/terms" className="text-blue-600 hover:text-blue-500">
                   Terms of Service
-                </Link>{" "}
-                and{" "}
+                </Link>{' '}
+                and{' '}
                 <Link href="/privacy" className="text-blue-600 hover:text-blue-500">
                   Privacy Policy
                 </Link>

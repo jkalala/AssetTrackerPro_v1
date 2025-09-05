@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertTriangle, Download, RefreshCw, Database } from "lucide-react"
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertTriangle, Download, RefreshCw, Database } from 'lucide-react'
 
 export default function FallbackDashboard() {
   return (
@@ -29,7 +29,8 @@ export default function FallbackDashboard() {
               <Alert>
                 <Database className="h-4 w-4" />
                 <AlertDescription>
-                  The v0 preview environment may have network restrictions that prevent full database connectivity.
+                  The v0 preview environment may have network restrictions that prevent full
+                  database connectivity.
                 </AlertDescription>
               </Alert>
 
@@ -145,17 +146,18 @@ export default function FallbackDashboard() {
         {/* Action Buttons */}
         <div className="text-center space-y-4">
           <div className="flex justify-center space-x-4">
-            <Button onClick={() => (window.location.href = "/client-dashboard")}>
+            <Button onClick={() => (window.location.href = '/client-dashboard')}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Try Client Dashboard
             </Button>
-            <Button variant="outline" onClick={() => (window.location.href = "/login")}>
+            <Button variant="outline" onClick={() => (window.location.href = '/login')}>
               Go to Login
             </Button>
           </div>
 
           <p className="text-sm text-gray-600">
-            For the best experience with full functionality, download the code and run it locally at localhost:3000
+            For the best experience with full functionality, download the code and run it locally at
+            localhost:3000
           </p>
         </div>
       </div>

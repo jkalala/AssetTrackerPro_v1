@@ -1,6 +1,6 @@
-import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
-import { ENV } from "@/lib/env"
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { ENV } from '@/lib/env'
 
 export async function createClient() {
   try {
@@ -13,7 +13,9 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
           } catch {
             // The `setAll` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
@@ -23,7 +25,7 @@ export async function createClient() {
       },
     })
   } catch (error) {
-    console.error("Error creating server client:", error)
+    console.error('Error creating server client:', error)
     throw error
   }
 }

@@ -1,14 +1,14 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   LineChart,
   Line,
@@ -16,9 +16,9 @@ import {
   Pie,
   Cell,
   AreaChart,
-  Area
+  Area,
 } from 'recharts'
-import { TrendingUp, TrendingDown, Activity, Users, Package, DollarSign } from "lucide-react"
+import { TrendingUp, TrendingDown, Activity, Users, Package, DollarSign } from 'lucide-react'
 
 interface AnalyticsChartsProps {
   data: {
@@ -42,7 +42,11 @@ interface AnalyticsChartsProps {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D']
 
-export function CategoryDistributionChart({ data }: { data: AnalyticsChartsProps['data']['categories'] }) {
+export function CategoryDistributionChart({
+  data,
+}: {
+  data: AnalyticsChartsProps['data']['categories']
+}) {
   return (
     <Card>
       <CardHeader>
@@ -77,7 +81,11 @@ export function CategoryDistributionChart({ data }: { data: AnalyticsChartsProps
   )
 }
 
-export function StatusDistributionChart({ data }: { data: AnalyticsChartsProps['data']['status'] }) {
+export function StatusDistributionChart({
+  data,
+}: {
+  data: AnalyticsChartsProps['data']['status']
+}) {
   return (
     <Card>
       <CardHeader>
@@ -102,7 +110,11 @@ export function StatusDistributionChart({ data }: { data: AnalyticsChartsProps['
   )
 }
 
-export function LocationDistributionChart({ data }: { data: AnalyticsChartsProps['data']['locations'] }) {
+export function LocationDistributionChart({
+  data,
+}: {
+  data: AnalyticsChartsProps['data']['locations']
+}) {
   return (
     <Card>
       <CardHeader>
@@ -146,41 +158,41 @@ export function TimeSeriesChart({ data }: { data: AnalyticsChartsProps['data']['
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="date" 
-              tickFormatter={formatDate}
-            />
+            <XAxis dataKey="date" tickFormatter={formatDate} />
             <YAxis />
-            <Tooltip 
+            <Tooltip
               labelFormatter={formatDate}
               formatter={(value: any, name: string) => [
-                value, 
-                name === 'assets' ? 'Assets Created' : 
-                name === 'scans' ? 'QR Scans' : 'Active Users'
+                value,
+                name === 'assets'
+                  ? 'Assets Created'
+                  : name === 'scans'
+                    ? 'QR Scans'
+                    : 'Active Users',
               ]}
             />
-            <Area 
-              type="monotone" 
-              dataKey="assets" 
-              stackId="1" 
-              stroke="#8884d8" 
-              fill="#8884d8" 
+            <Area
+              type="monotone"
+              dataKey="assets"
+              stackId="1"
+              stroke="#8884d8"
+              fill="#8884d8"
               fillOpacity={0.6}
             />
-            <Area 
-              type="monotone" 
-              dataKey="scans" 
-              stackId="1" 
-              stroke="#82ca9d" 
-              fill="#82ca9d" 
+            <Area
+              type="monotone"
+              dataKey="scans"
+              stackId="1"
+              stroke="#82ca9d"
+              fill="#82ca9d"
               fillOpacity={0.6}
             />
-            <Area 
-              type="monotone" 
-              dataKey="users" 
-              stackId="1" 
-              stroke="#ffc658" 
-              fill="#ffc658" 
+            <Area
+              type="monotone"
+              dataKey="users"
+              stackId="1"
+              stroke="#ffc658"
+              fill="#ffc658"
               fillOpacity={0.6}
             />
           </AreaChart>
@@ -208,19 +220,13 @@ export function ScanActivityChart({ data }: { data: AnalyticsChartsProps['data']
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="hour" 
-              tickFormatter={formatHour}
-            />
+            <XAxis dataKey="hour" tickFormatter={formatHour} />
             <YAxis />
-            <Tooltip 
-              labelFormatter={formatHour}
-              formatter={(value: any) => [value, 'Scans']}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="scans" 
-              stroke="#8884d8" 
+            <Tooltip labelFormatter={formatHour} formatter={(value: any) => [value, 'Scans']} />
+            <Line
+              type="monotone"
+              dataKey="scans"
+              stroke="#8884d8"
               strokeWidth={2}
               dot={{ fill: '#8884d8', strokeWidth: 2, r: 4 }}
             />
@@ -231,7 +237,11 @@ export function ScanActivityChart({ data }: { data: AnalyticsChartsProps['data']
   )
 }
 
-export function AnalyticsSummaryCards({ overview }: { overview: AnalyticsChartsProps['data']['overview'] }) {
+export function AnalyticsSummaryCards({
+  overview,
+}: {
+  overview: AnalyticsChartsProps['data']['overview']
+}) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -254,8 +264,7 @@ export function AnalyticsSummaryCards({ overview }: { overview: AnalyticsChartsP
           </div>
           <div className="mt-2">
             <Badge variant="outline">
-              <TrendingUp className="h-3 w-3 mr-1" />
-              +{overview.assetsCreatedThisWeek} this week
+              <TrendingUp className="h-3 w-3 mr-1" />+{overview.assetsCreatedThisWeek} this week
             </Badge>
           </div>
         </CardContent>
@@ -272,7 +281,10 @@ export function AnalyticsSummaryCards({ overview }: { overview: AnalyticsChartsP
           </div>
           <div className="mt-2">
             <Badge variant="default">
-              {overview.totalAssets > 0 ? Math.round((overview.activeAssets / overview.totalAssets) * 100) : 0}% active
+              {overview.totalAssets > 0
+                ? Math.round((overview.activeAssets / overview.totalAssets) * 100)
+                : 0}
+              % active
             </Badge>
           </div>
         </CardContent>
@@ -290,7 +302,10 @@ export function AnalyticsSummaryCards({ overview }: { overview: AnalyticsChartsP
           <div className="mt-2">
             <Badge variant="outline">
               <TrendingUp className="h-3 w-3 mr-1" />
-              Average: {formatCurrency(overview.totalAssets > 0 ? overview.totalValue / overview.totalAssets : 0)}
+              Average:{' '}
+              {formatCurrency(
+                overview.totalAssets > 0 ? overview.totalValue / overview.totalAssets : 0
+              )}
             </Badge>
           </div>
         </CardContent>
@@ -306,12 +321,12 @@ export function AnalyticsSummaryCards({ overview }: { overview: AnalyticsChartsP
             </div>
           </div>
           <div className="mt-2">
-            <Badge variant={overview.qrCoverage >= 80 ? "default" : "secondary"}>
-              {overview.qrCoverage >= 80 ? "Excellent" : "Needs Improvement"}
+            <Badge variant={overview.qrCoverage >= 80 ? 'default' : 'secondary'}>
+              {overview.qrCoverage >= 80 ? 'Excellent' : 'Needs Improvement'}
             </Badge>
           </div>
         </CardContent>
       </Card>
     </div>
   )
-} 
+}

@@ -2,7 +2,15 @@ import { useState } from 'react'
 
 export interface ExportOptions {
   format: 'csv' | 'json'
-  reportType: 'overview' | 'categories' | 'status' | 'locations' | 'assets' | 'activity' | 'users' | 'all'
+  reportType:
+    | 'overview'
+    | 'categories'
+    | 'status'
+    | 'locations'
+    | 'assets'
+    | 'activity'
+    | 'users'
+    | 'all'
 }
 
 export function useAnalyticsExport() {
@@ -29,7 +37,8 @@ export function useAnalyticsExport() {
       // Get the filename from the response headers
       const contentDisposition = response.headers.get('content-disposition')
       const filename = contentDisposition
-        ? contentDisposition.split('filename=')[1]?.replace(/"/g, '') || `export-${Date.now()}.${options.format}`
+        ? contentDisposition.split('filename=')[1]?.replace(/"/g, '') ||
+          `export-${Date.now()}.${options.format}`
         : `export-${Date.now()}.${options.format}`
 
       // Create a blob and download it
@@ -99,4 +108,4 @@ export function useAnalyticsExport() {
     exportActivity,
     exportUsers,
   }
-} 
+}

@@ -1,89 +1,99 @@
-"use client"
+'use client'
 
-import dynamic from 'next/dynamic';
-import type SwaggerUIType from 'swagger-ui-react';
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Code, Key, Globe, Shield, Copy, CheckCircle, AlertTriangle, ExternalLink, Zap } from "lucide-react"
+import dynamic from 'next/dynamic'
+import type SwaggerUIType from 'swagger-ui-react'
+import { useEffect, useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Code,
+  Key,
+  Globe,
+  Shield,
+  Copy,
+  CheckCircle,
+  AlertTriangle,
+  ExternalLink,
+  Zap,
+} from 'lucide-react'
 
-const SwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false }) as any;
+const SwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false }) as any
 
 const apiEndpoints = [
   {
-    method: "GET",
-    endpoint: "/api/assets",
-    description: "Retrieve all assets",
-    auth: "Required",
+    method: 'GET',
+    endpoint: '/api/assets',
+    description: 'Retrieve all assets',
+    auth: 'Required',
     parameters: [
-      { name: "page", type: "number", description: "Page number for pagination" },
-      { name: "limit", type: "number", description: "Number of items per page" },
-      { name: "category", type: "string", description: "Filter by asset category" },
-      { name: "status", type: "string", description: "Filter by asset status" },
+      { name: 'page', type: 'number', description: 'Page number for pagination' },
+      { name: 'limit', type: 'number', description: 'Number of items per page' },
+      { name: 'category', type: 'string', description: 'Filter by asset category' },
+      { name: 'status', type: 'string', description: 'Filter by asset status' },
     ],
   },
   {
-    method: "POST",
-    endpoint: "/api/assets",
-    description: "Create a new asset",
-    auth: "Required",
+    method: 'POST',
+    endpoint: '/api/assets',
+    description: 'Create a new asset',
+    auth: 'Required',
     parameters: [
-      { name: "name", type: "string", description: "Asset name (required)" },
-      { name: "category", type: "string", description: "Asset category (required)" },
-      { name: "description", type: "string", description: "Asset description" },
-      { name: "location", type: "string", description: "Asset location" },
-      { name: "value", type: "number", description: "Asset value" },
+      { name: 'name', type: 'string', description: 'Asset name (required)' },
+      { name: 'category', type: 'string', description: 'Asset category (required)' },
+      { name: 'description', type: 'string', description: 'Asset description' },
+      { name: 'location', type: 'string', description: 'Asset location' },
+      { name: 'value', type: 'number', description: 'Asset value' },
     ],
   },
   {
-    method: "GET",
-    endpoint: "/api/assets/{id}",
-    description: "Retrieve a specific asset",
-    auth: "Required",
-    parameters: [{ name: "id", type: "string", description: "Asset ID (required)" }],
+    method: 'GET',
+    endpoint: '/api/assets/{id}',
+    description: 'Retrieve a specific asset',
+    auth: 'Required',
+    parameters: [{ name: 'id', type: 'string', description: 'Asset ID (required)' }],
   },
   {
-    method: "PUT",
-    endpoint: "/api/assets/{id}",
-    description: "Update an existing asset",
-    auth: "Required",
+    method: 'PUT',
+    endpoint: '/api/assets/{id}',
+    description: 'Update an existing asset',
+    auth: 'Required',
     parameters: [
-      { name: "id", type: "string", description: "Asset ID (required)" },
-      { name: "name", type: "string", description: "Asset name" },
-      { name: "category", type: "string", description: "Asset category" },
-      { name: "description", type: "string", description: "Asset description" },
-      { name: "location", type: "string", description: "Asset location" },
-      { name: "status", type: "string", description: "Asset status" },
+      { name: 'id', type: 'string', description: 'Asset ID (required)' },
+      { name: 'name', type: 'string', description: 'Asset name' },
+      { name: 'category', type: 'string', description: 'Asset category' },
+      { name: 'description', type: 'string', description: 'Asset description' },
+      { name: 'location', type: 'string', description: 'Asset location' },
+      { name: 'status', type: 'string', description: 'Asset status' },
     ],
   },
   {
-    method: "DELETE",
-    endpoint: "/api/assets/{id}",
-    description: "Delete an asset",
-    auth: "Required",
-    parameters: [{ name: "id", type: "string", description: "Asset ID (required)" }],
+    method: 'DELETE',
+    endpoint: '/api/assets/{id}',
+    description: 'Delete an asset',
+    auth: 'Required',
+    parameters: [{ name: 'id', type: 'string', description: 'Asset ID (required)' }],
   },
   {
-    method: "POST",
-    endpoint: "/api/assets/{id}/qr",
-    description: "Generate QR code for an asset",
-    auth: "Required",
+    method: 'POST',
+    endpoint: '/api/assets/{id}/qr',
+    description: 'Generate QR code for an asset',
+    auth: 'Required',
     parameters: [
-      { name: "id", type: "string", description: "Asset ID (required)" },
-      { name: "size", type: "number", description: "QR code size in pixels" },
+      { name: 'id', type: 'string', description: 'Asset ID (required)' },
+      { name: 'size', type: 'number', description: 'QR code size in pixels' },
     ],
   },
   {
-    method: "GET",
-    endpoint: "/api/analytics/metrics",
-    description: "Get real-time analytics metrics",
-    auth: "Required",
+    method: 'GET',
+    endpoint: '/api/analytics/metrics',
+    description: 'Get real-time analytics metrics',
+    auth: 'Required',
     parameters: [
-      { name: "period", type: "string", description: "Time period (day, week, month)" },
-      { name: "category", type: "string", description: "Filter by category" },
+      { name: 'period', type: 'string', description: 'Time period (day, week, month)' },
+      { name: 'category', type: 'string', description: 'Filter by category' },
     ],
   },
 ]
@@ -214,28 +224,28 @@ curl -X POST https://your-domain.com/api/assets \\
 }
 
 export default function APIDocumentationPage() {
-  const [selectedLanguage, setSelectedLanguage] = useState("javascript")
+  const [selectedLanguage, setSelectedLanguage] = useState('javascript')
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
-  const [openApiSpec, setOpenApiSpec] = useState<any>(null);
-  const [loadingSpec, setLoadingSpec] = useState(false);
-  const [specError, setSpecError] = useState<string | null>(null);
+  const [openApiSpec, setOpenApiSpec] = useState<any>(null)
+  const [loadingSpec, setLoadingSpec] = useState(false)
+  const [specError, setSpecError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchSpec() {
-      setLoadingSpec(true);
-      setSpecError(null);
+      setLoadingSpec(true)
+      setSpecError(null)
       try {
-        const res = await fetch('/api/external/docs');
-        const data = await res.json();
-        setOpenApiSpec(data);
+        const res = await fetch('/api/external/docs')
+        const data = await res.json()
+        setOpenApiSpec(data)
       } catch (err) {
-        setSpecError('Failed to load OpenAPI spec');
+        setSpecError('Failed to load OpenAPI spec')
       } finally {
-        setLoadingSpec(false);
+        setLoadingSpec(false)
       }
     }
-    fetchSpec();
-  }, []);
+    fetchSpec()
+  }, [])
 
   const copyToClipboard = (code: string, id: string) => {
     navigator.clipboard.writeText(code)
@@ -245,16 +255,16 @@ export default function APIDocumentationPage() {
 
   const getMethodColor = (method: string) => {
     switch (method) {
-      case "GET":
-        return "bg-green-100 text-green-800"
-      case "POST":
-        return "bg-blue-100 text-blue-800"
-      case "PUT":
-        return "bg-yellow-100 text-yellow-800"
-      case "DELETE":
-        return "bg-red-100 text-red-800"
+      case 'GET':
+        return 'bg-green-100 text-green-800'
+      case 'POST':
+        return 'bg-blue-100 text-blue-800'
+      case 'PUT':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'DELETE':
+        return 'bg-red-100 text-red-800'
       default:
-        return "bg-gray-100 text-gray-800"
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
@@ -287,30 +297,40 @@ export default function APIDocumentationPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>API Overview</CardTitle>
-                  <CardDescription>RESTful API for managing assets, QR codes, and analytics</CardDescription>
+                  <CardDescription>
+                    RESTful API for managing assets, QR codes, and analytics
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="p-4 border rounded-lg text-center">
                       <Globe className="h-8 w-8 text-blue-600 mx-auto mb-2" />
                       <h4 className="font-semibold">RESTful Design</h4>
-                      <p className="text-sm text-gray-600">Standard HTTP methods and status codes</p>
+                      <p className="text-sm text-gray-600">
+                        Standard HTTP methods and status codes
+                      </p>
                     </div>
                     <div className="p-4 border rounded-lg text-center">
                       <Shield className="h-8 w-8 text-green-600 mx-auto mb-2" />
                       <h4 className="font-semibold">Secure Authentication</h4>
-                      <p className="text-sm text-gray-600">JWT-based authentication with role-based access</p>
+                      <p className="text-sm text-gray-600">
+                        JWT-based authentication with role-based access
+                      </p>
                     </div>
                     <div className="p-4 border rounded-lg text-center">
                       <Zap className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
                       <h4 className="font-semibold">Real-time Updates</h4>
-                      <p className="text-sm text-gray-600">WebSocket support for live data synchronization</p>
+                      <p className="text-sm text-gray-600">
+                        WebSocket support for live data synchronization
+                      </p>
                     </div>
                   </div>
 
                   <div>
                     <h4 className="font-semibold mb-3">Base URL</h4>
-                    <div className="bg-gray-100 p-3 rounded-lg font-mono text-sm">https://your-domain.com/api/v1</div>
+                    <div className="bg-gray-100 p-3 rounded-lg font-mono text-sm">
+                      https://your-domain.com/api/v1
+                    </div>
                   </div>
 
                   <div>
@@ -335,8 +355,8 @@ export default function APIDocumentationPage() {
                   <Alert>
                     <Key className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>API Key Required:</strong> All endpoints require authentication except for public asset
-                      viewing.
+                      <strong>API Key Required:</strong> All endpoints require authentication except
+                      for public asset viewing.
                     </AlertDescription>
                   </Alert>
                 </CardContent>
@@ -386,8 +406,8 @@ export default function APIDocumentationPage() {
                   <div>
                     <h4 className="font-semibold mb-3">JWT Token Authentication</h4>
                     <p className="text-gray-600 mb-4">
-                      The API uses JSON Web Tokens (JWT) for authentication. Include the token in the Authorization
-                      header:
+                      The API uses JSON Web Tokens (JWT) for authentication. Include the token in
+                      the Authorization header:
                     </p>
                     <div className="bg-gray-900 text-gray-100 p-4 rounded-lg">
                       <pre className="text-sm">{`Authorization: Bearer YOUR_JWT_TOKEN`}</pre>
@@ -429,8 +449,8 @@ Response:
                   <Alert>
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Token Expiry:</strong> Tokens expire after 1 hour. Implement token refresh logic in your
-                      application.
+                      <strong>Token Expiry:</strong> Tokens expire after 1 hour. Implement token
+                      refresh logic in your application.
                     </AlertDescription>
                   </Alert>
 
@@ -461,14 +481,17 @@ Response:
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <p className="text-gray-600">For server-to-server integrations, you can use API keys:</p>
+                    <p className="text-gray-600">
+                      For server-to-server integrations, you can use API keys:
+                    </p>
                     <div className="bg-gray-900 text-gray-100 p-4 rounded-lg">
                       <pre className="text-sm">{`X-API-Key: your-api-key-here`}</pre>
                     </div>
                     <Alert>
                       <Key className="h-4 w-4" />
                       <AlertDescription>
-                        API keys can be generated in your account settings and should be kept secure.
+                        API keys can be generated in your account settings and should be kept
+                        secure.
                       </AlertDescription>
                     </Alert>
                   </div>
@@ -482,7 +505,9 @@ Response:
               <Card>
                 <CardHeader>
                   <CardTitle>API Endpoints</CardTitle>
-                  <CardDescription>Complete list of available endpoints and their parameters</CardDescription>
+                  <CardDescription>
+                    Complete list of available endpoints and their parameters
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
@@ -490,8 +515,12 @@ Response:
                       <div key={index} className="border rounded-lg p-4">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center space-x-3">
-                            <Badge className={getMethodColor(endpoint.method)}>{endpoint.method}</Badge>
-                            <code className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">{endpoint.endpoint}</code>
+                            <Badge className={getMethodColor(endpoint.method)}>
+                              {endpoint.method}
+                            </Badge>
+                            <code className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
+                              {endpoint.endpoint}
+                            </code>
                           </div>
                           <Badge variant="outline">{endpoint.auth}</Badge>
                         </div>
@@ -502,9 +531,14 @@ Response:
                           <h5 className="font-medium mb-2">Parameters</h5>
                           <div className="space-y-2">
                             {endpoint.parameters.map((param, paramIndex) => (
-                              <div key={paramIndex} className="flex items-center justify-between text-sm">
+                              <div
+                                key={paramIndex}
+                                className="flex items-center justify-between text-sm"
+                              >
                                 <div className="flex items-center space-x-2">
-                                  <code className="bg-gray-100 px-2 py-1 rounded">{param.name}</code>
+                                  <code className="bg-gray-100 px-2 py-1 rounded">
+                                    {param.name}
+                                  </code>
                                   <Badge variant="outline" className="text-xs">
                                     {param.type}
                                   </Badge>
@@ -527,15 +561,17 @@ Response:
               <Card>
                 <CardHeader>
                   <CardTitle>Code Examples</CardTitle>
-                  <CardDescription>Implementation examples in different programming languages</CardDescription>
+                  <CardDescription>
+                    Implementation examples in different programming languages
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="mb-4">
                     <div className="flex space-x-2">
-                      {Object.keys(codeExamples).map((lang) => (
+                      {Object.keys(codeExamples).map(lang => (
                         <Button
                           key={lang}
-                          variant={selectedLanguage === lang ? "default" : "outline"}
+                          variant={selectedLanguage === lang ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => setSelectedLanguage(lang)}
                         >
@@ -546,12 +582,24 @@ Response:
                   </div>
 
                   <div className="space-y-6">
-                    {Object.entries(codeExamples[selectedLanguage as keyof typeof codeExamples]).map(([key, code]) => (
+                    {Object.entries(
+                      codeExamples[selectedLanguage as keyof typeof codeExamples]
+                    ).map(([key, code]) => (
                       <div key={key}>
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</h4>
-                          <Button variant="outline" size="sm" onClick={() => copyToClipboard(code, key)}>
-                            {copiedCode === key ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                          <h4 className="font-medium capitalize">
+                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                          </h4>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => copyToClipboard(code, key)}
+                          >
+                            {copiedCode === key ? (
+                              <CheckCircle className="h-4 w-4" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
                           </Button>
                         </div>
                         <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
@@ -619,16 +667,30 @@ Response:
                     <h4 className="font-semibold mb-3">Available Events</h4>
                     <div className="space-y-3">
                       {[
-                        { event: "asset.created", description: "Triggered when a new asset is created" },
-                        { event: "asset.updated", description: "Triggered when an asset is modified" },
-                        { event: "asset.deleted", description: "Triggered when an asset is deleted" },
-                        { event: "qr.generated", description: "Triggered when a QR code is generated" },
-                        { event: "qr.scanned", description: "Triggered when a QR code is scanned" },
-                        { event: "user.login", description: "Triggered when a user logs in" },
+                        {
+                          event: 'asset.created',
+                          description: 'Triggered when a new asset is created',
+                        },
+                        {
+                          event: 'asset.updated',
+                          description: 'Triggered when an asset is modified',
+                        },
+                        {
+                          event: 'asset.deleted',
+                          description: 'Triggered when an asset is deleted',
+                        },
+                        {
+                          event: 'qr.generated',
+                          description: 'Triggered when a QR code is generated',
+                        },
+                        { event: 'qr.scanned', description: 'Triggered when a QR code is scanned' },
+                        { event: 'user.login', description: 'Triggered when a user logs in' },
                       ].map((webhook, index) => (
                         <div key={index} className="p-3 border rounded-lg">
                           <div className="flex items-center justify-between">
-                            <code className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">{webhook.event}</code>
+                            <code className="text-sm font-mono bg-gray-100 px-2 py-1 rounded">
+                              {webhook.event}
+                            </code>
                             <span className="text-sm text-gray-600">{webhook.description}</span>
                           </div>
                         </div>
@@ -660,7 +722,9 @@ Response:
 
                   <div>
                     <h4 className="font-semibold mb-3">Webhook Configuration</h4>
-                    <p className="text-gray-600 mb-3">Configure webhooks in your account settings or via the API:</p>
+                    <p className="text-gray-600 mb-3">
+                      Configure webhooks in your account settings or via the API:
+                    </p>
                     <div className="bg-gray-900 text-gray-100 p-4 rounded-lg">
                       <pre className="text-sm">
                         {`POST /api/webhooks
@@ -678,8 +742,8 @@ Authorization: Bearer YOUR_TOKEN
                   <Alert>
                     <Shield className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Security:</strong> Webhook payloads are signed with HMAC-SHA256. Verify signatures to
-                      ensure authenticity.
+                      <strong>Security:</strong> Webhook payloads are signed with HMAC-SHA256.
+                      Verify signatures to ensure authenticity.
                     </AlertDescription>
                   </Alert>
                 </CardContent>
@@ -692,7 +756,9 @@ Authorization: Bearer YOUR_TOKEN
               <Card>
                 <CardHeader>
                   <CardTitle>OpenAPI / Swagger Reference</CardTitle>
-                  <CardDescription>Interactive API reference generated from the OpenAPI spec</CardDescription>
+                  <CardDescription>
+                    Interactive API reference generated from the OpenAPI spec
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="mb-4">
@@ -724,7 +790,9 @@ Authorization: Bearer YOUR_TOKEN
         <Card className="mt-8">
           <CardHeader>
             <CardTitle>SDKs and Tools</CardTitle>
-            <CardDescription>Official SDKs and tools to accelerate your integration</CardDescription>
+            <CardDescription>
+              Official SDKs and tools to accelerate your integration
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

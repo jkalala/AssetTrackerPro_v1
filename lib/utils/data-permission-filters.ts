@@ -30,17 +30,16 @@ export class DataPermissionFilter {
   // ASSET FILTERING
   // =====================================================
 
-  async filterAssets<T extends { id: string; assignee_id?: string; department?: string; created_by?: string }>(
-    assets: T[],
-    options: DataFilterOptions
-  ): Promise<FilterResult<T>> {
+  async filterAssets<
+    T extends { id: string; assignee_id?: string; department?: string; created_by?: string },
+  >(assets: T[], options: DataFilterOptions): Promise<FilterResult<T>> {
     const userPermissions = await this.permissionService.getUserPermissions(
       options.tenantId,
       options.userId
     )
 
-    const assetPermissions = userPermissions.filter(p => 
-      p.resource_type === 'asset' && p.action === options.action
+    const assetPermissions = userPermissions.filter(
+      p => p.resource_type === 'asset' && p.action === options.action
     )
 
     if (assetPermissions.length === 0) {
@@ -49,13 +48,13 @@ export class DataPermissionFilter {
         filtered: true,
         totalCount: assets.length,
         filteredCount: 0,
-        appliedFilters: ['no_permission']
+        appliedFilters: ['no_permission'],
       }
     }
 
     // Check if user has global asset permission
-    const globalPermission = assetPermissions.find(p => 
-      p.scope === 'global' || p.scope === 'tenant'
+    const globalPermission = assetPermissions.find(
+      p => p.scope === 'global' || p.scope === 'tenant'
     )
 
     if (globalPermission && !this.hasResourceFilters(globalPermission)) {
@@ -64,7 +63,7 @@ export class DataPermissionFilter {
         filtered: false,
         totalCount: assets.length,
         filteredCount: assets.length,
-        appliedFilters: []
+        appliedFilters: [],
       }
     }
 
@@ -96,15 +95,13 @@ export class DataPermissionFilter {
       filtered: filteredAssets.length < assets.length,
       totalCount: assets.length,
       filteredCount: filteredAssets.length,
-      appliedFilters
+      appliedFilters,
     }
   }
 
-  private async checkAssetAccess<T extends { id: string; assignee_id?: string; department?: string; created_by?: string }>(
-    asset: T,
-    permission: UserPermission,
-    options: DataFilterOptions
-  ): Promise<boolean> {
+  private async checkAssetAccess<
+    T extends { id: string; assignee_id?: string; department?: string; created_by?: string },
+  >(asset: T, permission: UserPermission, options: DataFilterOptions): Promise<boolean> {
     // Check scope-based access
     switch (permission.scope) {
       case 'global':
@@ -141,8 +138,8 @@ export class DataPermissionFilter {
       options.userId
     )
 
-    const userManagePermissions = userPermissions.filter(p => 
-      p.resource_type === 'user' && p.action === options.action
+    const userManagePermissions = userPermissions.filter(
+      p => p.resource_type === 'user' && p.action === options.action
     )
 
     if (userManagePermissions.length === 0) {
@@ -151,13 +148,13 @@ export class DataPermissionFilter {
         filtered: true,
         totalCount: users.length,
         filteredCount: 0,
-        appliedFilters: ['no_permission']
+        appliedFilters: ['no_permission'],
       }
     }
 
     // Check if user has global user management permission
-    const globalPermission = userManagePermissions.find(p => 
-      p.scope === 'global' || p.scope === 'tenant'
+    const globalPermission = userManagePermissions.find(
+      p => p.scope === 'global' || p.scope === 'tenant'
     )
 
     if (globalPermission && !this.hasResourceFilters(globalPermission)) {
@@ -166,7 +163,7 @@ export class DataPermissionFilter {
         filtered: false,
         totalCount: users.length,
         filteredCount: users.length,
-        appliedFilters: []
+        appliedFilters: [],
       }
     }
 
@@ -200,7 +197,7 @@ export class DataPermissionFilter {
       filtered: filteredUsers.length < users.length,
       totalCount: users.length,
       filteredCount: filteredUsers.length,
-      appliedFilters
+      appliedFilters,
     }
   }
 
@@ -232,17 +229,16 @@ export class DataPermissionFilter {
   // REPORT FILTERING
   // =====================================================
 
-  async filterReports<T extends { id: string; created_by: string; is_public?: boolean; department?: string }>(
-    reports: T[],
-    options: DataFilterOptions
-  ): Promise<FilterResult<T>> {
+  async filterReports<
+    T extends { id: string; created_by: string; is_public?: boolean; department?: string },
+  >(reports: T[], options: DataFilterOptions): Promise<FilterResult<T>> {
     const userPermissions = await this.permissionService.getUserPermissions(
       options.tenantId,
       options.userId
     )
 
-    const reportPermissions = userPermissions.filter(p => 
-      p.resource_type === 'report' && p.action === options.action
+    const reportPermissions = userPermissions.filter(
+      p => p.resource_type === 'report' && p.action === options.action
     )
 
     if (reportPermissions.length === 0) {
@@ -251,7 +247,7 @@ export class DataPermissionFilter {
         filtered: true,
         totalCount: reports.length,
         filteredCount: 0,
-        appliedFilters: ['no_permission']
+        appliedFilters: ['no_permission'],
       }
     }
 
@@ -269,7 +265,9 @@ export class DataPermissionFilter {
       } else {
         // Check permission-based access
         for (const permission of reportPermissions) {
-          if (await this.checkReportAccess(report, permission, options, userDepartment || undefined)) {
+          if (
+            await this.checkReportAccess(report, permission, options, userDepartment || undefined)
+          ) {
             hasAccess = true
             break
           }
@@ -290,11 +288,13 @@ export class DataPermissionFilter {
       filtered: filteredReports.length < reports.length,
       totalCount: reports.length,
       filteredCount: filteredReports.length,
-      appliedFilters
+      appliedFilters,
     }
   }
 
-  private async checkReportAccess<T extends { id: string; created_by: string; is_public?: boolean; department?: string }>(
+  private async checkReportAccess<
+    T extends { id: string; created_by: string; is_public?: boolean; department?: string },
+  >(
     report: T,
     permission: UserPermission,
     options: DataFilterOptions,
@@ -320,17 +320,14 @@ export class DataPermissionFilter {
   // DATABASE QUERY FILTERING
   // =====================================================
 
-  async buildAssetQuery(
-    baseQuery: any,
-    options: DataFilterOptions
-  ): Promise<any> {
+  async buildAssetQuery(baseQuery: any, options: DataFilterOptions): Promise<any> {
     const userPermissions = await this.permissionService.getUserPermissions(
       options.tenantId,
       options.userId
     )
 
-    const assetPermissions = userPermissions.filter(p => 
-      p.resource_type === 'asset' && p.action === options.action
+    const assetPermissions = userPermissions.filter(
+      p => p.resource_type === 'asset' && p.action === options.action
     )
 
     if (assetPermissions.length === 0) {
@@ -339,8 +336,8 @@ export class DataPermissionFilter {
     }
 
     // Check if user has global permission
-    const globalPermission = assetPermissions.find(p => 
-      p.scope === 'global' || p.scope === 'tenant'
+    const globalPermission = assetPermissions.find(
+      p => p.scope === 'global' || p.scope === 'tenant'
     )
 
     if (globalPermission && !this.hasResourceFilters(globalPermission)) {
@@ -353,12 +350,13 @@ export class DataPermissionFilter {
 
     for (const permission of assetPermissions) {
       switch (permission.scope) {
-        case 'department':
+        case 'department': {
           const userDepartment = await this.getUserDepartment(options.tenantId, options.userId)
           if (userDepartment) {
             conditions.push(`department.eq.${userDepartment}`)
           }
           break
+        }
 
         case 'personal':
           conditions.push(`assignee_id.eq.${options.userId}`)
@@ -375,25 +373,22 @@ export class DataPermissionFilter {
     return baseQuery
   }
 
-  async buildUserQuery(
-    baseQuery: any,
-    options: DataFilterOptions
-  ): Promise<any> {
+  async buildUserQuery(baseQuery: any, options: DataFilterOptions): Promise<any> {
     const userPermissions = await this.permissionService.getUserPermissions(
       options.tenantId,
       options.userId
     )
 
-    const userManagePermissions = userPermissions.filter(p => 
-      p.resource_type === 'user' && p.action === options.action
+    const userManagePermissions = userPermissions.filter(
+      p => p.resource_type === 'user' && p.action === options.action
     )
 
     if (userManagePermissions.length === 0) {
       return baseQuery.eq('id', 'no-access')
     }
 
-    const globalPermission = userManagePermissions.find(p => 
-      p.scope === 'global' || p.scope === 'tenant'
+    const globalPermission = userManagePermissions.find(
+      p => p.scope === 'global' || p.scope === 'tenant'
     )
 
     if (globalPermission && !this.hasResourceFilters(globalPermission)) {
@@ -404,12 +399,13 @@ export class DataPermissionFilter {
 
     for (const permission of userManagePermissions) {
       switch (permission.scope) {
-        case 'department':
+        case 'department': {
           const userDepartment = await this.getUserDepartment(options.tenantId, options.userId)
           if (userDepartment) {
             conditions.push(`department.eq.${userDepartment}`)
           }
           break
+        }
 
         case 'personal':
           conditions.push(`id.eq.${options.userId}`)
@@ -429,8 +425,7 @@ export class DataPermissionFilter {
   // =====================================================
 
   private hasResourceFilters(permission: UserPermission): boolean {
-    return permission.resource_filters && 
-           Object.keys(permission.resource_filters).length > 0
+    return permission.resource_filters && Object.keys(permission.resource_filters).length > 0
   }
 
   private async getUserDepartment(tenantId: string, userId: string): Promise<string | null> {
@@ -462,10 +457,12 @@ export class DataPermissionFilter {
       action: string
     }>,
     options: Omit<DataFilterOptions, 'resourceType' | 'action'>
-  ): Promise<Array<{
-    type: string
-    result: FilterResult<T>
-  }>> {
+  ): Promise<
+    Array<{
+      type: string
+      result: FilterResult<T>
+    }>
+  > {
     const results = []
 
     for (const resource of resources) {
@@ -473,27 +470,27 @@ export class DataPermissionFilter {
 
       switch (resource.type) {
         case 'asset':
-          result = await this.filterAssets(resource.data as any, {
+          result = (await this.filterAssets(resource.data as any, {
             ...options,
             resourceType: resource.type,
-            action: resource.action
-          }) as FilterResult<T>
+            action: resource.action,
+          })) as FilterResult<T>
           break
 
         case 'user':
-          result = await this.filterUsers(resource.data as any, {
+          result = (await this.filterUsers(resource.data as any, {
             ...options,
             resourceType: resource.type,
-            action: resource.action
-          }) as FilterResult<T>
+            action: resource.action,
+          })) as FilterResult<T>
           break
 
         case 'report':
-          result = await this.filterReports(resource.data as any, {
+          result = (await this.filterReports(resource.data as any, {
             ...options,
             resourceType: resource.type,
-            action: resource.action
-          }) as FilterResult<T>
+            action: resource.action,
+          })) as FilterResult<T>
           break
 
         default:
@@ -502,13 +499,13 @@ export class DataPermissionFilter {
             filtered: false,
             totalCount: resource.data.length,
             filteredCount: resource.data.length,
-            appliedFilters: []
+            appliedFilters: [],
           }
       }
 
       results.push({
         type: resource.type,
-        result
+        result,
       })
     }
 
@@ -526,7 +523,9 @@ export const globalDataFilter = new DataPermissionFilter()
 // CONVENIENCE FUNCTIONS
 // =====================================================
 
-export async function filterAssetsByPermissions<T extends { id: string; assignee_id?: string; department?: string; created_by?: string }>(
+export async function filterAssetsByPermissions<
+  T extends { id: string; assignee_id?: string; department?: string; created_by?: string },
+>(
   assets: T[],
   tenantId: string,
   userId: string,
@@ -536,21 +535,18 @@ export async function filterAssetsByPermissions<T extends { id: string; assignee
     tenantId,
     userId,
     resourceType: 'asset',
-    action
+    action,
   })
 }
 
-export async function filterUsersByPermissions<T extends { id: string; tenant_id: string; department?: string }>(
-  users: T[],
-  tenantId: string,
-  userId: string,
-  action: string = 'read'
-): Promise<FilterResult<T>> {
+export async function filterUsersByPermissions<
+  T extends { id: string; tenant_id: string; department?: string },
+>(users: T[], tenantId: string, userId: string, action: string = 'read'): Promise<FilterResult<T>> {
   return globalDataFilter.filterUsers(users, {
     tenantId,
     userId,
     resourceType: 'user',
-    action
+    action,
   })
 }
 

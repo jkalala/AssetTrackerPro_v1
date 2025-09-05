@@ -26,7 +26,7 @@ export function RoleAnalytics({ tenantId, roles }: RoleAnalyticsProps) {
             <div className="text-2xl font-bold">{totalRoles}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Active Roles</CardTitle>
@@ -35,7 +35,7 @@ export function RoleAnalytics({ tenantId, roles }: RoleAnalyticsProps) {
             <div className="text-2xl font-bold">{activeRoles}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">System Roles</CardTitle>
@@ -52,20 +52,16 @@ export function RoleAnalytics({ tenantId, roles }: RoleAnalyticsProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {roles.map((role) => (
+            {roles.map(role => (
               <div key={role.id} className="flex items-center justify-between p-2 border rounded">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{role.display_name || role.name}</span>
                   <Badge variant={role.is_active ? 'default' : 'secondary'}>
                     {role.is_active ? 'Active' : 'Inactive'}
                   </Badge>
-                  {role.is_system_role && (
-                    <Badge variant="outline">System</Badge>
-                  )}
+                  {role.is_system_role && <Badge variant="outline">System</Badge>}
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  Level {role.level}
-                </div>
+                <div className="text-sm text-muted-foreground">Level {role.level}</div>
               </div>
             ))}
           </div>

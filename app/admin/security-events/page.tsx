@@ -4,9 +4,22 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/components/auth/auth-provider'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Shield, AlertTriangle, CheckCircle, XCircle } from 'lucide-react'
 import { SecurityEvent } from '@/lib/types/database'
@@ -43,7 +56,7 @@ export default function SecurityEventsPage() {
     'api_key_created',
     'api_key_revoked',
     'session_terminated',
-    'concurrent_session_limit'
+    'concurrent_session_limit',
   ]
 
   const severityLevels = ['all', 'low', 'medium', 'high', 'critical']
@@ -56,7 +69,7 @@ export default function SecurityEventsPage() {
 
         const params = new URLSearchParams({
           page: page.toString(),
-          limit: '50'
+          limit: '50',
         })
 
         if (eventTypeFilter !== 'all') {
@@ -68,7 +81,7 @@ export default function SecurityEventsPage() {
         }
 
         const response = await fetch(`/api/admin/security-events?${params}`)
-        
+
         if (!response.ok) {
           if (response.status === 403) {
             throw new Error('Access denied. Admin privileges required.')
@@ -77,7 +90,7 @@ export default function SecurityEventsPage() {
         }
 
         const data = await response.json()
-        
+
         if (data.success) {
           setEvents(data.data)
           setTotalPages(data.pagination.totalPages)
@@ -133,9 +146,10 @@ export default function SecurityEventsPage() {
   }
 
   const formatEventType = (eventType: string) => {
-    return eventType.split('_').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ')
+    return eventType
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
   }
 
   const formatDate = (dateString: string) => {
@@ -213,15 +227,12 @@ export default function SecurityEventsPage() {
               <label htmlFor="eventType" className="block text-sm font-medium mb-2">
                 Event Type
               </label>
-              <Select
-                value={eventTypeFilter}
-                onValueChange={setEventTypeFilter}
-              >
+              <Select value={eventTypeFilter} onValueChange={setEventTypeFilter}>
                 <SelectTrigger name="eventType">
                   <SelectValue placeholder="Select event type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {eventTypes.map((type) => (
+                  {eventTypes.map(type => (
                     <SelectItem key={type} value={type}>
                       {type === 'all' ? 'All Events' : formatEventType(type)}
                     </SelectItem>
@@ -234,17 +245,16 @@ export default function SecurityEventsPage() {
               <label htmlFor="severity" className="block text-sm font-medium mb-2">
                 Severity
               </label>
-              <Select
-                value={severityFilter}
-                onValueChange={setSeverityFilter}
-              >
+              <Select value={severityFilter} onValueChange={setSeverityFilter}>
                 <SelectTrigger name="severity">
                   <SelectValue placeholder="Select severity" />
                 </SelectTrigger>
                 <SelectContent>
-                  {severityLevels.map((level) => (
+                  {severityLevels.map(level => (
                     <SelectItem key={level} value={level}>
-                      {level === 'all' ? 'All Severities' : level.charAt(0).toUpperCase() + level.slice(1)}
+                      {level === 'all'
+                        ? 'All Severities'
+                        : level.charAt(0).toUpperCase() + level.slice(1)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -261,9 +271,7 @@ export default function SecurityEventsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Security Events</CardTitle>
-          <CardDescription>
-            {events.length} events found
-          </CardDescription>
+          <CardDescription>{events.length} events found</CardDescription>
         </CardHeader>
         <CardContent>
           {events.length === 0 ? (
@@ -286,18 +294,15 @@ export default function SecurityEventsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {events.map((event) => (
+                  {events.map(event => (
                     <TableRow key={event.id}>
                       <TableCell>
-                        <Badge 
-                          variant="outline" 
-                          data-testid={`event-type-${event.event_type}`}
-                        >
+                        <Badge variant="outline" data-testid={`event-type-${event.event_type}`}>
                           {formatEventType(event.event_type)}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge 
+                        <Badge
                           variant={getSeverityColor(event.severity)}
                           className="flex items-center gap-1 w-fit"
                         >
@@ -308,15 +313,11 @@ export default function SecurityEventsPage() {
                       <TableCell>
                         {event.profiles?.full_name || event.profiles?.email || 'System'}
                       </TableCell>
-                      <TableCell className="max-w-xs truncate">
-                        {event.description}
-                      </TableCell>
+                      <TableCell className="max-w-xs truncate">{event.description}</TableCell>
                       <TableCell className="font-mono text-sm">
                         {event.ip_address || 'N/A'}
                       </TableCell>
-                      <TableCell className="text-sm">
-                        {formatDate(event.created_at)}
-                      </TableCell>
+                      <TableCell className="text-sm">{formatDate(event.created_at)}</TableCell>
                       <TableCell>
                         <Badge variant={event.is_resolved ? 'default' : 'secondary'}>
                           {event.is_resolved ? 'Resolved' : 'Open'}

@@ -3,13 +3,7 @@
 // =====================================================
 // TypeScript types that match the enhanced database schema
 
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 // =====================================================
 // ENUM TYPES
@@ -17,14 +11,40 @@ export type Json =
 
 export type TenantStatus = 'active' | 'suspended' | 'trial' | 'cancelled'
 export type SubscriptionPlan = 'starter' | 'professional' | 'enterprise' | 'custom'
-export type AssetStatus = 'active' | 'maintenance' | 'retired' | 'lost' | 'damaged' | 'disposed' | 'reserved'
-export type DepreciationMethod = 'straight_line' | 'declining_balance' | 'sum_of_years' | 'units_of_production'
-export type IoTDeviceType = 'gps_tracker' | 'temperature_sensor' | 'humidity_sensor' | 'vibration_sensor' | 'rfid_reader' | 'beacon'
+export type AssetStatus =
+  | 'active'
+  | 'maintenance'
+  | 'retired'
+  | 'lost'
+  | 'damaged'
+  | 'disposed'
+  | 'reserved'
+export type DepreciationMethod =
+  | 'straight_line'
+  | 'declining_balance'
+  | 'sum_of_years'
+  | 'units_of_production'
+export type IoTDeviceType =
+  | 'gps_tracker'
+  | 'temperature_sensor'
+  | 'humidity_sensor'
+  | 'vibration_sensor'
+  | 'rfid_reader'
+  | 'beacon'
 export type IoTProtocol = 'mqtt' | 'lorawan' | 'sigfox' | 'wifi' | 'bluetooth' | 'cellular'
 export type DeviceStatus = 'active' | 'inactive' | 'maintenance' | 'error'
 export type GeofenceEventType = 'entry' | 'exit' | 'dwell'
 export type GeofenceStatus = 'active' | 'inactive' | 'draft'
-export type AuditAction = 'create' | 'update' | 'delete' | 'login' | 'logout' | 'export' | 'import' | 'assign' | 'transfer'
+export type AuditAction =
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'login'
+  | 'logout'
+  | 'export'
+  | 'import'
+  | 'assign'
+  | 'transfer'
 export type UserRole = 'owner' | 'admin' | 'manager' | 'user' | 'viewer'
 export type MaintenanceType = 'preventive' | 'corrective' | 'predictive'
 export type MaintenancePriority = 'low' | 'medium' | 'high' | 'critical'
@@ -300,7 +320,12 @@ export interface UserSession {
   created_at: string
   expires_at: string
   terminated_at?: string
-  termination_reason?: 'logout' | 'timeout' | 'admin_revoke' | 'security_revoke' | 'concurrent_limit'
+  termination_reason?:
+    | 'logout'
+    | 'timeout'
+    | 'admin_revoke'
+    | 'security_revoke'
+    | 'concurrent_limit'
 }
 
 export interface UserSessionInsert {
@@ -400,10 +425,19 @@ export interface SecurityEvent {
   tenant_id: string
   user_id?: string
   session_id?: string
-  event_type: 'login_success' | 'login_failure' | 'mfa_success' | 'mfa_failure' | 
-             'password_change' | 'account_locked' | 'account_unlocked' |
-             'suspicious_activity' | 'api_key_created' | 'api_key_revoked' |
-             'session_terminated' | 'concurrent_session_limit'
+  event_type:
+    | 'login_success'
+    | 'login_failure'
+    | 'mfa_success'
+    | 'mfa_failure'
+    | 'password_change'
+    | 'account_locked'
+    | 'account_unlocked'
+    | 'suspicious_activity'
+    | 'api_key_created'
+    | 'api_key_revoked'
+    | 'session_terminated'
+    | 'concurrent_session_limit'
   severity: 'low' | 'medium' | 'high' | 'critical'
   description: string
   details: Record<string, any>

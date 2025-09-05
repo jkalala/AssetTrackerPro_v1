@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="71" failures="8" errors="0" time="5.621">
+  <testsuite name="MFA Setup Modal Component - Unit Tests" errors="0" failures="0" skipped="0" timestamp="2025-09-05T10:15:40" time="1.542" tests="17">
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Modal Rendering and Test IDs" name="should have correct test IDs for E2E testing" time="0.005">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Modal Rendering and Test IDs" name="should render modal title correctly" time="0">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Modal Rendering and Test IDs" name="should handle modal visibility states" time="0.001">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › QR Code and Secret Display" name="should display QR code with correct format" time="0">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › QR Code and Secret Display" name="should display manual secret with correct format" time="0.001">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › QR Code and Secret Display" name="should generate backup codes with correct format" time="0.003">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Verification Code Input and Validation" name="should validate verification code format" time="0.002">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Verification Code Input and Validation" name="should handle verification code input changes" time="0.001">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Verification Code Input and Validation" name="should enable/disable verify button based on code validity" time="0.008">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Error Handling and Loading States" name="should handle setup errors gracefully" time="0.001">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Error Handling and Loading States" name="should handle verification errors gracefully" time="0">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Error Handling and Loading States" name="should show appropriate loading states" time="0.001">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Modal Interaction and Callbacks" name="should handle modal close callback" time="0">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Modal Interaction and Callbacks" name="should handle success callback" time="0.002">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Modal Interaction and Callbacks" name="should handle modal visibility" time="0.002">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Component Props Validation" name="should validate required props" time="0.002">
+    </testcase>
+    <testcase classname="MFA Setup Modal Component - Unit Tests › Component Props Validation" name="should handle optional props" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="DepartmentService" errors="0" failures="6" skipped="0" timestamp="2025-09-05T10:15:40" time="2.676" tests="20">
+    <testcase classname="DepartmentService › createDepartment" name="should create a new department successfully" time="0.031">
+    </testcase>
+    <testcase classname="DepartmentService › createDepartment" name="should throw error if department name already exists" time="0.024">
+    </testcase>
+    <testcase classname="DepartmentService › createDepartment" name="should validate parent department exists" time="0.001">
+    </testcase>
+    <testcase classname="DepartmentService › updateDepartment" name="should update a department successfully" time="0.001">
+    </testcase>
+    <testcase classname="DepartmentService › updateDepartment" name="should validate name uniqueness when updating" time="0.001">
+    </testcase>
+    <testcase classname="DepartmentService › deleteDepartment" name="should delete a department successfully" time="0.001">
+      <failure>TypeError: supabase.from(...).delete(...).eq is not a function
+    at DepartmentService.eq [as deleteDepartment] (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\lib\services\department-service.ts:238:10)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at Object.&lt;anonymous&gt; (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\__tests__\lib\services\department-delegation.test.ts:216:22)</failure>
+    </testcase>
+    <testcase classname="DepartmentService › deleteDepartment" name="should throw error when department has assigned users" time="0.001">
+    </testcase>
+    <testcase classname="DepartmentService › assignUserToDepartment" name="should assign user to department successfully" time="0.006">
+    </testcase>
+    <testcase classname="DepartmentService › assignUserToDepartment" name="should throw error if department not found" time="0.002">
+    </testcase>
+    <testcase classname="DepartmentService › getDepartmentHierarchy" name="should build department hierarchy correctly" time="0.001">
+      <failure>TypeError: supabase.from(...).select(...).eq is not a function
+    at DepartmentService.eq [as getDepartmentHierarchy] (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\lib\services\department-service.ts:358:10)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at Object.&lt;anonymous&gt; (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\__tests__\lib\services\department-delegation.test.ts:337:22)</failure>
+    </testcase>
+    <testcase classname="DelegationService › createDelegation" name="should create a delegation successfully" time="0.001">
+      <failure>TypeError: supabase.from(...).select(...).eq is not a function
+    at DelegationService.eq [as createDelegation] (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\lib\services\delegation-service.ts:37:10)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at Object.&lt;anonymous&gt; (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\__tests__\lib\services\department-delegation.test.ts:419:22)</failure>
+    </testcase>
+    <testcase classname="DelegationService › createDelegation" name="should throw error if delegatee not found" time="0.001">
+    </testcase>
+    <testcase classname="DelegationService › createDelegation" name="should validate expiration date" time="0.001">
+    </testcase>
+    <testcase classname="DelegationService › revokeDelegation" name="should revoke delegation successfully" time="0">
+      <failure>TypeError: supabase.from(...).update(...).eq is not a function
+    at DelegationService.eq [as revokeDelegation] (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\lib\services\delegation-service.ts:219:10)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at Object.&lt;anonymous&gt; (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\__tests__\lib\services\department-delegation.test.ts:487:22)</failure>
+    </testcase>
+    <testcase classname="DelegationService › revokeDelegation" name="should throw error if user is not the delegator" time="0">
+    </testcase>
+    <testcase classname="DelegationService › createGuestAccess" name="should create guest access successfully" time="0.004">
+    </testcase>
+    <testcase classname="DelegationService › createGuestAccess" name="should validate email format" time="0.001">
+    </testcase>
+    <testcase classname="DelegationService › createGuestAccess" name="should throw error if active guest access already exists" time="0.001">
+    </testcase>
+    <testcase classname="DelegationService › cleanupExpiredDelegations" name="should cleanup expired delegations" time="0.001">
+      <failure>TypeError: supabase.from(...).update(...).eq is not a function
+    at DelegationService.eq [as cleanupExpiredDelegations] (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\lib\services\delegation-service.ts:584:10)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at Object.&lt;anonymous&gt; (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\__tests__\lib\services\department-delegation.test.ts:598:22)</failure>
+    </testcase>
+    <testcase classname="DelegationService › getDelegationStats" name="should return delegation statistics" time="0.001">
+      <failure>TypeError: supabase.from(...).select(...).eq is not a function
+    at DelegationService.eq [as getDelegationStats] (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\lib\services\delegation-service.ts:697:10)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at Object.&lt;anonymous&gt; (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\__tests__\lib\services\department-delegation.test.ts:626:22)</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="RoleValidationMiddleware" errors="0" failures="0" skipped="0" timestamp="2025-09-05T10:15:40" time="2.73" tests="16">
+    <testcase classname="RoleValidationMiddleware › validateApiRoute" name="should validate permissions successfully" time="0.009">
+    </testcase>
+    <testcase classname="RoleValidationMiddleware › validateApiRoute" name="should deny access when user lacks permissions" time="0.004">
+    </testcase>
+    <testcase classname="RoleValidationMiddleware › validateApiRoute" name="should handle unauthenticated users" time="0.002">
+    </testcase>
+    <testcase classname="RoleValidationMiddleware › validateApiRoute" name="should handle OR logic for multiple permissions" time="0.002">
+    </testcase>
+    <testcase classname="RoleValidationMiddleware › validateApiRoute" name="should handle AND logic for multiple permissions" time="0.002">
+    </testcase>
+    <testcase classname="RoleValidationMiddleware › resource extraction" name="should extract resource ID from URL" time="0.004">
+    </testcase>
+    <testcase classname="PermissionCache" name="should cache and retrieve user permissions" time="0.003">
+    </testcase>
+    <testcase classname="PermissionCache" name="should cache and retrieve permission checks" time="0.002">
+    </testcase>
+    <testcase classname="PermissionCache" name="should handle cache expiration" time="0.024">
+    </testcase>
+    <testcase classname="PermissionCache" name="should invalidate user cache" time="0.001">
+    </testcase>
+    <testcase classname="PermissionCache" name="should provide cache statistics" time="0.001">
+    </testcase>
+    <testcase classname="DataPermissionFilter › filterAssets" name="should return all assets for users with global permission" time="0.001">
+    </testcase>
+    <testcase classname="DataPermissionFilter › filterAssets" name="should filter assets for users with personal scope" time="0.003">
+    </testcase>
+    <testcase classname="DataPermissionFilter › filterAssets" name="should return empty array for users with no permissions" time="0.003">
+    </testcase>
+    <testcase classname="DataPermissionFilter › filterUsers" name="should filter users by department scope" time="0.003">
+    </testcase>
+    <testcase classname="convenience functions" name="should filter assets by permissions" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="RoleService" errors="0" failures="2" skipped="0" timestamp="2025-09-05T10:15:40" time="2.758" tests="18">
+    <testcase classname="RoleService › createRole" name="should create a new role successfully" time="0.013">
+    </testcase>
+    <testcase classname="RoleService › createRole" name="should throw error if role name already exists" time="0.027">
+    </testcase>
+    <testcase classname="RoleService › updateRole" name="should update a role successfully" time="0.002">
+    </testcase>
+    <testcase classname="RoleService › updateRole" name="should throw error when trying to update system role" time="0.001">
+    </testcase>
+    <testcase classname="RoleService › deleteRole" name="should delete a role successfully" time="0.001">
+      <failure>TypeError: supabase.from(...).delete(...).eq is not a function
+    at RoleService.eq [as deleteRole] (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\lib\services\role-service.ts:206:10)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at Object.&lt;anonymous&gt; (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\__tests__\lib\services\role-service.test.ts:193:22)</failure>
+    </testcase>
+    <testcase classname="RoleService › deleteRole" name="should throw error when trying to delete system role" time="0">
+    </testcase>
+    <testcase classname="RoleService › deleteRole" name="should throw error when role has active users" time="0.001">
+    </testcase>
+    <testcase classname="RoleService › assignRoleToUser" name="should assign role to user successfully" time="0.001">
+    </testcase>
+    <testcase classname="RoleService › assignRoleToUser" name="should throw error if role not found" time="0.001">
+    </testcase>
+    <testcase classname="RoleService › revokeRoleFromUser" name="should revoke role from user successfully" time="0.001">
+    </testcase>
+    <testcase classname="RoleService › getRoles" name="should get all active roles for tenant" time="0.001">
+      <failure>TypeError: supabase.from(...).select(...).eq(...).order(...).order is not a function
+    at RoleService.order [as getRoles] (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\lib\services\role-service.ts:289:10)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at Object.&lt;anonymous&gt; (C:\Users\joaqu\Desktop\AssetTrackerPro_v1\__tests__\lib\services\role-service.test.ts:356:22)</failure>
+    </testcase>
+    <testcase classname="RoleService › getRoles" name="should include inactive roles when requested" time="0.001">
+    </testcase>
+    <testcase classname="RoleService › getUserRoles" name="should get all roles for a user" time="0.001">
+    </testcase>
+    <testcase classname="PermissionService › checkPermission" name="should grant permission when user has it" time="0.005">
+    </testcase>
+    <testcase classname="PermissionService › checkPermission" name="should deny permission when user does not have it" time="0.001">
+    </testcase>
+    <testcase classname="PermissionService › hasPermission" name="should return true when user has permission" time="0">
+    </testcase>
+    <testcase classname="PermissionService › hasPermission" name="should return false when user does not have permission" time="0">
+    </testcase>
+    <testcase classname="PermissionService › getUserPermissions" name="should return all user permissions including inherited" time="0.001">
+    </testcase>
+  </testsuite>
+</testsuites>

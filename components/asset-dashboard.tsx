@@ -1,16 +1,39 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Package, AlertCircle, CheckCircle, Clock, Search, Plus, AlertTriangle, Edit, Trash2 } from "lucide-react"
-import Link from "next/link"
-import { Input } from "@/components/ui/input"
-import { useToast } from "@/components/ui/use-toast"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import {
+  Package,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Search,
+  Plus,
+  AlertTriangle,
+  Edit,
+  Trash2,
+} from 'lucide-react'
+import Link from 'next/link'
+import { Input } from '@/components/ui/input'
+import { useToast } from '@/components/ui/use-toast'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import AssetGeofenceEvents from './asset-geofence-events'
 
 export default function AssetDashboard() {
@@ -24,29 +47,35 @@ export default function AssetDashboard() {
     retired: 0,
   })
 
-  const { toast } = useToast();
+  const { toast } = useToast()
   // Predictive Maintenance State
-  const [selectedAssetId, setSelectedAssetId] = useState<string>("");
-  const [prediction, setPrediction] = useState<null | { will_fail_soon: boolean; probability: number }>(null);
-  const [predicting, setPredicting] = useState(false);
-  const [anomalyResults, setAnomalyResults] = useState<null | number[]>(null);
-  const [anomalyLoading, setAnomalyLoading] = useState(false);
-  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; asset: any | null }>({ open: false, asset: null });
+  const [selectedAssetId, setSelectedAssetId] = useState<string>('')
+  const [prediction, setPrediction] = useState<null | {
+    will_fail_soon: boolean
+    probability: number
+  }>(null)
+  const [predicting, setPredicting] = useState(false)
+  const [anomalyResults, setAnomalyResults] = useState<null | number[]>(null)
+  const [anomalyLoading, setAnomalyLoading] = useState(false)
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; asset: any | null }>({
+    open: false,
+    asset: null,
+  })
 
   useEffect(() => {
     const fetchAssets = async () => {
       try {
         setError(null)
-        console.log("AssetDashboard: Fetching assets")
+        console.log('AssetDashboard: Fetching assets')
 
         // Create client with explicit error handling
         let supabase
         try {
           supabase = createClient()
-          console.log("AssetDashboard: Supabase client created successfully")
+          console.log('AssetDashboard: Supabase client created successfully')
         } catch (err) {
-          console.error("AssetDashboard: Error creating Supabase client:", err)
-          setError("Failed to initialize database connection")
+          console.error('AssetDashboard: Error creating Supabase client:', err)
+          setError('Failed to initialize database connection')
           setLoading(false)
           return
         }
@@ -54,9 +83,9 @@ export default function AssetDashboard() {
         // Fetch assets with error handling
         try {
           const { data, error } = await supabase
-            .from("assets")
-            .select("*")
-            .order("created_at", { ascending: false })
+            .from('assets')
+            .select('*')
+            .order('created_at', { ascending: false })
             .limit(5)
 
           if (error) throw error
@@ -65,9 +94,11 @@ export default function AssetDashboard() {
 
           // Calculate stats
           if (data) {
-            const activeAssets = data.filter((asset: any) => asset.status === "active").length
-            const maintenanceAssets = data.filter((asset: any) => asset.status === "maintenance").length
-            const retiredAssets = data.filter((asset: any) => asset.status === "retired").length
+            const activeAssets = data.filter((asset: any) => asset.status === 'active').length
+            const maintenanceAssets = data.filter(
+              (asset: any) => asset.status === 'maintenance'
+            ).length
+            const retiredAssets = data.filter((asset: any) => asset.status === 'retired').length
 
             setStats({
               total: data.length,
@@ -77,12 +108,12 @@ export default function AssetDashboard() {
             })
           }
         } catch (error) {
-          console.error("Error fetching assets:", error)
-          setError("Failed to load assets")
+          console.error('Error fetching assets:', error)
+          setError('Failed to load assets')
         }
       } catch (error) {
-        console.error("Error in fetchAssets:", error)
-        setError("An unexpected error occurred")
+        console.error('Error in fetchAssets:', error)
+        setError('An unexpected error occurred')
       } finally {
         setLoading(false)
       }
@@ -93,99 +124,120 @@ export default function AssetDashboard() {
 
   // Helper to get asset features by id
   const getAssetFeatures = (id: string) => {
-    const asset = assets.find((a) => a.id === id);
-    if (!asset) return null;
+    const asset = assets.find(a => a.id === id)
+    if (!asset) return null
     return {
       usage_hours: asset.usage_hours || 0,
       last_maintenance_days: asset.last_maintenance_days || 0,
       failures: asset.failures || 0,
       age_years: asset.age_years || 0,
-    };
-  };
+    }
+  }
 
   const handlePredict = async () => {
-    if (!selectedAssetId) return;
-    const features = getAssetFeatures(selectedAssetId);
+    if (!selectedAssetId) return
+    const features = getAssetFeatures(selectedAssetId)
     if (!features) {
-      toast({ title: "Asset data missing", description: "Cannot find features for selected asset.", variant: "destructive" });
-      return;
+      toast({
+        title: 'Asset data missing',
+        description: 'Cannot find features for selected asset.',
+        variant: 'destructive',
+      })
+      return
     }
-    setPredicting(true);
-    setPrediction(null);
+    setPredicting(true)
+    setPrediction(null)
     try {
-      const res = await fetch("/api/ml/predict-maintenance", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/ml/predict-maintenance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(features),
-      });
-      const data = await res.json();
-      setPrediction(data);
+      })
+      const data = await res.json()
+      setPrediction(data)
     } catch (err) {
-      toast({ title: "Prediction failed", description: String(err), variant: "destructive" });
+      toast({ title: 'Prediction failed', description: String(err), variant: 'destructive' })
     } finally {
-      setPredicting(false);
+      setPredicting(false)
     }
-  };
+  }
 
   const handleAnomalyDetection = async () => {
-    setAnomalyLoading(true);
-    setAnomalyResults(null);
+    setAnomalyLoading(true)
+    setAnomalyResults(null)
     try {
-      const featuresList = assets.map((asset) => [
+      const featuresList = assets.map(asset => [
         asset.usage_hours || 0,
         asset.last_maintenance_days || 0,
         asset.failures || 0,
         asset.age_years || 0,
-      ]);
-      const res = await fetch("/api/ml/anomaly-insights", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      ])
+      const res = await fetch('/api/ml/anomaly-insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ features_list: featuresList }),
-      });
-      const data = await res.json();
-      setAnomalyResults(data.anomalies);
+      })
+      const data = await res.json()
+      setAnomalyResults(data.anomalies)
     } catch (err) {
-      toast({ title: "Anomaly detection failed", description: String(err), variant: "destructive" });
+      toast({ title: 'Anomaly detection failed', description: String(err), variant: 'destructive' })
     } finally {
-      setAnomalyLoading(false);
+      setAnomalyLoading(false)
     }
-  };
+  }
 
   const handleDelete = async (asset: any) => {
-    setDeleteDialog({ open: false, asset: null });
+    setDeleteDialog({ open: false, asset: null })
     try {
-      const res = await fetch(`/api/assets/${asset.id}`, { method: "DELETE" });
-      const data = await res.json();
+      const res = await fetch(`/api/assets/${asset.id}`, { method: 'DELETE' })
+      const data = await res.json()
       if (!res.ok) {
-        toast({ title: "Delete Failed", description: data.error || "Failed to delete asset", variant: "destructive" });
+        toast({
+          title: 'Delete Failed',
+          description: data.error || 'Failed to delete asset',
+          variant: 'destructive',
+        })
       } else {
-        toast({ title: "Asset Deleted", description: `${asset.name} has been deleted.` });
-        setAssets((prev) => prev.filter((a) => a.id !== asset.id));
+        toast({ title: 'Asset Deleted', description: `${asset.name} has been deleted.` })
+        setAssets(prev => prev.filter(a => a.id !== asset.id))
       }
     } catch (e) {
-      toast({ title: "Delete Failed", description: "An unexpected error occurred", variant: "destructive" });
+      toast({
+        title: 'Delete Failed',
+        description: 'An unexpected error occurred',
+        variant: 'destructive',
+      })
     }
-  };
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "active":
+      case 'active':
         return (
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1">
+          <Badge
+            variant="outline"
+            className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1"
+          >
             <CheckCircle className="h-3 w-3" />
             Active
           </Badge>
         )
-      case "maintenance":
+      case 'maintenance':
         return (
-          <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 flex items-center gap-1">
+          <Badge
+            variant="outline"
+            className="bg-amber-50 text-amber-700 border-amber-200 flex items-center gap-1"
+          >
             <Clock className="h-3 w-3" />
             Maintenance
           </Badge>
         )
-      case "retired":
+      case 'retired':
         return (
-          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200 flex items-center gap-1">
+          <Badge
+            variant="outline"
+            className="bg-gray-50 text-gray-700 border-gray-200 flex items-center gap-1"
+          >
             <AlertCircle className="h-3 w-3" />
             Retired
           </Badge>
@@ -223,7 +275,7 @@ export default function AssetDashboard() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{loading ? "..." : stats.total}</div>
+            <div className="text-2xl font-bold">{loading ? '...' : stats.total}</div>
           </CardContent>
         </Card>
         <Card>
@@ -232,7 +284,7 @@ export default function AssetDashboard() {
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{loading ? "..." : stats.active}</div>
+            <div className="text-2xl font-bold">{loading ? '...' : stats.active}</div>
           </CardContent>
         </Card>
         <Card>
@@ -241,7 +293,7 @@ export default function AssetDashboard() {
             <Clock className="h-4 w-4 text-amber-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{loading ? "..." : stats.maintenance}</div>
+            <div className="text-2xl font-bold">{loading ? '...' : stats.maintenance}</div>
           </CardContent>
         </Card>
         <Card>
@@ -250,7 +302,7 @@ export default function AssetDashboard() {
             <AlertCircle className="h-4 w-4 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{loading ? "..." : stats.retired}</div>
+            <div className="text-2xl font-bold">{loading ? '...' : stats.retired}</div>
           </CardContent>
         </Card>
       </div>
@@ -270,21 +322,25 @@ export default function AssetDashboard() {
               <select
                 className="border rounded px-3 py-2 w-full"
                 value={selectedAssetId}
-                onChange={(e) => {
-                  setSelectedAssetId(e.target.value);
-                  setPrediction(null);
+                onChange={e => {
+                  setSelectedAssetId(e.target.value)
+                  setPrediction(null)
                 }}
               >
                 <option value="">Select asset...</option>
-                {assets.map((asset) => (
+                {assets.map(asset => (
                   <option key={asset.id} value={asset.id}>
                     {asset.name} (ID: {asset.id})
                   </option>
                 ))}
               </select>
             </div>
-            <Button onClick={handlePredict} disabled={!selectedAssetId || predicting} className="mt-4 md:mt-0">
-              {predicting ? "Predicting..." : "Predict Maintenance"}
+            <Button
+              onClick={handlePredict}
+              disabled={!selectedAssetId || predicting}
+              className="mt-4 md:mt-0"
+            >
+              {predicting ? 'Predicting...' : 'Predict Maintenance'}
             </Button>
           </div>
           {prediction && (
@@ -296,9 +352,13 @@ export default function AssetDashboard() {
                   <CheckCircle className="text-green-600" />
                 )}
                 <span className="font-semibold">
-                  {prediction.will_fail_soon ? "Maintenance Needed Soon" : "No Immediate Maintenance Needed"}
+                  {prediction.will_fail_soon
+                    ? 'Maintenance Needed Soon'
+                    : 'No Immediate Maintenance Needed'}
                 </span>
-                <span className="ml-2 text-sm text-gray-500">(Confidence: {(prediction.probability * 100).toFixed(1)}%)</span>
+                <span className="ml-2 text-sm text-gray-500">
+                  (Confidence: {(prediction.probability * 100).toFixed(1)}%)
+                </span>
               </div>
             </div>
           )}
@@ -315,7 +375,7 @@ export default function AssetDashboard() {
         </CardHeader>
         <CardContent>
           <Button onClick={handleAnomalyDetection} disabled={anomalyLoading || assets.length === 0}>
-            {anomalyLoading ? "Detecting..." : "Run Anomaly Detection"}
+            {anomalyLoading ? 'Detecting...' : 'Run Anomaly Detection'}
           </Button>
           {anomalyResults && (
             <div className="mt-4">
@@ -330,15 +390,22 @@ export default function AssetDashboard() {
                   {assets.map((asset, idx) => (
                     <TableRow key={asset.id}>
                       <TableCell>
-                        <Link href={`/asset/${asset.id}`} className="hover:text-blue-600 hover:underline">
+                        <Link
+                          href={`/asset/${asset.id}`}
+                          className="hover:text-blue-600 hover:underline"
+                        >
                           {asset.name}
                         </Link>
                       </TableCell>
                       <TableCell>
                         {anomalyResults[idx] === -1 ? (
-                          <span className="flex items-center text-red-600"><AlertTriangle className="h-4 w-4 mr-1" /> Anomaly</span>
+                          <span className="flex items-center text-red-600">
+                            <AlertTriangle className="h-4 w-4 mr-1" /> Anomaly
+                          </span>
                         ) : (
-                          <span className="flex items-center text-green-600"><CheckCircle className="h-4 w-4 mr-1" /> Normal</span>
+                          <span className="flex items-center text-green-600">
+                            <CheckCircle className="h-4 w-4 mr-1" /> Normal
+                          </span>
                         )}
                       </TableCell>
                     </TableRow>
@@ -402,10 +469,13 @@ export default function AssetDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {assets.map((asset) => (
+                  {assets.map(asset => (
                     <TableRow key={asset.id}>
                       <TableCell className="font-medium">
-                        <Link href={`/asset/${asset.id}`} className="hover:text-blue-600 hover:underline">
+                        <Link
+                          href={`/asset/${asset.id}`}
+                          className="hover:text-blue-600 hover:underline"
+                        >
                           {asset.name}
                         </Link>
                         <Button asChild size="sm" variant="outline" className="ml-2">
@@ -418,11 +488,11 @@ export default function AssetDashboard() {
                           <AssetGeofenceEvents assetId={asset.id} />
                         </div>
                       </TableCell>
-                      <TableCell>{asset.category || "Uncategorized"}</TableCell>
+                      <TableCell>{asset.category || 'Uncategorized'}</TableCell>
                       <TableCell>{getStatusBadge(asset.status)}</TableCell>
-                      <TableCell>{asset.location || "Unknown"}</TableCell>
+                      <TableCell>{asset.location || 'Unknown'}</TableCell>
                       <TableCell className="text-right">
-                        {asset.value ? `$${Number.parseFloat(asset.value).toFixed(2)}` : "N/A"}
+                        {asset.value ? `$${Number.parseFloat(asset.value).toFixed(2)}` : 'N/A'}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -432,14 +502,24 @@ export default function AssetDashboard() {
           )}
         </CardContent>
       </Card>
-      <Dialog open={deleteDialog.open} onOpenChange={open => setDeleteDialog({ open, asset: deleteDialog.asset })}>
+      <Dialog
+        open={deleteDialog.open}
+        onOpenChange={open => setDeleteDialog({ open, asset: deleteDialog.asset })}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Asset</DialogTitle>
           </DialogHeader>
-          <div>Are you sure you want to delete <b>{deleteDialog.asset?.name}</b>?</div>
+          <div>
+            Are you sure you want to delete <b>{deleteDialog.asset?.name}</b>?
+          </div>
           <DialogFooter>
-            <Button variant="destructive" onClick={() => deleteDialog.asset && handleDelete(deleteDialog.asset)}>Delete</Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteDialog.asset && handleDelete(deleteDialog.asset)}
+            >
+              Delete
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

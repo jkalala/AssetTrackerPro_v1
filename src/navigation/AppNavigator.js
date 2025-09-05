@@ -1,44 +1,44 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
-import { useTheme } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React from 'react'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { createStackNavigator } from '@react-navigation/stack'
+import { useTheme } from 'react-native-paper'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 // Import screens
-import HomeScreen from '../screens/HomeScreen';
-import ScannerScreen from '../screens/ScannerScreen';
-import AssetsScreen from '../screens/AssetsScreen';
-import CheckoutScreen from '../screens/CheckoutScreen';
-import LocationScreen from '../screens/LocationScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import HomeScreen from '../screens/HomeScreen'
+import ScannerScreen from '../screens/ScannerScreen'
+import AssetsScreen from '../screens/AssetsScreen'
+import CheckoutScreen from '../screens/CheckoutScreen'
+import LocationScreen from '../screens/LocationScreen'
+import SettingsScreen from '../screens/SettingsScreen'
 
-const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator()
+const Stack = createStackNavigator()
 
 function TabNavigator() {
-  const theme = useTheme();
+  const theme = useTheme()
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+          let iconName
 
           if (route.name === 'Home') {
-            iconName = focused ? 'home' : 'home-outline';
+            iconName = focused ? 'home' : 'home-outline'
           } else if (route.name === 'Scanner') {
-            iconName = focused ? 'qrcode-scan' : 'qrcode-scan';
+            iconName = focused ? 'qrcode-scan' : 'qrcode-scan'
           } else if (route.name === 'Assets') {
-            iconName = focused ? 'package-variant' : 'package-variant-outline';
+            iconName = focused ? 'package-variant' : 'package-variant-outline'
           } else if (route.name === 'Checkout') {
-            iconName = focused ? 'clipboard-check' : 'clipboard-check-outline';
+            iconName = focused ? 'clipboard-check' : 'clipboard-check-outline'
           } else if (route.name === 'Location') {
-            iconName = focused ? 'map-marker' : 'map-marker-outline';
+            iconName = focused ? 'map-marker' : 'map-marker-outline'
           } else if (route.name === 'Settings') {
-            iconName = focused ? 'cog' : 'cog-outline';
+            iconName = focused ? 'cog' : 'cog-outline'
           }
 
-          return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+          return <MaterialCommunityIcons name={iconName} size={size} color={color} />
         },
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
@@ -101,17 +101,13 @@ function TabNavigator() {
         }}
       />
     </Tab.Navigator>
-  );
+  )
 }
 
 export default function AppNavigator() {
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Main"
-        component={TabNavigator}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="Main" component={TabNavigator} options={{ headerShown: false }} />
     </Stack.Navigator>
-  );
+  )
 }

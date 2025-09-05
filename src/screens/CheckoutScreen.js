@@ -1,10 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import React, { useState, useEffect } from 'react'
+import { View, ScrollView, StyleSheet, Alert } from 'react-native'
 import {
   Card,
   Title,
@@ -17,155 +12,152 @@ import {
   ActivityIndicator,
   Text,
   Searchbar,
-} from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme } from 'react-native-paper';
-import * as Location from 'expo-location';
-import { assetAPI, offlineStorage } from '../services/api';
+} from 'react-native-paper'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { useTheme } from 'react-native-paper'
+import * as Location from 'expo-location'
+import { assetAPI, offlineStorage } from '../services/api'
 
 export default function CheckoutScreen({ navigation, route }) {
-  const theme = useTheme();
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [assets, setAssets] = useState([]);
-  const [filteredAssets, setFilteredAssets] = useState([]);
-  const [selectedAsset, setSelectedAsset] = useState(null);
-  const [action, setAction] = useState('checkout'); // 'checkout' or 'checkin'
-  const [location, setLocation] = useState(null);
-  const [gettingLocation, setGettingLocation] = useState(false);
-  const [notes, setNotes] = useState('');
-  const [offlineMode, setOfflineMode] = useState(false);
+  const theme = useTheme()
+  const [loading, setLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [assets, setAssets] = useState([])
+  const [filteredAssets, setFilteredAssets] = useState([])
+  const [selectedAsset, setSelectedAsset] = useState(null)
+  const [action, setAction] = useState('checkout') // 'checkout' or 'checkin'
+  const [location, setLocation] = useState(null)
+  const [gettingLocation, setGettingLocation] = useState(false)
+  const [notes, setNotes] = useState('')
+  const [offlineMode, setOfflineMode] = useState(false)
 
   // Check if asset was passed from navigation
   useEffect(() => {
     if (route.params?.asset) {
-      setSelectedAsset(route.params.asset);
-      setAction(route.params.asset.status === 'available' ? 'checkout' : 'checkin');
+      setSelectedAsset(route.params.asset)
+      setAction(route.params.asset.status === 'available' ? 'checkout' : 'checkin')
     }
-  }, [route.params]);
+  }, [route.params])
 
   useEffect(() => {
-    loadAssets();
-  }, []);
+    loadAssets()
+  }, [])
 
   useEffect(() => {
-    filterAssets();
-  }, [assets, searchQuery]);
+    filterAssets()
+  }, [assets, searchQuery])
 
   const loadAssets = async () => {
     try {
       // Try to load from API first
       try {
-        const response = await assetAPI.getAssets();
-        const assetsData = response.assets || [];
-        setAssets(assetsData);
-        setOfflineMode(false);
-        
+        const response = await assetAPI.getAssets()
+        const assetsData = response.assets || []
+        setAssets(assetsData)
+        setOfflineMode(false)
+
         // Store for offline use
-        await offlineStorage.storeData('assets', assetsData);
+        await offlineStorage.storeData('assets', assetsData)
       } catch (error) {
-        console.log('API unavailable, loading from offline storage');
-        setOfflineMode(true);
-        
+        console.log('API unavailable, loading from offline storage')
+        setOfflineMode(true)
+
         // Load from offline storage
-        const offlineAssets = await offlineStorage.getData('assets');
-        if (offlineAssets) setAssets(offlineAssets);
+        const offlineAssets = await offlineStorage.getData('assets')
+        if (offlineAssets) setAssets(offlineAssets)
       }
     } catch (error) {
-      console.error('Error loading assets:', error);
+      console.error('Error loading assets:', error)
     }
-  };
+  }
 
   const filterAssets = () => {
-    let filtered = assets;
+    let filtered = assets
 
     // Filter by search query
     if (searchQuery) {
-      filtered = filtered.filter(asset =>
-        asset.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        asset.asset_id?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      filtered = filtered.filter(
+        asset =>
+          asset.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          asset.asset_id?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
     }
 
     // Filter by action type
     if (action === 'checkout') {
-      filtered = filtered.filter(asset => asset.status === 'available');
+      filtered = filtered.filter(asset => asset.status === 'available')
     } else {
-      filtered = filtered.filter(asset => asset.status === 'checked_out');
+      filtered = filtered.filter(asset => asset.status === 'checked_out')
     }
 
-    setFilteredAssets(filtered);
-  };
+    setFilteredAssets(filtered)
+  }
 
   const getCurrentLocation = async () => {
     try {
-      setGettingLocation(true);
-      
+      setGettingLocation(true)
+
       // Request location permissions
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await Location.requestForegroundPermissionsAsync()
       if (status !== 'granted') {
         Alert.alert(
           'Location Permission Required',
           'Location access is needed to record where the asset is being checked in/out.',
           [{ text: 'OK' }]
-        );
-        return;
+        )
+        return
       }
 
       // Get current location
       const currentLocation = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
-      });
+      })
 
-      const { latitude, longitude } = currentLocation.coords;
-      
+      const { latitude, longitude } = currentLocation.coords
+
       // Reverse geocode to get address
       const reverseGeocode = await Location.reverseGeocodeAsync({
         latitude,
         longitude,
-      });
+      })
 
-      const address = reverseGeocode[0];
+      const address = reverseGeocode[0]
       const locationString = address
         ? `${address.street || ''} ${address.city || ''} ${address.region || ''}`.trim()
-        : `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+        : `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
 
       setLocation({
         latitude,
         longitude,
         address: locationString,
-      });
+      })
 
-      Alert.alert(
-        'Location Captured',
-        `Location: ${locationString}`,
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Location Captured', `Location: ${locationString}`, [{ text: 'OK' }])
     } catch (error) {
-      console.error('Error getting location:', error);
+      console.error('Error getting location:', error)
       Alert.alert(
         'Location Error',
         'Failed to get current location. You can still proceed without location.',
         [{ text: 'OK' }]
-      );
+      )
     } finally {
-      setGettingLocation(false);
+      setGettingLocation(false)
     }
-  };
+  }
 
-  const handleAssetSelect = (asset) => {
-    setSelectedAsset(asset);
-    setAction(asset.status === 'available' ? 'checkout' : 'checkin');
-  };
+  const handleAssetSelect = asset => {
+    setSelectedAsset(asset)
+    setAction(asset.status === 'available' ? 'checkout' : 'checkin')
+  }
 
   const handleCheckInOut = async () => {
     if (!selectedAsset) {
-      Alert.alert('Error', 'Please select an asset first.');
-      return;
+      Alert.alert('Error', 'Please select an asset first.')
+      return
     }
 
     try {
-      setLoading(true);
+      setLoading(true)
 
       const actionData = {
         assetId: selectedAsset.id,
@@ -173,12 +165,12 @@ export default function CheckoutScreen({ navigation, route }) {
         location: location?.address || 'Location not specified',
         notes: notes,
         timestamp: new Date().toISOString(),
-      };
+      }
 
       // Try to perform action via API
       try {
-        await assetAPI.checkInOut(selectedAsset.id, action, location?.address);
-        
+        await assetAPI.checkInOut(selectedAsset.id, action, location?.address)
+
         Alert.alert(
           'Success',
           `Asset ${action === 'checkout' ? 'checked out' : 'checked in'} successfully!`,
@@ -186,20 +178,20 @@ export default function CheckoutScreen({ navigation, route }) {
             {
               text: 'OK',
               onPress: () => {
-                setSelectedAsset(null);
-                setLocation(null);
-                setNotes('');
-                loadAssets(); // Refresh assets list
+                setSelectedAsset(null)
+                setLocation(null)
+                setNotes('')
+                loadAssets() // Refresh assets list
               },
             },
           ]
-        );
+        )
       } catch (error) {
-        console.log('API unavailable, storing action for later sync');
-        
+        console.log('API unavailable, storing action for later sync')
+
         // Store action for offline sync
-        await offlineStorage.storeOfflineAction(actionData);
-        
+        await offlineStorage.storeOfflineAction(actionData)
+
         Alert.alert(
           'Action Queued',
           `Asset ${action === 'checkout' ? 'checkout' : 'checkin'} has been queued for sync when connection is restored.`,
@@ -207,57 +199,50 @@ export default function CheckoutScreen({ navigation, route }) {
             {
               text: 'OK',
               onPress: () => {
-                setSelectedAsset(null);
-                setLocation(null);
-                setNotes('');
+                setSelectedAsset(null)
+                setLocation(null)
+                setNotes('')
               },
             },
           ]
-        );
+        )
       }
     } catch (error) {
-      console.error('Error performing check in/out:', error);
-      Alert.alert(
-        'Error',
-        'Failed to perform action. Please try again.',
-        [{ text: 'OK' }]
-      );
+      console.error('Error performing check in/out:', error)
+      Alert.alert('Error', 'Failed to perform action. Please try again.', [{ text: 'OK' }])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const renderAssetItem = ({ item }) => (
     <List.Item
       title={item.name || `Asset ${item.id}`}
       description={`${item.asset_id || item.id} • ${item.category || 'No category'}`}
-      left={(props) => (
+      left={props => (
         <List.Icon
           {...props}
           icon={
             item.status === 'available'
               ? 'check-circle'
               : item.status === 'checked_out'
-              ? 'account-arrow-right'
-              : 'wrench'
+                ? 'account-arrow-right'
+                : 'wrench'
           }
         />
       )}
       right={() => (
-        <Chip
-          mode="outlined"
-          textStyle={{ fontSize: 12 }}
-        >
+        <Chip mode="outlined" textStyle={{ fontSize: 12 }}>
           {item.status || 'Unknown'}
         </Chip>
       )}
       onPress={() => handleAssetSelect(item)}
       style={[
         styles.assetItem,
-        selectedAsset?.id === item.id && { backgroundColor: theme.colors.primaryContainer }
+        selectedAsset?.id === item.id && { backgroundColor: theme.colors.primaryContainer },
       ]}
     />
-  );
+  )
 
   return (
     <View style={styles.container}>
@@ -308,7 +293,7 @@ export default function CheckoutScreen({ navigation, route }) {
             value={searchQuery}
             style={styles.searchbar}
           />
-          
+
           <ScrollView style={styles.assetsList}>
             {filteredAssets.map((asset, index) => (
               <View key={asset.id || index}>
@@ -326,7 +311,9 @@ export default function CheckoutScreen({ navigation, route }) {
           <Card.Content>
             <Title>Selected Asset</Title>
             <View style={styles.selectedAssetInfo}>
-              <Text style={styles.assetName}>{selectedAsset.name || `Asset ${selectedAsset.id}`}</Text>
+              <Text style={styles.assetName}>
+                {selectedAsset.name || `Asset ${selectedAsset.id}`}
+              </Text>
               <Text style={styles.assetId}>{selectedAsset.asset_id || selectedAsset.id}</Text>
               <Chip mode="outlined" style={styles.statusChip}>
                 {selectedAsset.status || 'Unknown'}
@@ -341,13 +328,17 @@ export default function CheckoutScreen({ navigation, route }) {
         <Card style={styles.card}>
           <Card.Content>
             <Title>Additional Information</Title>
-            
+
             {/* Location */}
             <View style={styles.locationSection}>
               <Text style={styles.sectionTitle}>Location</Text>
               {location ? (
                 <View style={styles.locationInfo}>
-                  <MaterialCommunityIcons name="map-marker" size={20} color={theme.colors.primary} />
+                  <MaterialCommunityIcons
+                    name="map-marker"
+                    size={20}
+                    color={theme.colors.primary}
+                  />
                   <Text style={styles.locationText}>{location.address}</Text>
                 </View>
               ) : (
@@ -392,13 +383,15 @@ export default function CheckoutScreen({ navigation, route }) {
               style={styles.actionButton}
               icon={action === 'checkout' ? 'account-arrow-right' : 'account-arrow-left'}
             >
-              {loading ? 'Processing...' : `${action === 'checkout' ? 'Check Out' : 'Check In'} Asset`}
+              {loading
+                ? 'Processing...'
+                : `${action === 'checkout' ? 'Check Out' : 'Check In'} Asset`}
             </Button>
           </Card.Content>
         </Card>
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -484,4 +477,4 @@ const styles = StyleSheet.create({
   notesInput: {
     marginTop: 4,
   },
-});
+})

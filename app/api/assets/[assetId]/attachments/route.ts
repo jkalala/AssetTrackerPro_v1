@@ -97,7 +97,8 @@ export async function DELETE(req: Request, { params }: { params: { assetId: stri
     .select('*')
     .eq('id', id)
     .single()
-  if (fetchError || !attachment) return NextResponse.json({ error: 'Attachment not found' }, { status: 404 })
+  if (fetchError || !attachment)
+    return NextResponse.json({ error: 'Attachment not found' }, { status: 404 })
   // Remove from storage
   const filePath = attachment.file_url.split('/asset-attachments/')[1]
   if (filePath) {
@@ -107,4 +108,4 @@ export async function DELETE(req: Request, { params }: { params: { assetId: stri
   const { error: deleteError } = await supabase.from('asset_attachments').delete().eq('id', id)
   if (deleteError) return NextResponse.json({ error: deleteError.message }, { status: 500 })
   return NextResponse.json({ success: true })
-} 
+}

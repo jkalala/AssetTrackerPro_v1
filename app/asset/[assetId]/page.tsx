@@ -1,24 +1,37 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { useAuth } from "@/components/auth/auth-provider"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "lucide-react"
-import { 
-  Package, 
-  Loader2, 
-  AlertTriangle, 
-  Edit, 
-  Trash2, 
-  ArrowLeft, 
+import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { useAuth } from '@/components/auth/auth-provider'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Calendar } from 'lucide-react'
+import {
+  Package,
+  Loader2,
+  AlertTriangle,
+  Edit,
+  Trash2,
+  ArrowLeft,
   QrCode,
   MapPin,
   DollarSign,
@@ -27,12 +40,12 @@ import {
   FileText,
   Tag,
   Building,
-  Hash
-} from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
-import { Asset, getAsset, deleteAsset } from "@/lib/asset-actions"
-import Link from "next/link"
-import MaintenanceCalendar from "@/components/maintenance-calendar"
+  Hash,
+} from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import { Asset, getAsset, deleteAsset } from '@/lib/asset-actions'
+import Link from 'next/link'
+import MaintenanceCalendar from '@/components/maintenance-calendar'
 
 export default function AssetDetailPage() {
   const params = useParams()
@@ -48,11 +61,20 @@ export default function AssetDetailPage() {
   const [maintenanceLoading, setMaintenanceLoading] = useState(true)
   const [showMaintDialog, setShowMaintDialog] = useState(false)
   const [editingMaint, setEditingMaint] = useState<any | null>(null)
-  const [maintForm, setMaintForm] = useState<any>({ type: "inspection", interval: "monthly", next_due: "", notes: "" })
+  const [maintForm, setMaintForm] = useState<any>({
+    type: 'inspection',
+    interval: 'monthly',
+    next_due: '',
+    notes: '',
+  })
   const [maintenanceHistory, setMaintenanceHistory] = useState<any[]>([])
   const [historyLoading, setHistoryLoading] = useState(true)
   const [showHistoryDialog, setShowHistoryDialog] = useState(false)
-  const [historyForm, setHistoryForm] = useState<any>({ schedule_id: "", performed_at: "", notes: "" })
+  const [historyForm, setHistoryForm] = useState<any>({
+    schedule_id: '',
+    performed_at: '',
+    notes: '',
+  })
 
   const assetId = params.assetId as string
 
@@ -69,24 +91,24 @@ export default function AssetDetailPage() {
     try {
       setError(null)
       const result = await getAsset(assetId)
-      
+
       if (result.error) {
         setError(result.error)
         toast({
-          title: "Error Loading Asset",
+          title: 'Error Loading Asset',
           description: result.error,
-          variant: "destructive"
+          variant: 'destructive',
         })
       } else {
         setAsset(result.data)
       }
     } catch (error) {
-      console.error("Error fetching asset:", error)
-      setError("Failed to load asset")
+      console.error('Error fetching asset:', error)
+      setError('Failed to load asset')
       toast({
-        title: "Error Loading Asset",
-        description: "An unexpected error occurred while loading the asset",
-        variant: "destructive"
+        title: 'Error Loading Asset',
+        description: 'An unexpected error occurred while loading the asset',
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
@@ -121,7 +143,7 @@ export default function AssetDetailPage() {
 
   const openAddMaint = () => {
     setEditingMaint(null)
-    setMaintForm({ type: "inspection", interval: "monthly", next_due: "", notes: "" })
+    setMaintForm({ type: 'inspection', interval: 'monthly', next_due: '', notes: '' })
     setShowMaintDialog(true)
   }
 
@@ -135,93 +157,95 @@ export default function AssetDetailPage() {
     let res
     if (editingMaint) {
       res = await fetch(`/api/assets/${assetId}/maintenance`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editingMaint.id, ...maintForm })
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: editingMaint.id, ...maintForm }),
       })
     } else {
       res = await fetch(`/api/assets/${assetId}/maintenance`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(maintForm)
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(maintForm),
       })
     }
     const json = await res.json()
     if (json.error) {
-      toast({ title: "Error", description: json.error, variant: "destructive" })
+      toast({ title: 'Error', description: json.error, variant: 'destructive' })
     } else {
       setShowMaintDialog(false)
       fetchMaintenance()
-      toast({ title: "Saved", description: "Maintenance schedule saved." })
+      toast({ title: 'Saved', description: 'Maintenance schedule saved.' })
     }
   }
 
   const handleDeleteMaint = async (m: any) => {
-    if (!window.confirm("Delete this maintenance schedule?")) return
+    if (!window.confirm('Delete this maintenance schedule?')) return
     const res = await fetch(`/api/assets/${assetId}/maintenance`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: m.id })
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: m.id }),
     })
     const json = await res.json()
     if (json.error) {
-      toast({ title: "Error", description: json.error, variant: "destructive" })
+      toast({ title: 'Error', description: json.error, variant: 'destructive' })
     } else {
       fetchMaintenance()
-      toast({ title: "Deleted", description: "Maintenance schedule deleted." })
+      toast({ title: 'Deleted', description: 'Maintenance schedule deleted.' })
     }
   }
 
   const openAddHistory = () => {
-    setHistoryForm({ schedule_id: maintenance[0]?.id || "", performed_at: "", notes: "" })
+    setHistoryForm({ schedule_id: maintenance[0]?.id || '', performed_at: '', notes: '' })
     setShowHistoryDialog(true)
   }
 
   const handleSaveHistory = async () => {
     const res = await fetch(`/api/assets/${assetId}/maintenance/history`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...historyForm, performed_by: user?.id })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...historyForm, performed_by: user?.id }),
     })
     const json = await res.json()
     if (json.error) {
-      toast({ title: "Error", description: json.error, variant: "destructive" })
+      toast({ title: 'Error', description: json.error, variant: 'destructive' })
     } else {
       setShowHistoryDialog(false)
       fetchMaintenanceHistory()
-      toast({ title: "Logged", description: "Maintenance event logged." })
+      toast({ title: 'Logged', description: 'Maintenance event logged.' })
     }
   }
 
   const handleDelete = async () => {
     if (!asset) return
 
-    if (!confirm(`Are you sure you want to delete "${asset.name}"? This action cannot be undone.`)) {
+    if (
+      !confirm(`Are you sure you want to delete "${asset.name}"? This action cannot be undone.`)
+    ) {
       return
     }
 
     setDeleting(true)
     try {
       const result = await deleteAsset(asset.id!)
-      
+
       if (result.error) {
         toast({
-          title: "Error Deleting Asset",
+          title: 'Error Deleting Asset',
           description: result.error,
-          variant: "destructive"
+          variant: 'destructive',
         })
       } else {
         toast({
-          title: "Asset Deleted",
-          description: "The asset has been successfully deleted."
+          title: 'Asset Deleted',
+          description: 'The asset has been successfully deleted.',
         })
-        router.push("/assets")
+        router.push('/assets')
       }
     } catch (error) {
       toast({
-        title: "Error Deleting Asset",
-        description: "An unexpected error occurred while deleting the asset",
-        variant: "destructive"
+        title: 'Error Deleting Asset',
+        description: 'An unexpected error occurred while deleting the asset',
+        variant: 'destructive',
       })
     } finally {
       setDeleting(false)
@@ -230,16 +254,16 @@ export default function AssetDetailPage() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      active: { color: "bg-green-50 text-green-700 border-green-200", label: "Active" },
-      maintenance: { color: "bg-amber-50 text-amber-700 border-amber-200", label: "Maintenance" },
-      retired: { color: "bg-gray-50 text-gray-700 border-gray-200", label: "Retired" },
-      lost: { color: "bg-red-50 text-red-700 border-red-200", label: "Lost" },
-      damaged: { color: "bg-orange-50 text-orange-700 border-orange-200", label: "Damaged" }
+      active: { color: 'bg-green-50 text-green-700 border-green-200', label: 'Active' },
+      maintenance: { color: 'bg-amber-50 text-amber-700 border-amber-200', label: 'Maintenance' },
+      retired: { color: 'bg-gray-50 text-gray-700 border-gray-200', label: 'Retired' },
+      lost: { color: 'bg-red-50 text-red-700 border-red-200', label: 'Lost' },
+      damaged: { color: 'bg-orange-50 text-orange-700 border-orange-200', label: 'Damaged' },
     }
 
     const config = statusConfig[status as keyof typeof statusConfig] || {
-      color: "bg-blue-50 text-blue-700 border-blue-200",
-      label: status
+      color: 'bg-blue-50 text-blue-700 border-blue-200',
+      label: status,
     }
 
     return (
@@ -250,7 +274,7 @@ export default function AssetDetailPage() {
   }
 
   const formatCurrency = (value?: number | null) => {
-    if (!value) return "N/A"
+    if (!value) return 'N/A'
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -260,7 +284,7 @@ export default function AssetDetailPage() {
   }
 
   const formatDate = (dateString?: string | null) => {
-    if (!dateString) return "N/A"
+    if (!dateString) return 'N/A'
     return new Date(dateString).toLocaleDateString()
   }
 
@@ -314,7 +338,7 @@ export default function AssetDetailPage() {
                 Asset Not Found
               </CardTitle>
               <CardDescription>
-                {error || "The requested asset could not be found."}
+                {error || 'The requested asset could not be found.'}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -362,12 +386,7 @@ export default function AssetDetailPage() {
                   </Link>
                 </Button>
               )}
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={deleting}
-              >
+              <Button size="sm" variant="destructive" onClick={handleDelete} disabled={deleting}>
                 {deleting ? (
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
@@ -419,7 +438,7 @@ export default function AssetDetailPage() {
                         <label className="text-sm font-medium text-gray-500">Location</label>
                         <p className="text-lg flex items-center">
                           <MapPin className="h-4 w-4 mr-1 text-gray-400" />
-                          {asset.location || "Not specified"}
+                          {asset.location || 'Not specified'}
                         </p>
                       </div>
                     </div>
@@ -431,8 +450,12 @@ export default function AssetDetailPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {customFields.map(cf => (
                             <div key={cf.field_id} className="space-y-1">
-                              <label className="text-sm font-medium text-gray-500">{cf.asset_field_definitions?.label || cf.field_id}</label>
-                              <p className="text-lg">{cf.value || <span className="text-gray-400">Not specified</span>}</p>
+                              <label className="text-sm font-medium text-gray-500">
+                                {cf.asset_field_definitions?.label || cf.field_id}
+                              </label>
+                              <p className="text-lg">
+                                {cf.value || <span className="text-gray-400">Not specified</span>}
+                              </p>
                             </div>
                           ))}
                         </div>
@@ -492,25 +515,25 @@ export default function AssetDetailPage() {
                         <label className="text-sm font-medium text-gray-500">Manufacturer</label>
                         <p className="text-lg flex items-center">
                           <Building className="h-4 w-4 mr-1 text-gray-400" />
-                          {asset.manufacturer || "Not specified"}
+                          {asset.manufacturer || 'Not specified'}
                         </p>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-500">Model</label>
-                        <p className="text-lg">{asset.model || "Not specified"}</p>
+                        <p className="text-lg">{asset.model || 'Not specified'}</p>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-500">Serial Number</label>
                         <p className="font-mono text-lg flex items-center">
                           <Hash className="h-4 w-4 mr-1 text-gray-400" />
-                          {asset.serial_number || "Not specified"}
+                          {asset.serial_number || 'Not specified'}
                         </p>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-500">Assigned To</label>
                         <p className="text-lg flex items-center">
                           <User className="h-4 w-4 mr-1 text-gray-400" />
-                          {asset.assigned_to || "Not assigned"}
+                          {asset.assigned_to || 'Not assigned'}
                         </p>
                       </div>
                     </div>
@@ -566,13 +589,19 @@ export default function AssetDetailPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>Maintenance Schedules</CardTitle>
-                    <Button onClick={openAddMaint} size="sm">Add Schedule</Button>
+                    <Button onClick={openAddMaint} size="sm">
+                      Add Schedule
+                    </Button>
                   </CardHeader>
                   <CardContent>
                     {maintenanceLoading ? (
-                      <div className="flex items-center justify-center py-8"><Loader2 className="animate-spin h-6 w-6 mr-2" /> Loading...</div>
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="animate-spin h-6 w-6 mr-2" /> Loading...
+                      </div>
                     ) : maintenance.length === 0 ? (
-                      <div className="text-center text-gray-500 py-8">No maintenance schedules defined yet.</div>
+                      <div className="text-center text-gray-500 py-8">
+                        No maintenance schedules defined yet.
+                      </div>
                     ) : (
                       <table className="w-full text-sm border">
                         <thead>
@@ -594,8 +623,21 @@ export default function AssetDetailPage() {
                               <td className="p-2">{m.notes}</td>
                               <td className="p-2">{m.status}</td>
                               <td className="p-2">
-                                <Button variant="outline" size="icon" className="mr-1" onClick={() => openEditMaint(m)}><Edit className="h-4 w-4" /></Button>
-                                <Button variant="destructive" size="icon" onClick={() => handleDeleteMaint(m)}><Trash2 className="h-4 w-4" /></Button>
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className="mr-1"
+                                  onClick={() => openEditMaint(m)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="icon"
+                                  onClick={() => handleDeleteMaint(m)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </td>
                             </tr>
                           ))}
@@ -608,13 +650,19 @@ export default function AssetDetailPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>Maintenance History</CardTitle>
-                    <Button onClick={openAddHistory} size="sm">Log Event</Button>
+                    <Button onClick={openAddHistory} size="sm">
+                      Log Event
+                    </Button>
                   </CardHeader>
                   <CardContent>
                     {historyLoading ? (
-                      <div className="flex items-center justify-center py-8"><Loader2 className="animate-spin h-6 w-6 mr-2" /> Loading...</div>
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="animate-spin h-6 w-6 mr-2" /> Loading...
+                      </div>
                     ) : maintenanceHistory.length === 0 ? (
-                      <div className="text-center text-gray-500 py-8">No maintenance events logged yet.</div>
+                      <div className="text-center text-gray-500 py-8">
+                        No maintenance events logged yet.
+                      </div>
                     ) : (
                       <table className="w-full text-sm border">
                         <thead>
@@ -628,10 +676,14 @@ export default function AssetDetailPage() {
                         <tbody>
                           {maintenanceHistory.map(h => (
                             <tr key={h.id} className="border-t">
-                              <td className="p-2">{maintenance.find(m => m.id === h.schedule_id)?.type || "-"}</td>
+                              <td className="p-2">
+                                {maintenance.find(m => m.id === h.schedule_id)?.type || '-'}
+                              </td>
                               <td className="p-2">{h.performed_at}</td>
                               <td className="p-2">{h.notes}</td>
-                              <td className="p-2">{h.performed_by?.full_name || h.performed_by?.email || "-"}</td>
+                              <td className="p-2">
+                                {h.performed_by?.full_name || h.performed_by?.email || '-'}
+                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -640,16 +692,27 @@ export default function AssetDetailPage() {
                   </CardContent>
                 </Card>
 
-                <MaintenanceCalendar assetId={assetId} schedules={maintenance} history={maintenanceHistory} />
+                <MaintenanceCalendar
+                  assetId={assetId}
+                  schedules={maintenance}
+                  history={maintenanceHistory}
+                />
 
                 <Dialog open={showMaintDialog} onOpenChange={setShowMaintDialog}>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>{editingMaint ? "Edit Maintenance Schedule" : "Add Maintenance Schedule"}</DialogTitle>
+                      <DialogTitle>
+                        {editingMaint ? 'Edit Maintenance Schedule' : 'Add Maintenance Schedule'}
+                      </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-2">
-                      <Select value={maintForm.type} onValueChange={val => setMaintForm((f: any) => ({ ...f, type: val }))}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
+                      <Select
+                        value={maintForm.type}
+                        onValueChange={val => setMaintForm((f: any) => ({ ...f, type: val }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="inspection">Inspection</SelectItem>
                           <SelectItem value="service">Service</SelectItem>
@@ -657,8 +720,13 @@ export default function AssetDetailPage() {
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Select value={maintForm.interval} onValueChange={val => setMaintForm((f: any) => ({ ...f, interval: val }))}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
+                      <Select
+                        value={maintForm.interval}
+                        onValueChange={val => setMaintForm((f: any) => ({ ...f, interval: val }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="monthly">Monthly</SelectItem>
                           <SelectItem value="quarterly">Quarterly</SelectItem>
@@ -666,12 +734,26 @@ export default function AssetDetailPage() {
                           <SelectItem value="one-time">One-time</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Input type="date" value={maintForm.next_due} onChange={e => setMaintForm((f: any) => ({ ...f, next_due: e.target.value }))} />
-                      <Input placeholder="Notes" value={maintForm.notes} onChange={e => setMaintForm((f: any) => ({ ...f, notes: e.target.value }))} />
+                      <Input
+                        type="date"
+                        value={maintForm.next_due}
+                        onChange={e =>
+                          setMaintForm((f: any) => ({ ...f, next_due: e.target.value }))
+                        }
+                      />
+                      <Input
+                        placeholder="Notes"
+                        value={maintForm.notes}
+                        onChange={e => setMaintForm((f: any) => ({ ...f, notes: e.target.value }))}
+                      />
                     </div>
                     <DialogFooter>
-                      <Button onClick={handleSaveMaint}>{editingMaint ? "Save Changes" : "Add Schedule"}</Button>
-                      <Button variant="outline" onClick={() => setShowMaintDialog(false)}>Cancel</Button>
+                      <Button onClick={handleSaveMaint}>
+                        {editingMaint ? 'Save Changes' : 'Add Schedule'}
+                      </Button>
+                      <Button variant="outline" onClick={() => setShowMaintDialog(false)}>
+                        Cancel
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -682,24 +764,46 @@ export default function AssetDetailPage() {
                       <DialogTitle>Log Maintenance Event</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 py-2">
-                      <Select value={historyForm.schedule_id} onValueChange={val => setHistoryForm((f: any) => ({ ...f, schedule_id: val }))}>
-                        <SelectTrigger><SelectValue placeholder="Select schedule" /></SelectTrigger>
+                      <Select
+                        value={historyForm.schedule_id}
+                        onValueChange={val =>
+                          setHistoryForm((f: any) => ({ ...f, schedule_id: val }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select schedule" />
+                        </SelectTrigger>
                         <SelectContent>
                           {maintenance.map(m => (
-                            <SelectItem key={m.id} value={m.id}>{m.type} ({m.interval})</SelectItem>
+                            <SelectItem key={m.id} value={m.id}>
+                              {m.type} ({m.interval})
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      <Input type="date" value={historyForm.performed_at} onChange={e => setHistoryForm((f: any) => ({ ...f, performed_at: e.target.value }))} />
-                      <Input placeholder="Notes" value={historyForm.notes} onChange={e => setHistoryForm((f: any) => ({ ...f, notes: e.target.value }))} />
+                      <Input
+                        type="date"
+                        value={historyForm.performed_at}
+                        onChange={e =>
+                          setHistoryForm((f: any) => ({ ...f, performed_at: e.target.value }))
+                        }
+                      />
+                      <Input
+                        placeholder="Notes"
+                        value={historyForm.notes}
+                        onChange={e =>
+                          setHistoryForm((f: any) => ({ ...f, notes: e.target.value }))
+                        }
+                      />
                     </div>
                     <DialogFooter>
                       <Button onClick={handleSaveHistory}>Log Event</Button>
-                      <Button variant="outline" onClick={() => setShowHistoryDialog(false)}>Cancel</Button>
+                      <Button variant="outline" onClick={() => setShowHistoryDialog(false)}>
+                        Cancel
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
-
               </TabsContent>
             </Tabs>
           </div>

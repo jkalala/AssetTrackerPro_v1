@@ -22,7 +22,10 @@ export async function GET(request: Request) {
     }
     // Convert to CSV
     const fields = assets && assets.length > 0 ? Object.keys(assets[0]) : []
-    const csvRows = [fields.join(','), ...assets.map(asset => fields.map(f => JSON.stringify(asset[f] ?? '')).join(','))]
+    const csvRows = [
+      fields.join(','),
+      ...assets.map(asset => fields.map(f => JSON.stringify(asset[f] ?? '')).join(',')),
+    ]
     const csv = csvRows.join('\r\n')
     // Return as file
     return new NextResponse(csv, {
@@ -35,4 +38,4 @@ export async function GET(request: Request) {
   } catch (err) {
     return new NextResponse('Internal Server Error', { status: 500 })
   }
-} 
+}

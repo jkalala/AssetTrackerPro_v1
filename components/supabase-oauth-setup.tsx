@@ -1,11 +1,19 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ExternalLink, Copy, CheckCircle, Mail, Github, Settings, AlertTriangle } from "lucide-react"
-import { useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  ExternalLink,
+  Copy,
+  CheckCircle,
+  Mail,
+  Github,
+  Settings,
+  AlertTriangle,
+} from 'lucide-react'
+import { useState } from 'react'
 
 export default function SupabaseOAuthSetup() {
   const [copied, setCopied] = useState<string | null>(null)
@@ -16,17 +24,19 @@ export default function SupabaseOAuthSetup() {
     setTimeout(() => setCopied(null), 2000)
   }
 
-  const githubClientId = "Ov23lipMb8831rUNvsJR"
-  const githubClientSecret = "97c8805c06fa9b6589b8d33848a0835873fd2f98"
-  const supabaseUrl = "https://wyqohljdnrouovuqqdlt.supabase.co"
+  const githubClientId = 'Ov23lipMb8831rUNvsJR'
+  const githubClientSecret = '97c8805c06fa9b6589b8d33848a0835873fd2f98'
+  const supabaseUrl = 'https://wyqohljdnrouovuqqdlt.supabase.co'
   const callbackUrl = `${supabaseUrl}/auth/v1/callback`
-  const siteUrl = "https://cloudeleavepro.vercel.app"
+  const siteUrl = 'https://cloudeleavepro.vercel.app'
 
   return (
     <div className="container py-8 max-w-6xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Authentication Setup Guide</h1>
-        <p className="text-gray-600">Configure email confirmations and GitHub OAuth for your AssetTracker Pro</p>
+        <p className="text-gray-600">
+          Configure email confirmations and GitHub OAuth for your AssetTracker Pro
+        </p>
       </div>
 
       <Tabs defaultValue="email" className="space-y-6">
@@ -53,13 +63,16 @@ export default function SupabaseOAuthSetup() {
                 <Mail className="h-5 w-5 text-blue-600" />
                 Email Configuration
               </CardTitle>
-              <CardDescription>Set up email confirmations and SMTP settings in Supabase</CardDescription>
+              <CardDescription>
+                Set up email confirmations and SMTP settings in Supabase
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  <strong>Important:</strong> Email confirmations require proper SMTP configuration in Supabase.
+                  <strong>Important:</strong> Email confirmations require proper SMTP configuration
+                  in Supabase.
                 </AlertDescription>
               </Alert>
 
@@ -86,13 +99,19 @@ export default function SupabaseOAuthSetup() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => copyToClipboard(siteUrl, "siteUrl")}
+                        onClick={() => copyToClipboard(siteUrl, 'siteUrl')}
                         className="h-6 px-2"
                       >
-                        {copied === "siteUrl" ? <CheckCircle className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                        {copied === 'siteUrl' ? (
+                          <CheckCircle className="h-3 w-3" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
                       </Button>
                     </div>
-                    <code className="bg-white px-3 py-2 rounded border text-sm block break-all">{siteUrl}</code>
+                    <code className="bg-white px-3 py-2 rounded border text-sm block break-all">
+                      {siteUrl}
+                    </code>
                   </div>
                 </div>
 
@@ -108,12 +127,14 @@ export default function SupabaseOAuthSetup() {
                           `${siteUrl}/auth/callback`,
                           `${siteUrl}/dashboard`,
                           `${siteUrl}/`,
-                          "http://localhost:3000/auth/callback",
-                          "http://localhost:3000/dashboard",
-                          "http://localhost:3000/",
+                          'http://localhost:3000/auth/callback',
+                          'http://localhost:3000/dashboard',
+                          'http://localhost:3000/',
                         ].map((url, index) => (
                           <div key={index} className="flex items-center justify-between">
-                            <code className="bg-white px-3 py-2 rounded border text-sm flex-1 mr-2">{url}</code>
+                            <code className="bg-white px-3 py-2 rounded border text-sm flex-1 mr-2">
+                              {url}
+                            </code>
                             <Button
                               variant="outline"
                               size="sm"
@@ -146,11 +167,13 @@ export default function SupabaseOAuthSetup() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">Step 5: Configure SMTP (Optional but Recommended)</h3>
+                  <h3 className="text-lg font-semibold mb-3">
+                    Step 5: Configure SMTP (Optional but Recommended)
+                  </h3>
                   <Alert>
                     <AlertDescription>
-                      For production use, configure custom SMTP settings in the Auth Settings. Without SMTP, Supabase
-                      uses their default service which may have limitations.
+                      For production use, configure custom SMTP settings in the Auth Settings.
+                      Without SMTP, Supabase uses their default service which may have limitations.
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -201,10 +224,14 @@ export default function SupabaseOAuthSetup() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => copyToClipboard(githubClientId, "clientId")}
+                          onClick={() => copyToClipboard(githubClientId, 'clientId')}
                           className="h-6 px-2"
                         >
-                          {copied === "clientId" ? <CheckCircle className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                          {copied === 'clientId' ? (
+                            <CheckCircle className="h-3 w-3" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
                         </Button>
                       </div>
                       <code className="bg-white px-3 py-2 rounded border text-sm block break-all">
@@ -218,10 +245,10 @@ export default function SupabaseOAuthSetup() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => copyToClipboard(githubClientSecret, "clientSecret")}
+                          onClick={() => copyToClipboard(githubClientSecret, 'clientSecret')}
                           className="h-6 px-2"
                         >
-                          {copied === "clientSecret" ? (
+                          {copied === 'clientSecret' ? (
                             <CheckCircle className="h-3 w-3" />
                           ) : (
                             <Copy className="h-3 w-3" />
@@ -239,17 +266,19 @@ export default function SupabaseOAuthSetup() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => copyToClipboard(callbackUrl, "callbackUrl")}
+                          onClick={() => copyToClipboard(callbackUrl, 'callbackUrl')}
                           className="h-6 px-2"
                         >
-                          {copied === "callbackUrl" ? (
+                          {copied === 'callbackUrl' ? (
                             <CheckCircle className="h-3 w-3" />
                           ) : (
                             <Copy className="h-3 w-3" />
                           )}
                         </Button>
                       </div>
-                      <code className="bg-white px-3 py-2 rounded border text-sm block break-all">{callbackUrl}</code>
+                      <code className="bg-white px-3 py-2 rounded border text-sm block break-all">
+                        {callbackUrl}
+                      </code>
                     </div>
                   </div>
                 </div>
@@ -305,7 +334,9 @@ export default function SupabaseOAuthSetup() {
                 <Settings className="h-5 w-5 text-green-600" />
                 Testing Authentication
               </CardTitle>
-              <CardDescription>Verify that email confirmations and GitHub OAuth are working</CardDescription>
+              <CardDescription>
+                Verify that email confirmations and GitHub OAuth are working
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -348,8 +379,9 @@ export default function SupabaseOAuthSetup() {
 
               <Alert>
                 <AlertDescription>
-                  <strong>Troubleshooting:</strong> If authentication isn't working, check the browser console for
-                  errors and verify all URLs are correctly configured in both Supabase and GitHub.
+                  <strong>Troubleshooting:</strong> If authentication isn't working, check the
+                  browser console for errors and verify all URLs are correctly configured in both
+                  Supabase and GitHub.
                 </AlertDescription>
               </Alert>
 

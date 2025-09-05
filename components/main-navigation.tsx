@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { useAuth, usePermissions } from "@/components/auth/auth-provider"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+import { useState, useEffect } from 'react'
+import { useAuth, usePermissions } from '@/components/auth/auth-provider'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 import {
   Package,
   QrCode,
@@ -37,9 +37,9 @@ import {
   Menu,
   X,
   Sparkles,
-} from "lucide-react"
-import Link from "next/link"
-import SignOutButton from "@/components/auth/sign-out-button"
+} from 'lucide-react'
+import Link from 'next/link'
+import SignOutButton from '@/components/auth/sign-out-button'
 
 interface MainNavigationProps {
   className?: string
@@ -58,241 +58,241 @@ export default function MainNavigation({ className }: MainNavigationProps) {
 
   const featureCategories = [
     {
-      title: "Asset Management",
+      title: 'Asset Management',
       icon: Package,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200",
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200',
       features: [
         {
-          name: "Asset Dashboard",
-          description: "View and manage all assets",
-          href: "/assets",
+          name: 'Asset Dashboard',
+          description: 'View and manage all assets',
+          href: '/assets',
           icon: Grid3X3,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Add New Asset",
-          description: "Create new asset entries",
-          href: "/add-asset",
+          name: 'Add New Asset',
+          description: 'Create new asset entries',
+          href: '/add-asset',
           icon: Plus,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Asset Search",
-          description: "Advanced search and filtering",
-          href: "/assets",
+          name: 'Asset Search',
+          description: 'Advanced search and filtering',
+          href: '/assets',
           icon: Search,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Asset History",
-          description: "Track asset lifecycle",
-          href: "/assets",
+          name: 'Asset History',
+          description: 'Track asset lifecycle',
+          href: '/assets',
           icon: History,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Asset Attachments",
-          description: "Manage asset files and documents",
-          href: "/assets",
+          name: 'Asset Attachments',
+          description: 'Manage asset files and documents',
+          href: '/assets',
           icon: FileImage,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Asset Depreciation",
-          description: "Financial tracking and depreciation",
-          href: "/assets",
+          name: 'Asset Depreciation',
+          description: 'Financial tracking and depreciation',
+          href: '/assets',
           icon: DollarSign,
-          status: "active"
-        }
-      ]
+          status: 'active',
+        },
+      ],
     },
     {
-      title: "QR Code System",
+      title: 'QR Code System',
       icon: QrCode,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      borderColor: "border-purple-200",
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50',
+      borderColor: 'border-purple-200',
       features: [
         {
-          name: "QR Management",
-          description: "Generate and manage QR codes",
-          href: "/qr-management",
+          name: 'QR Management',
+          description: 'Generate and manage QR codes',
+          href: '/qr-management',
           icon: QrCode,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "QR Scanner",
-          description: "Scan QR codes with camera",
-          href: "/qr-test",
+          name: 'QR Scanner',
+          description: 'Scan QR codes with camera',
+          href: '/qr-test',
           icon: Eye,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Bulk QR Operations",
-          description: "Generate multiple QR codes",
-          href: "/preview",
+          name: 'Bulk QR Operations',
+          description: 'Generate multiple QR codes',
+          href: '/preview',
           icon: Layers,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "QR Analytics",
-          description: "Track QR code usage",
-          href: "/analytics",
+          name: 'QR Analytics',
+          description: 'Track QR code usage',
+          href: '/analytics',
           icon: BarChart3,
-          status: "active"
-        }
-      ]
+          status: 'active',
+        },
+      ],
     },
     {
-      title: "Geofencing & Location",
+      title: 'Geofencing & Location',
       icon: MapPin,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      borderColor: "border-green-200",
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-200',
       features: [
         {
-          name: "Interactive Maps",
-          description: "View assets on interactive maps",
-          href: "/asset-tracker-preview",
+          name: 'Interactive Maps',
+          description: 'View assets on interactive maps',
+          href: '/asset-tracker-preview',
           icon: Globe,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Geofence Management",
-          description: "Create and manage geofence zones",
-          href: "/asset/geofence-management",
+          name: 'Geofence Management',
+          description: 'Create and manage geofence zones',
+          href: '/asset/geofence-management',
           icon: Navigation,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Location History",
-          description: "Track asset movement history",
-          href: "/assets",
+          name: 'Location History',
+          description: 'Track asset movement history',
+          href: '/assets',
           icon: History,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Geofence Alerts",
-          description: "Monitor zone entry/exit",
-          href: "/assets",
+          name: 'Geofence Alerts',
+          description: 'Monitor zone entry/exit',
+          href: '/assets',
           icon: AlertTriangle,
-          status: "active"
-        }
-      ]
+          status: 'active',
+        },
+      ],
     },
     {
-      title: "Analytics & Reporting",
+      title: 'Analytics & Reporting',
       icon: BarChart3,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      borderColor: "border-orange-200",
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50',
+      borderColor: 'border-orange-200',
       features: [
         {
-          name: "Analytics Dashboard",
-          description: "Comprehensive analytics",
-          href: "/analytics",
+          name: 'Analytics Dashboard',
+          description: 'Comprehensive analytics',
+          href: '/analytics',
           icon: BarChart3,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Real-time Charts",
-          description: "Live data visualization",
-          href: "/analytics",
+          name: 'Real-time Charts',
+          description: 'Live data visualization',
+          href: '/analytics',
           icon: Zap,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Activity Feed",
-          description: "Live system activity",
-          href: "/dashboard",
+          name: 'Activity Feed',
+          description: 'Live system activity',
+          href: '/dashboard',
           icon: Clock,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Custom Reports",
-          description: "Generate custom reports",
-          href: "/analytics",
+          name: 'Custom Reports',
+          description: 'Generate custom reports',
+          href: '/analytics',
           icon: FileText,
-          status: "active"
-        }
-      ]
+          status: 'active',
+        },
+      ],
     },
     {
-      title: "Bulk Operations",
+      title: 'Bulk Operations',
       icon: Layers,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50",
-      borderColor: "border-indigo-200",
+      color: 'text-indigo-600',
+      bgColor: 'bg-indigo-50',
+      borderColor: 'border-indigo-200',
       features: [
         {
-          name: "Bulk Import",
-          description: "Import assets from CSV/Excel",
-          href: "/assets",
+          name: 'Bulk Import',
+          description: 'Import assets from CSV/Excel',
+          href: '/assets',
           icon: Upload,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Bulk Export",
-          description: "Export assets to various formats",
-          href: "/assets",
+          name: 'Bulk Export',
+          description: 'Export assets to various formats',
+          href: '/assets',
           icon: Download,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Bulk QR Generation",
-          description: "Generate QR codes for multiple assets",
-          href: "/preview",
+          name: 'Bulk QR Generation',
+          description: 'Generate QR codes for multiple assets',
+          href: '/preview',
           icon: QrCode,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Bulk Assignment",
-          description: "Assign multiple assets to users",
-          href: "/assets",
+          name: 'Bulk Assignment',
+          description: 'Assign multiple assets to users',
+          href: '/assets',
           icon: Users,
-          status: "active"
-        }
-      ]
+          status: 'active',
+        },
+      ],
     },
     {
-      title: "System Administration",
+      title: 'System Administration',
       icon: Settings,
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      borderColor: "border-red-200",
+      color: 'text-red-600',
+      bgColor: 'bg-red-50',
+      borderColor: 'border-red-200',
       features: [
         {
-          name: "Database Management",
-          description: "Database tools and scripts",
-          href: "/debug-supabase",
+          name: 'Database Management',
+          description: 'Database tools and scripts',
+          href: '/debug-supabase',
           icon: Database,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Auth Debug",
-          description: "Authentication troubleshooting",
-          href: "/auth/debug",
+          name: 'Auth Debug',
+          description: 'Authentication troubleshooting',
+          href: '/auth/debug',
           icon: Shield,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Supabase Status",
-          description: "Check system status",
-          href: "/supabase-test",
+          name: 'Supabase Status',
+          description: 'Check system status',
+          href: '/supabase-test',
           icon: CheckCircle,
-          status: "active"
+          status: 'active',
         },
         {
-          name: "Environment Debug",
-          description: "Environment configuration",
-          href: "/debug-urls",
+          name: 'Environment Debug',
+          description: 'Environment configuration',
+          href: '/debug-urls',
           icon: Settings,
-          status: "active"
-        }
-      ]
-    }
+          status: 'active',
+        },
+      ],
+    },
   ]
 
   return (
@@ -337,16 +337,14 @@ export default function MainNavigation({ className }: MainNavigationProps) {
                                 <h4 className="font-medium text-sm text-gray-900 truncate">
                                   {feature.name}
                                 </h4>
-                                <Badge 
+                                <Badge
                                   variant={feature.status === 'active' ? 'default' : 'secondary'}
                                   className="text-xs"
                                 >
                                   {feature.status}
                                 </Badge>
                               </div>
-                              <p className="text-xs text-gray-600 mt-1">
-                                {feature.description}
-                              </p>
+                              <p className="text-xs text-gray-600 mt-1">{feature.description}</p>
                             </div>
                           </div>
                         </CardContent>
@@ -402,10 +400,8 @@ export default function MainNavigation({ className }: MainNavigationProps) {
             )}
           </CardContent>
         </Card>
-        <div className="flex items-center space-x-4">
-          {user && <SignOutButton />}
-        </div>
+        <div className="flex items-center space-x-4">{user && <SignOutButton />}</div>
       </div>
     </div>
   )
-} 
+}

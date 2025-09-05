@@ -1,15 +1,15 @@
-import type { Metadata } from "next"
-import Link from "next/link"
-import { SUPABASE_CONFIG } from "@/lib/supabase/config"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Separator } from "@/components/ui/separator"
-import { AlertCircle, CheckCircle2, Copy } from "lucide-react"
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { SUPABASE_CONFIG } from '@/lib/supabase/config'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Separator } from '@/components/ui/separator'
+import { AlertCircle, CheckCircle2, Copy } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: "Supabase Configuration Guide",
-  description: "Complete guide for setting up Supabase with your application",
+  title: 'Supabase Configuration Guide',
+  description: 'Complete guide for setting up Supabase with your application',
 }
 
 export default function SupabaseSetupPage() {
@@ -21,7 +21,8 @@ export default function SupabaseSetupPage() {
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Important</AlertTitle>
         <AlertDescription>
-          Keep your API keys secure. Never commit them to public repositories or expose them in client-side code.
+          Keep your API keys secure. Never commit them to public repositories or expose them in
+          client-side code.
         </AlertDescription>
       </Alert>
 
@@ -36,7 +37,9 @@ export default function SupabaseSetupPage() {
           <Card>
             <CardHeader>
               <CardTitle>Vercel Environment Variables</CardTitle>
-              <CardDescription>Configure these environment variables in your Vercel project settings</CardDescription>
+              <CardDescription>
+                Configure these environment variables in your Vercel project settings
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -60,7 +63,9 @@ export default function SupabaseSetupPage() {
                     <Copy className="h-3.5 w-3.5 shrink-0 cursor-pointer opacity-70 hover:opacity-100" />
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">Your public anon key for client-side operations</p>
+                <p className="text-sm text-muted-foreground">
+                  Your public anon key for client-side operations
+                </p>
               </div>
 
               <Separator />
@@ -82,8 +87,8 @@ export default function SupabaseSetupPage() {
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Warning</AlertTitle>
                   <AlertDescription>
-                    The service role key has admin privileges. Only use it in secure server environments and never
-                    expose it to the client.
+                    The service role key has admin privileges. Only use it in secure server
+                    environments and never expose it to the client.
                   </AlertDescription>
                 </Alert>
               </div>
@@ -98,7 +103,9 @@ export default function SupabaseSetupPage() {
                     <Copy className="h-3.5 w-3.5 cursor-pointer opacity-70 hover:opacity-100" />
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">Your application URL for OAuth redirects</p>
+                <p className="text-sm text-muted-foreground">
+                  Your application URL for OAuth redirects
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -116,7 +123,8 @@ export default function SupabaseSetupPage() {
                 </li>
                 <li>Add each of the variables listed above</li>
                 <li>
-                  Make sure to set the correct <strong>Environment</strong> (Production, Preview, Development)
+                  Make sure to set the correct <strong>Environment</strong> (Production, Preview,
+                  Development)
                 </li>
                 <li>
                   Click <strong>Save</strong> to apply the changes
@@ -135,7 +143,8 @@ export default function SupabaseSetupPage() {
             </CardHeader>
             <CardContent>
               <p className="mb-4">
-                Create a <code>.env.local</code> file in your project root with the following variables:
+                Create a <code>.env.local</code> file in your project root with the following
+                variables:
               </p>
 
               <div className="bg-muted p-4 rounded-md font-mono text-sm mb-6 whitespace-pre overflow-x-auto">
@@ -149,8 +158,8 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000`}
                 <CheckCircle2 className="h-4 w-4" />
                 <AlertTitle>Important</AlertTitle>
                 <AlertDescription>
-                  Make sure to add <code>.env.local</code> to your <code>.gitignore</code> file to prevent committing
-                  sensitive keys.
+                  Make sure to add <code>.env.local</code> to your <code>.gitignore</code> file to
+                  prevent committing sensitive keys.
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -161,7 +170,9 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000`}
           <Card>
             <CardHeader>
               <CardTitle>Testing Your Supabase Connection</CardTitle>
-              <CardDescription>Verify that your Supabase configuration is working correctly</CardDescription>
+              <CardDescription>
+                Verify that your Supabase configuration is working correctly
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <h3 className="font-medium">1. Authentication Test</h3>
@@ -212,7 +223,9 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000`}
       <Card>
         <CardHeader>
           <CardTitle>Security Best Practices</CardTitle>
-          <CardDescription>Follow these guidelines to keep your Supabase project secure</CardDescription>
+          <CardDescription>
+            Follow these guidelines to keep your Supabase project secure
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="list-disc pl-5 space-y-2">

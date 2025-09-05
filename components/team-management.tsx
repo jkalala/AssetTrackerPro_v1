@@ -1,138 +1,157 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { User, Mail, Loader2, Trash2, Plus } from "lucide-react"
-import Link from "next/link";
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { User, Mail, Loader2, Trash2, Plus } from 'lucide-react'
+import Link from 'next/link'
 
-const ROLES = ["admin", "manager", "user"];
+const ROLES = ['admin', 'manager', 'user']
 
 export default function TeamManagement() {
-  const [members, setMembers] = useState<any[]>([]);
-  const [invitations, setInvitations] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [inviteDialog, setInviteDialog] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState("user");
-  const [inviteLoading, setInviteLoading] = useState(false);
-  const [teamId, setTeamId] = useState<string | null>(null);
+  const [members, setMembers] = useState<any[]>([])
+  const [invitations, setInvitations] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [inviteDialog, setInviteDialog] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteRole, setInviteRole] = useState('user')
+  const [inviteLoading, setInviteLoading] = useState(false)
+  const [teamId, setTeamId] = useState<string | null>(null)
 
   // Fetch teamId for current user
   useEffect(() => {
     async function fetchTeamId() {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
       try {
-        const supabase = createClient();
-        const { data: profile } = await supabase.from("profiles").select("team_id").single();
-        if (profile?.team_id) setTeamId(profile.team_id);
+        const supabase = createClient()
+        const { data: profile } = await supabase.from('profiles').select('team_id').single()
+        if (profile?.team_id) setTeamId(profile.team_id)
       } catch (e: any) {
-        setError("Failed to load team info");
+        setError('Failed to load team info')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
-    fetchTeamId();
-  }, []);
+    fetchTeamId()
+  }, [])
 
   // Fetch members and invitations
   useEffect(() => {
-    if (!teamId) return;
-    setLoading(true);
-    setError(null);
+    if (!teamId) return
+    setLoading(true)
+    setError(null)
     async function fetchData() {
       try {
-        const supabase = createClient();
+        const supabase = createClient()
         const [membersRes, invitesRes] = await Promise.all([
-          supabase.rpc("get_team_members", { team_id: teamId }),
+          supabase.rpc('get_team_members', { team_id: teamId }),
           fetch(`/api/teams/${teamId}/invitations`).then(r => r.json()),
-        ]);
-        setMembers(membersRes.data || []);
-        setInvitations(invitesRes.invitations || []);
+        ])
+        setMembers(membersRes.data || [])
+        setInvitations(invitesRes.invitations || [])
       } catch (e: any) {
-        setError("Failed to load team data");
+        setError('Failed to load team data')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
-    fetchData();
-  }, [teamId]);
+    fetchData()
+  }, [teamId])
 
   async function handleInvite() {
-    setInviteLoading(true);
-    setError(null);
+    setInviteLoading(true)
+    setError(null)
     try {
-      const res = await fetch("/api/teams/invite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/teams/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: inviteEmail, role: inviteRole, team_id: teamId }),
-      });
-      if (!res.ok) throw new Error((await res.json()).error || "Failed to invite");
-      setInviteDialog(false);
-      setInviteEmail("");
-      setInviteRole("user");
+      })
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed to invite')
+      setInviteDialog(false)
+      setInviteEmail('')
+      setInviteRole('user')
       // Refresh
-      const invitesRes = await fetch(`/api/teams/${teamId}/invitations`).then(r => r.json());
-      setInvitations(invitesRes.invitations || []);
+      const invitesRes = await fetch(`/api/teams/${teamId}/invitations`).then(r => r.json())
+      setInvitations(invitesRes.invitations || [])
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message)
     } finally {
-      setInviteLoading(false);
+      setInviteLoading(false)
     }
   }
 
   async function handleRemoveMember(userId: string) {
-    if (!window.confirm("Remove this member from the team?")) return;
-    setLoading(true);
-    setError(null);
+    if (!window.confirm('Remove this member from the team?')) return
+    setLoading(true)
+    setError(null)
     try {
-      const res = await fetch(`/api/teams/${teamId}/members/${userId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error((await res.json()).error || "Failed to remove member");
-      setMembers(members.filter(m => m.user_id !== userId));
+      const res = await fetch(`/api/teams/${teamId}/members/${userId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed to remove member')
+      setMembers(members.filter(m => m.user_id !== userId))
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   async function handleChangeRole(userId: string, newRole: string) {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
     try {
       const res = await fetch(`/api/teams/${teamId}/members/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: newRole }),
-      });
-      if (!res.ok) throw new Error((await res.json()).error || "Failed to change role");
-      setMembers(members.map(m => m.user_id === userId ? { ...m, role: newRole } : m));
+      })
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed to change role')
+      setMembers(members.map(m => (m.user_id === userId ? { ...m, role: newRole } : m)))
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   async function handleCancelInvite(inviteId: string) {
-    if (!window.confirm("Cancel this invitation?")) return;
-    setLoading(true);
-    setError(null);
+    if (!window.confirm('Cancel this invitation?')) return
+    setLoading(true)
+    setError(null)
     try {
-      const res = await fetch(`/api/teams/invitations/${inviteId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error((await res.json()).error || "Failed to cancel invitation");
-      setInvitations(invitations.filter(i => i.id !== inviteId));
+      const res = await fetch(`/api/teams/invitations/${inviteId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed to cancel invitation')
+      setInvitations(invitations.filter(i => i.id !== inviteId))
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
@@ -159,7 +178,9 @@ export default function TeamManagement() {
             <Plus className="w-4 h-4 mr-2" /> Invite Member
           </Button>
           {loading ? (
-            <div className="flex items-center gap-2"><Loader2 className="animate-spin" /> Loading...</div>
+            <div className="flex items-center gap-2">
+              <Loader2 className="animate-spin" /> Loading...
+            </div>
           ) : error ? (
             <div className="text-red-500">{error}</div>
           ) : (
@@ -175,20 +196,35 @@ export default function TeamManagement() {
               <TableBody>
                 {members.map(member => (
                   <TableRow key={member.user_id}>
-                    <TableCell>{member.profiles?.full_name || <span className="text-gray-400">-</span>}</TableCell>
-                    <TableCell>{member.profiles?.email || <span className="text-gray-400">-</span>}</TableCell>
                     <TableCell>
-                      <Select value={member.role} onValueChange={val => handleChangeRole(member.user_id, val)}>
+                      {member.profiles?.full_name || <span className="text-gray-400">-</span>}
+                    </TableCell>
+                    <TableCell>
+                      {member.profiles?.email || <span className="text-gray-400">-</span>}
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        value={member.role}
+                        onValueChange={val => handleChangeRole(member.user_id, val)}
+                      >
                         <SelectTrigger className="w-28">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {ROLES.map(role => <SelectItem key={role} value={role}>{role}</SelectItem>)}
+                          {ROLES.map(role => (
+                            <SelectItem key={role} value={role}>
+                              {role}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </TableCell>
                     <TableCell>
-                      <Button variant="destructive" size="icon" onClick={() => handleRemoveMember(member.user_id)}>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => handleRemoveMember(member.user_id)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </TableCell>
@@ -206,7 +242,9 @@ export default function TeamManagement() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="flex items-center gap-2"><Loader2 className="animate-spin" /> Loading...</div>
+            <div className="flex items-center gap-2">
+              <Loader2 className="animate-spin" /> Loading...
+            </div>
           ) : error ? (
             <div className="text-red-500">{error}</div>
           ) : invitations.length === 0 ? (
@@ -226,9 +264,15 @@ export default function TeamManagement() {
                   <TableRow key={invite.id}>
                     <TableCell>{invite.email}</TableCell>
                     <TableCell>{invite.role}</TableCell>
-                    <TableCell>{invite.invited_by || <span className="text-gray-400">-</span>}</TableCell>
                     <TableCell>
-                      <Button variant="destructive" size="icon" onClick={() => handleCancelInvite(invite.id)}>
+                      {invite.invited_by || <span className="text-gray-400">-</span>}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => handleCancelInvite(invite.id)}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </TableCell>
@@ -257,17 +301,26 @@ export default function TeamManagement() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {ROLES.map(role => <SelectItem key={role} value={role}>{role}</SelectItem>)}
+                {ROLES.map(role => (
+                  <SelectItem key={role} value={role}>
+                    {role}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <DialogFooter>
             <Button onClick={handleInvite} disabled={inviteLoading}>
-              {inviteLoading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : <Mail className="w-4 h-4 mr-2" />} Send Invite
+              {inviteLoading ? (
+                <Loader2 className="animate-spin w-4 h-4 mr-2" />
+              ) : (
+                <Mail className="w-4 h-4 mr-2" />
+              )}{' '}
+              Send Invite
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-  );
-} 
+  )
+}

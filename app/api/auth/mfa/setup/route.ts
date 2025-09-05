@@ -5,7 +5,10 @@ import { mfaService } from '@/lib/services/mfa-service'
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -15,10 +18,7 @@ export async function POST(request: NextRequest) {
     const { method_type, method_name, phone_number, email } = body
 
     if (!method_type || !method_name) {
-      return NextResponse.json(
-        { error: 'Method type and name are required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Method type and name are required' }, { status: 400 })
     }
 
     // Get user's tenant ID
@@ -48,12 +48,7 @@ export async function POST(request: NextRequest) {
         if (!phone_number) {
           return NextResponse.json({ error: 'Phone number is required for SMS' }, { status: 400 })
         }
-        result = await mfaService.setupSMS(
-          profile.tenant_id,
-          user.id,
-          method_name,
-          phone_number
-        )
+        result = await mfaService.setupSMS(profile.tenant_id, user.id, method_name, phone_number)
         break
 
       case 'email':
@@ -61,12 +56,7 @@ export async function POST(request: NextRequest) {
         if (!emailAddress) {
           return NextResponse.json({ error: 'Email address is required' }, { status: 400 })
         }
-        result = await mfaService.setupEmail(
-          profile.tenant_id,
-          user.id,
-          method_name,
-          emailAddress
-        )
+        result = await mfaService.setupEmail(profile.tenant_id, user.id, method_name, emailAddress)
         break
 
       default:
@@ -79,14 +69,14 @@ export async function POST(request: NextRequest) {
 
     // Return setup data (secret is only returned during setup, not stored in method)
     const response: {
-      success: boolean;
-      method: unknown;
-      qrCode?: string;
-      secret?: string;
-      backupCodes?: string[];
+      success: boolean
+      method: unknown
+      qrCode?: string
+      secret?: string
+      backupCodes?: string[]
     } = {
       success: true,
-      method: result.method
+      method: result.method,
     }
 
     if (result.qrCode) {
@@ -104,9 +94,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(response)
   } catch (error) {
     console.error('MFA setup error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

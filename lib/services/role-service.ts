@@ -4,10 +4,10 @@
 // Service for managing hierarchical roles and permissions
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  Role, 
-  RoleInsert, 
-  RoleUpdate, 
+import {
+  Role,
+  RoleInsert,
+  RoleUpdate,
   RoleWithPermissions,
   Permission,
   RolePermission,
@@ -18,7 +18,7 @@ import {
   RevokeRoleRequest,
   RoleHierarchyNode,
   RoleAnalytics,
-  RBACError
+  RBACError,
 } from '@/lib/types/rbac'
 import { Database } from '@/lib/types/database'
 
@@ -66,27 +66,22 @@ export class RoleService {
       }
 
       // Create role using stored procedure
-      const { data: roleId, error } = await supabase
-        .rpc('create_role_with_permissions', {
-          p_tenant_id: tenantId,
-          p_name: request.name,
-          p_display_name: request.display_name,
-          p_description: request.description || null,
-          p_parent_role_id: request.parent_role_id || null,
-          p_permission_names: request.permission_names || [],
-          p_created_by: createdBy
-        })
+      const { data: roleId, error } = await supabase.rpc('create_role_with_permissions', {
+        p_tenant_id: tenantId,
+        p_name: request.name,
+        p_display_name: request.display_name,
+        p_description: request.description || null,
+        p_parent_role_id: request.parent_role_id || null,
+        p_permission_names: request.permission_names || [],
+        p_created_by: createdBy,
+      })
 
       if (error) {
         throw new Error(`Failed to create role: ${error.message}`)
       }
 
       // Fetch and return the created role
-      const { data: role } = await supabase
-        .from('roles')
-        .select('*')
-        .eq('id', roleId)
-        .single()
+      const { data: role } = await supabase.from('roles').select('*').eq('id', roleId).single()
 
       if (!role) {
         throw new Error('Failed to retrieve created role')
@@ -102,7 +97,7 @@ export class RoleService {
   async updateRole(tenantId: string, roleId: string, updates: RoleUpdate): Promise<Role> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Check if role exists and is not a system role
       const { data: existingRole } = await supabase
         .from('roles')
@@ -142,7 +137,7 @@ export class RoleService {
         .from('roles')
         .update({
           ...updates,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', roleId)
         .eq('tenant_id', tenantId)
@@ -163,7 +158,7 @@ export class RoleService {
   async deleteRole(tenantId: string, roleId: string): Promise<boolean> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Check if role exists and is not a system role
       const { data: role } = await supabase
         .from('roles')
@@ -232,10 +227,11 @@ export class RoleService {
   async getRole(tenantId: string, roleId: string): Promise<RoleWithPermissions | null> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: role } = await supabase
         .from('roles')
-        .select(`
+        .select(
+          `
           *,
           role_permissions (
             id,
@@ -252,7 +248,8 @@ export class RoleService {
               scope
             )
           )
-        `)
+        `
+        )
         .eq('id', roleId)
         .eq('tenant_id', tenantId)
         .single()
@@ -262,16 +259,17 @@ export class RoleService {
       }
 
       // Transform the data to match our interface
-      const permissions = role.role_permissions?.map((rp: any) => ({
-        ...rp.permissions,
-        conditions: rp.conditions,
-        resource_filters: rp.resource_filters,
-        inherited_from_role_id: rp.inherited_from_role_id
-      })) || []
+      const permissions =
+        role.role_permissions?.map((rp: any) => ({
+          ...rp.permissions,
+          conditions: rp.conditions,
+          resource_filters: rp.resource_filters,
+          inherited_from_role_id: rp.inherited_from_role_id,
+        })) || []
 
       return {
         ...role,
-        permissions
+        permissions,
       }
     } catch (error) {
       console.error('Error getting role:', error)
@@ -282,7 +280,7 @@ export class RoleService {
   async getRoles(tenantId: string, includeInactive = false): Promise<Role[]> {
     try {
       const supabase = await this.getSupabase()
-      
+
       let query = supabase
         .from('roles')
         .select('*')
@@ -311,7 +309,7 @@ export class RoleService {
     try {
       const supabase = await this.getSupabase()
       const roles = await this.getRoles(tenantId)
-      
+
       // Get user counts for each role
       const { data: userCounts } = await supabase
         .from('user_roles')
@@ -319,15 +317,20 @@ export class RoleService {
         .eq('tenant_id', tenantId)
         .eq('is_active', true)
 
-      const userCountMap = userCounts?.reduce((acc, ur) => {
-        acc[ur.role_id] = (acc[ur.role_id] || 0) + 1
-        return acc
-      }, {} as Record<string, number>) || {}
+      const userCountMap =
+        userCounts?.reduce(
+          (acc, ur) => {
+            acc[ur.role_id] = (acc[ur.role_id] || 0) + 1
+            return acc
+          },
+          {} as Record<string, number>
+        ) || {}
 
       // Get permissions for each role
       const { data: rolePermissions } = await supabase
         .from('role_permissions')
-        .select(`
+        .select(
+          `
           role_id,
           permissions (
             id,
@@ -337,32 +340,39 @@ export class RoleService {
             action,
             scope
           )
-        `)
+        `
+        )
         .eq('tenant_id', tenantId)
 
-      const permissionMap = rolePermissions?.reduce((acc, rp) => {
-        if (!acc[rp.role_id]) {
-          acc[rp.role_id] = []
-        }
-        // rp.permissions is already an array of permissions
-        if (Array.isArray(rp.permissions)) {
-          acc[rp.role_id].push(...rp.permissions.map((p: any) => ({
-            ...p,
-            is_system_permission: p.is_system_permission || false,
-            created_at: p.created_at || new Date().toISOString(),
-            updated_at: p.updated_at || new Date().toISOString()
-          })))
-        } else {
-          const permission = rp.permissions as any
-          acc[rp.role_id].push({
-            ...permission,
-            is_system_permission: permission.is_system_permission || false,
-            created_at: permission.created_at || new Date().toISOString(),
-            updated_at: permission.updated_at || new Date().toISOString()
-          })
-        }
-        return acc
-      }, {} as Record<string, Permission[]>) || {}
+      const permissionMap =
+        rolePermissions?.reduce(
+          (acc, rp) => {
+            if (!acc[rp.role_id]) {
+              acc[rp.role_id] = []
+            }
+            // rp.permissions is already an array of permissions
+            if (Array.isArray(rp.permissions)) {
+              acc[rp.role_id].push(
+                ...rp.permissions.map((p: any) => ({
+                  ...p,
+                  is_system_permission: p.is_system_permission || false,
+                  created_at: p.created_at || new Date().toISOString(),
+                  updated_at: p.updated_at || new Date().toISOString(),
+                }))
+              )
+            } else {
+              const permission = rp.permissions as any
+              acc[rp.role_id].push({
+                ...permission,
+                is_system_permission: permission.is_system_permission || false,
+                created_at: permission.created_at || new Date().toISOString(),
+                updated_at: permission.updated_at || new Date().toISOString(),
+              })
+            }
+            return acc
+          },
+          {} as Record<string, Permission[]>
+        ) || {}
 
       // Build hierarchy
       const roleMap = new Map<string, RoleHierarchyNode>()
@@ -374,7 +384,7 @@ export class RoleService {
           role,
           children: [],
           permissions: permissionMap[role.id] || [],
-          user_count: userCountMap[role.id] || 0
+          user_count: userCountMap[role.id] || 0,
         }
         roleMap.set(role.id, node)
       })
@@ -403,10 +413,14 @@ export class RoleService {
   // ROLE ASSIGNMENT MANAGEMENT
   // =====================================================
 
-  async assignRoleToUser(tenantId: string, request: AssignRoleRequest, assignedBy: string): Promise<UserRole> {
+  async assignRoleToUser(
+    tenantId: string,
+    request: AssignRoleRequest,
+    assignedBy: string
+  ): Promise<UserRole> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Validate role exists
       const { data: role } = await supabase
         .from('roles')
@@ -450,14 +464,13 @@ export class RoleService {
       }
 
       // Use stored procedure to assign role
-      const { data: assignmentId, error } = await supabase
-        .rpc('assign_role_to_user', {
-          p_tenant_id: tenantId,
-          p_user_id: request.user_id,
-          p_role_id: request.role_id,
-          p_expires_at: request.expires_at || null,
-          p_assigned_by: assignedBy
-        })
+      const { data: assignmentId, error } = await supabase.rpc('assign_role_to_user', {
+        p_tenant_id: tenantId,
+        p_user_id: request.user_id,
+        p_role_id: request.role_id,
+        p_expires_at: request.expires_at || null,
+        p_assigned_by: assignedBy,
+      })
 
       if (error) {
         throw new Error(`Failed to assign role: ${error.message}`)
@@ -481,19 +494,22 @@ export class RoleService {
     }
   }
 
-  async revokeRoleFromUser(tenantId: string, request: RevokeRoleRequest, revokedBy: string): Promise<boolean> {
+  async revokeRoleFromUser(
+    tenantId: string,
+    request: RevokeRoleRequest,
+    revokedBy: string
+  ): Promise<boolean> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Use stored procedure to revoke role
-      const { data: success, error } = await supabase
-        .rpc('revoke_role_from_user', {
-          p_tenant_id: tenantId,
-          p_user_id: request.user_id,
-          p_role_id: request.role_id,
-          p_reason: request.reason || null,
-          p_revoked_by: revokedBy
-        })
+      const { data: success, error } = await supabase.rpc('revoke_role_from_user', {
+        p_tenant_id: tenantId,
+        p_user_id: request.user_id,
+        p_role_id: request.role_id,
+        p_reason: request.reason || null,
+        p_revoked_by: revokedBy,
+      })
 
       if (error) {
         throw new Error(`Failed to revoke role: ${error.message}`)
@@ -506,13 +522,17 @@ export class RoleService {
     }
   }
 
-  async getUserRoles(tenantId: string, userId: string): Promise<(Role & { assigned_at: string; expires_at?: string; assigned_by: string })[]> {
+  async getUserRoles(
+    tenantId: string,
+    userId: string
+  ): Promise<(Role & { assigned_at: string; expires_at?: string; assigned_by: string })[]> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: userRoles, error } = await supabase
         .from('user_roles')
-        .select(`
+        .select(
+          `
           assigned_at,
           expires_at,
           assigned_by,
@@ -527,7 +547,8 @@ export class RoleService {
             is_default_role,
             is_active
           )
-        `)
+        `
+        )
         .eq('tenant_id', tenantId)
         .eq('user_id', userId)
         .eq('is_active', true)
@@ -537,12 +558,14 @@ export class RoleService {
         throw new Error(`Failed to get user roles: ${error.message}`)
       }
 
-      return userRoles?.map((ur: any) => ({
-        ...ur.roles,
-        assigned_at: ur.assigned_at,
-        expires_at: ur.expires_at,
-        assigned_by: ur.assigned_by
-      })) || []
+      return (
+        userRoles?.map((ur: any) => ({
+          ...ur.roles,
+          assigned_at: ur.assigned_at,
+          expires_at: ur.expires_at,
+          assigned_by: ur.assigned_by,
+        })) || []
+      )
     } catch (error) {
       console.error('Error getting user roles:', error)
       throw error
@@ -552,10 +575,11 @@ export class RoleService {
   async getRoleUsers(tenantId: string, roleId: string): Promise<any[]> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: roleUsers, error } = await supabase
         .from('user_roles')
-        .select(`
+        .select(
+          `
           assigned_at,
           expires_at,
           assigned_by,
@@ -567,7 +591,8 @@ export class RoleService {
             department,
             job_title
           )
-        `)
+        `
+        )
         .eq('tenant_id', tenantId)
         .eq('role_id', roleId)
         .eq('is_active', true)
@@ -577,12 +602,14 @@ export class RoleService {
         throw new Error(`Failed to get role users: ${error.message}`)
       }
 
-      return roleUsers?.map((ru: any) => ({
-        ...ru.profiles,
-        assigned_at: ru.assigned_at,
-        expires_at: ru.expires_at,
-        assigned_by: ru.assigned_by
-      })) || []
+      return (
+        roleUsers?.map((ru: any) => ({
+          ...ru.profiles,
+          assigned_at: ru.assigned_at,
+          expires_at: ru.expires_at,
+          assigned_by: ru.assigned_by,
+        })) || []
+      )
     } catch (error) {
       console.error('Error getting role users:', error)
       throw error
@@ -593,10 +620,16 @@ export class RoleService {
   // PERMISSION MANAGEMENT
   // =====================================================
 
-  async addPermissionToRole(tenantId: string, roleId: string, permissionId: string, conditions?: Record<string, any>, resourceFilters?: Record<string, any>): Promise<RolePermission> {
+  async addPermissionToRole(
+    tenantId: string,
+    roleId: string,
+    permissionId: string,
+    conditions?: Record<string, any>,
+    resourceFilters?: Record<string, any>
+  ): Promise<RolePermission> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: rolePermission, error } = await supabase
         .from('role_permissions')
         .insert({
@@ -604,7 +637,7 @@ export class RoleService {
           role_id: roleId,
           permission_id: permissionId,
           conditions: conditions || {},
-          resource_filters: resourceFilters || {}
+          resource_filters: resourceFilters || {},
         })
         .select()
         .single()
@@ -620,10 +653,14 @@ export class RoleService {
     }
   }
 
-  async removePermissionFromRole(tenantId: string, roleId: string, permissionId: string): Promise<boolean> {
+  async removePermissionFromRole(
+    tenantId: string,
+    roleId: string,
+    permissionId: string
+  ): Promise<boolean> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { error } = await supabase
         .from('role_permissions')
         .delete()
@@ -645,7 +682,7 @@ export class RoleService {
   async getSystemPermissions(): Promise<Permission[]> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: permissions, error } = await supabase
         .from('permissions')
         .select('*')
@@ -696,13 +733,21 @@ export class RoleService {
       const totalChecks = usageStats?.length || 0
       const grantedChecks = usageStats?.filter(us => us.was_granted).length || 0
       const deniedChecks = totalChecks - grantedChecks
-      const avgResponseTime = totalChecks > 0 ? (usageStats?.reduce((sum, us) => sum + (us.response_time_ms || 0), 0) || 0) / totalChecks : 0
+      const avgResponseTime =
+        totalChecks > 0
+          ? (usageStats?.reduce((sum, us) => sum + (us.response_time_ms || 0), 0) || 0) /
+            totalChecks
+          : 0
 
       // Get most used permissions
-      const permissionUsage = usageStats?.reduce((acc, us) => {
-        acc[us.permission_id] = (acc[us.permission_id] || 0) + 1
-        return acc
-      }, {} as Record<string, number>) || {}
+      const permissionUsage =
+        usageStats?.reduce(
+          (acc, us) => {
+            acc[us.permission_id] = (acc[us.permission_id] || 0) + 1
+            return acc
+          },
+          {} as Record<string, number>
+        ) || {}
 
       const mostUsedPermissions = Object.entries(permissionUsage)
         .sort(([, a], [, b]) => b - a)
@@ -711,7 +756,7 @@ export class RoleService {
           const permission = role.permissions.find(p => p.id === permissionId)
           return {
             permission_name: permission?.name || 'Unknown',
-            usage_count: count
+            usage_count: count,
           }
         })
 
@@ -724,9 +769,9 @@ export class RoleService {
           total_checks: totalChecks,
           granted_checks: grantedChecks,
           denied_checks: deniedChecks,
-          avg_response_time_ms: avgResponseTime
+          avg_response_time_ms: avgResponseTime,
         },
-        most_used_permissions: mostUsedPermissions
+        most_used_permissions: mostUsedPermissions,
       }
     } catch (error) {
       console.error('Error getting role analytics:', error)
@@ -741,9 +786,8 @@ export class RoleService {
   async cleanupExpiredAssignments(tenantId: string): Promise<number> {
     try {
       const supabase = await this.getSupabase()
-      
-      const { data: count, error } = await supabase
-        .rpc('cleanup_expired_role_assignments')
+
+      const { data: count, error } = await supabase.rpc('cleanup_expired_role_assignments')
 
       if (error) {
         throw new Error(`Failed to cleanup expired assignments: ${error.message}`)
@@ -759,7 +803,7 @@ export class RoleService {
   async validateRoleHierarchy(tenantId: string): Promise<boolean> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Check for circular references
       const { data: roles } = await supabase
         .from('roles')

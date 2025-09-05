@@ -1,48 +1,48 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Activity, 
-  Users, 
-  Download, 
-  Filter, 
-  Calendar, 
-  Zap, 
+import { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  BarChart3,
+  TrendingUp,
+  Activity,
+  Users,
+  Download,
+  Filter,
+  Calendar,
+  Zap,
   RefreshCw,
   AlertCircle,
   FileText,
   DollarSign,
   Package,
   MapPin,
-  Clock
-} from "lucide-react"
-import { useAnalytics } from "@/hooks/use-analytics"
-import { useAnalyticsExport } from "@/hooks/use-analytics-export"
-import { useToast } from "@/hooks/use-toast"
-import { 
+  Clock,
+} from 'lucide-react'
+import { useAnalytics } from '@/hooks/use-analytics'
+import { useAnalyticsExport } from '@/hooks/use-analytics-export'
+import { useToast } from '@/hooks/use-toast'
+import {
   AnalyticsSummaryCards,
   CategoryDistributionChart,
   StatusDistributionChart,
   LocationDistributionChart,
   TimeSeriesChart,
-  ScanActivityChart
-} from "@/components/analytics-charts"
+  ScanActivityChart,
+} from '@/components/analytics-charts'
 import {
   AssetValueReport,
   AssetStatusReport,
   LocationReport,
-  UserActivityReport
-} from "@/components/analytics-reports"
+  UserActivityReport,
+} from '@/components/analytics-reports'
 
 export default function AnalyticsPage() {
-  const [activeTab, setActiveTab] = useState("overview")
+  const [activeTab, setActiveTab] = useState('overview')
   const { data, loading, error, refresh } = useAnalytics()
   const [isRefreshing, setIsRefreshing] = useState(false)
   const { exportAll, exporting } = useAnalyticsExport()
@@ -59,21 +59,21 @@ export default function AnalyticsPage() {
       const result = await exportAll('json')
       if (result.success) {
         toast({
-          title: "Export Successful",
-          description: "All analytics data exported as JSON",
+          title: 'Export Successful',
+          description: 'All analytics data exported as JSON',
         })
       } else {
         toast({
-          title: "Export Failed",
-          description: result.error || "Failed to export data",
-          variant: "destructive",
+          title: 'Export Failed',
+          description: result.error || 'Failed to export data',
+          variant: 'destructive',
         })
       }
     } catch (error) {
       toast({
-        title: "Export Failed",
-        description: "An unexpected error occurred",
-        variant: "destructive",
+        title: 'Export Failed',
+        description: 'An unexpected error occurred',
+        variant: 'destructive',
       })
     }
   }
@@ -124,9 +124,7 @@ export default function AnalyticsPage() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Failed to load analytics data: {error}
-            </AlertDescription>
+            <AlertDescription>Failed to load analytics data: {error}</AlertDescription>
           </Alert>
         </div>
       </div>
@@ -170,7 +168,7 @@ export default function AnalyticsPage() {
             </div>
             <div className="flex items-center space-x-4">
               <Button onClick={handleRefresh} disabled={isRefreshing} variant="outline" size="sm">
-                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
               <Button onClick={handleExportAll} disabled={exporting} variant="outline" size="sm">
@@ -224,7 +222,7 @@ export default function AnalyticsPage() {
           <TabsContent value="overview">
             <div className="space-y-6">
               <AnalyticsSummaryCards overview={data.overview} />
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <TimeSeriesChart data={data.timeSeries} />
                 <ScanActivityChart data={data.scanData} />
@@ -245,7 +243,7 @@ export default function AnalyticsPage() {
                 <TimeSeriesChart data={data.timeSeries} />
                 <ScanActivityChart data={data.scanData} />
               </div>
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <CategoryDistributionChart data={data.categories} />
                 <StatusDistributionChart data={data.status} />
@@ -340,8 +338,11 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {data.recentActivity.slice(0, 10).map((activity) => (
-                      <div key={activity.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    {data.recentActivity.slice(0, 10).map(activity => (
+                      <div
+                        key={activity.id}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
                         <div className="flex items-center space-x-4">
                           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                           <div>
@@ -368,7 +369,7 @@ export default function AnalyticsPage() {
           <TabsContent value="users">
             <div className="space-y-6">
               <UserActivityReport data={data} />
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                   <CardContent className="pt-6">
@@ -386,7 +387,12 @@ export default function AnalyticsPage() {
                       </div>
                       <div className="text-sm text-gray-600">Active Users</div>
                       <Badge variant="default" className="mt-2">
-                        {data.userActivity.totalUsers > 0 ? Math.round((data.userActivity.activeUsers / data.userActivity.totalUsers) * 100) : 0}% active
+                        {data.userActivity.totalUsers > 0
+                          ? Math.round(
+                              (data.userActivity.activeUsers / data.userActivity.totalUsers) * 100
+                            )
+                          : 0}
+                        % active
                       </Badge>
                     </div>
                   </CardContent>

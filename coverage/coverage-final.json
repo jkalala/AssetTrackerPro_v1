@@ -1,0 +1,29 @@
+{
+  "lib/middleware/role-validation.ts": {
+    "path": "lib/middleware/role-validation.ts",
+    "statementMap": {},
+    "fnMap": {},
+    "branchMap": {},
+    "s": {},
+    "f": {},
+    "b": {}
+  },
+  "lib/services/permission-service.ts": {
+    "path": "lib/services/permission-service.ts",
+    "statementMap": {},
+    "fnMap": {},
+    "branchMap": {},
+    "s": {},
+    "f": {},
+    "b": {}
+  },
+  "lib/utils/permission-cache.ts": {
+    "path": "lib/utils/permission-cache.ts",
+    "statementMap": {},
+    "fnMap": {},
+    "branchMap": {},
+    "s": {},
+    "f": {},
+    "b": {}
+  }
+}

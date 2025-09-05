@@ -1,21 +1,23 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertTriangle, CheckCircle, RefreshCw } from "lucide-react"
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react'
 
 export default function ProfileCheck() {
-  const [profileStatus, setProfileStatus] = useState<"checking" | "exists" | "missing" | "error">("checking")
+  const [profileStatus, setProfileStatus] = useState<'checking' | 'exists' | 'missing' | 'error'>(
+    'checking'
+  )
   const [error, setError] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
   const supabase = createClient()
 
   const checkProfile = async () => {
     try {
-      setProfileStatus("checking")
+      setProfileStatus('checking')
       setError(null)
 
       const {
@@ -23,28 +25,28 @@ export default function ProfileCheck() {
       } = await supabase.auth.getUser()
 
       if (!user) {
-        setError("No authenticated user found")
-        setProfileStatus("error")
+        setError('No authenticated user found')
+        setProfileStatus('error')
         return
       }
 
       const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("id, email, full_name, role")
-        .eq("id", user.id)
+        .from('profiles')
+        .select('id, email, full_name, role')
+        .eq('id', user.id)
         .single()
 
-      if (profileError && profileError.code === "PGRST116") {
-        setProfileStatus("missing")
+      if (profileError && profileError.code === 'PGRST116') {
+        setProfileStatus('missing')
       } else if (profileError) {
         setError(profileError.message)
-        setProfileStatus("error")
+        setProfileStatus('error')
       } else {
-        setProfileStatus("exists")
+        setProfileStatus('exists')
       }
     } catch (err) {
-      setError("Failed to check profile")
-      setProfileStatus("error")
+      setError('Failed to check profile')
+      setProfileStatus('error')
     }
   }
 
@@ -58,27 +60,31 @@ export default function ProfileCheck() {
       } = await supabase.auth.getUser()
 
       if (!user) {
-        setError("No authenticated user found")
+        setError('No authenticated user found')
         return
       }
 
-      const { error: createError } = await supabase.from("profiles").insert({
+      const { error: createError } = await supabase.from('profiles').insert({
         id: user.id,
         email: user.email!,
-        full_name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || null,
+        full_name:
+          user.user_metadata?.full_name ||
+          user.user_metadata?.name ||
+          user.email?.split('@')[0] ||
+          null,
         avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
-        role: "user",
+        role: 'user',
       })
 
       if (createError) {
         setError(createError.message)
       } else {
-        setProfileStatus("exists")
+        setProfileStatus('exists')
         // Refresh the page to update the UI
         window.location.reload()
       }
     } catch (err) {
-      setError("Failed to create profile")
+      setError('Failed to create profile')
     } finally {
       setCreating(false)
     }
@@ -88,7 +94,7 @@ export default function ProfileCheck() {
     checkProfile()
   }, [])
 
-  if (profileStatus === "checking") {
+  if (profileStatus === 'checking') {
     return (
       <Alert>
         <RefreshCw className="h-4 w-4 animate-spin" />
@@ -97,16 +103,18 @@ export default function ProfileCheck() {
     )
   }
 
-  if (profileStatus === "exists") {
+  if (profileStatus === 'exists') {
     return (
       <Alert className="border-green-200 bg-green-50">
         <CheckCircle className="h-4 w-4 text-green-600" />
-        <AlertDescription className="text-green-800">User profile is properly configured</AlertDescription>
+        <AlertDescription className="text-green-800">
+          User profile is properly configured
+        </AlertDescription>
       </Alert>
     )
   }
 
-  if (profileStatus === "missing") {
+  if (profileStatus === 'missing') {
     return (
       <Card className="border-orange-200 bg-orange-50">
         <CardHeader>
@@ -134,7 +142,7 @@ export default function ProfileCheck() {
                   Creating Profile...
                 </>
               ) : (
-                "Create User Profile"
+                'Create User Profile'
               )}
             </Button>
 

@@ -1,12 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  StyleSheet,
-  Alert,
-  Dimensions,
-} from 'react-native';
-import { Camera } from 'expo-camera';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+import React, { useState, useEffect, useRef } from 'react'
+import { View, StyleSheet, Alert, Dimensions } from 'react-native'
+import { Camera } from 'expo-camera'
+import { BarCodeScanner } from 'expo-barcode-scanner'
 import {
   Button,
   Card,
@@ -15,115 +10,103 @@ import {
   ActivityIndicator,
   Text,
   IconButton,
-} from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme } from 'react-native-paper';
-import { assetAPI } from '../services/api';
+} from 'react-native-paper'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { useTheme } from 'react-native-paper'
+import { assetAPI } from '../services/api'
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window')
 
 export default function ScannerScreen({ navigation }) {
-  const theme = useTheme();
-  const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
-  const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
-  const [scanning, setScanning] = useState(false);
-  const [lastScannedData, setLastScannedData] = useState(null);
-  const cameraRef = useRef(null);
+  const theme = useTheme()
+  const [hasPermission, setHasPermission] = useState(null)
+  const [scanned, setScanned] = useState(false)
+  const [flash, setFlash] = useState(Camera.Constants.FlashMode.off)
+  const [scanning, setScanning] = useState(false)
+  const [lastScannedData, setLastScannedData] = useState(null)
+  const cameraRef = useRef(null)
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
+    ;(async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync()
+      setHasPermission(status === 'granted')
+    })()
+  }, [])
 
   const handleBarCodeScanned = async ({ type, data }) => {
-    if (scanned) return;
-    
-    setScanned(true);
-    setScanning(true);
-    setLastScannedData(data);
+    if (scanned) return
+
+    setScanned(true)
+    setScanning(true)
+    setLastScannedData(data)
 
     try {
       // Process the scanned QR code
-      const result = await processQRCode(data);
-      
+      const result = await processQRCode(data)
+
       if (result.success) {
-        Alert.alert(
-          'Asset Found!',
-          `Asset: ${result.asset.name}\nStatus: ${result.asset.status}`,
-          [
-            {
-              text: 'View Details',
-              onPress: () => navigation.navigate('Assets'),
-            },
-            {
-              text: 'Scan Again',
-              onPress: () => resetScanner(),
-            },
-          ]
-        );
-      } else {
-        Alert.alert(
-          'Asset Not Found',
-          'The scanned QR code does not match any known asset.',
-          [
-            {
-              text: 'Try Again',
-              onPress: () => resetScanner(),
-            },
-          ]
-        );
-      }
-    } catch (error) {
-      console.error('Error processing QR code:', error);
-      Alert.alert(
-        'Error',
-        'Failed to process QR code. Please try again.',
-        [
+        Alert.alert('Asset Found!', `Asset: ${result.asset.name}\nStatus: ${result.asset.status}`, [
           {
-            text: 'OK',
+            text: 'View Details',
+            onPress: () => navigation.navigate('Assets'),
+          },
+          {
+            text: 'Scan Again',
             onPress: () => resetScanner(),
           },
-        ]
-      );
+        ])
+      } else {
+        Alert.alert('Asset Not Found', 'The scanned QR code does not match any known asset.', [
+          {
+            text: 'Try Again',
+            onPress: () => resetScanner(),
+          },
+        ])
+      }
+    } catch (error) {
+      console.error('Error processing QR code:', error)
+      Alert.alert('Error', 'Failed to process QR code. Please try again.', [
+        {
+          text: 'OK',
+          onPress: () => resetScanner(),
+        },
+      ])
     } finally {
-      setScanning(false);
+      setScanning(false)
     }
-  };
+  }
 
-  const processQRCode = async (qrData) => {
+  const processQRCode = async qrData => {
     try {
       // Try to find asset by QR code
-      const response = await assetAPI.getAssets({ qr_code: qrData });
-      
+      const response = await assetAPI.getAssets({ qr_code: qrData })
+
       if (response.assets && response.assets.length > 0) {
         return {
           success: true,
           asset: response.assets[0],
-        };
+        }
       }
-      
-      return { success: false };
+
+      return { success: false }
     } catch (error) {
-      console.error('Error processing QR code:', error);
-      throw error;
+      console.error('Error processing QR code:', error)
+      throw error
     }
-  };
+  }
 
   const resetScanner = () => {
-    setScanned(false);
-    setLastScannedData(null);
-  };
+    setScanned(false)
+    setLastScannedData(null)
+  }
 
   const toggleFlash = () => {
     setFlash(
       flash === Camera.Constants.FlashMode.off
         ? Camera.Constants.FlashMode.torch
         : Camera.Constants.FlashMode.off
-    );
-  };
+    )
+  }
 
   if (hasPermission === null) {
     return (
@@ -131,7 +114,7 @@ export default function ScannerScreen({ navigation }) {
         <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>Requesting camera permission...</Text>
       </View>
-    );
+    )
   }
 
   if (hasPermission === false) {
@@ -147,7 +130,8 @@ export default function ScannerScreen({ navigation }) {
             />
             <Title style={styles.permissionTitle}>Camera Access Required</Title>
             <Paragraph style={styles.permissionText}>
-              This app needs camera access to scan QR codes. Please enable camera permissions in your device settings.
+              This app needs camera access to scan QR codes. Please enable camera permissions in
+              your device settings.
             </Paragraph>
             <Button
               mode="contained"
@@ -159,7 +143,7 @@ export default function ScannerScreen({ navigation }) {
           </Card.Content>
         </Card>
       </View>
-    );
+    )
   }
 
   return (
@@ -202,19 +186,13 @@ export default function ScannerScreen({ navigation }) {
 
           {/* Instructions */}
           <View style={styles.instructions}>
-            <Text style={styles.instructionText}>
-              Position the QR code within the frame
-            </Text>
+            <Text style={styles.instructionText}>Position the QR code within the frame</Text>
           </View>
 
           {/* Bottom Controls */}
           <View style={styles.bottomControls}>
             {scanned && (
-              <Button
-                mode="contained"
-                onPress={resetScanner}
-                style={styles.scanAgainButton}
-              >
+              <Button mode="contained" onPress={resetScanner} style={styles.scanAgainButton}>
                 Scan Again
               </Button>
             )}
@@ -240,7 +218,7 @@ export default function ScannerScreen({ navigation }) {
         </Card>
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -389,4 +367,4 @@ const styles = StyleSheet.create({
     right: 20,
     backgroundColor: 'white',
   },
-});
+})

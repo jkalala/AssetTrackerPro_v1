@@ -1,16 +1,16 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { ExternalLink, Copy, CheckCircle } from "lucide-react"
-import { useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { ExternalLink, Copy, CheckCircle } from 'lucide-react'
+import { useState } from 'react'
 
 export default function GitHubOAuthSetup() {
   const [copied, setCopied] = useState<string | null>(null)
 
-  const currentOrigin = typeof window !== "undefined" ? window.location.origin : ""
-  const callbackUrl = "https://wyqohljdnrouovuqqdlt.supabase.co/auth/v1/callback"
+  const currentOrigin = typeof window !== 'undefined' ? window.location.origin : ''
+  const callbackUrl = 'https://wyqohljdnrouovuqqdlt.supabase.co/auth/v1/callback'
 
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text)
@@ -23,13 +23,15 @@ export default function GitHubOAuthSetup() {
       <Card>
         <CardHeader>
           <CardTitle>GitHub OAuth Setup for v0 Preview</CardTitle>
-          <CardDescription>Configure GitHub OAuth to work with the current preview environment</CardDescription>
+          <CardDescription>
+            Configure GitHub OAuth to work with the current preview environment
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <Alert>
             <AlertDescription>
-              You're currently viewing this app in the v0 preview environment. To enable GitHub OAuth, you need to
-              update your GitHub OAuth app settings.
+              You're currently viewing this app in the v0 preview environment. To enable GitHub
+              OAuth, you need to update your GitHub OAuth app settings.
             </AlertDescription>
           </Alert>
 
@@ -46,7 +48,9 @@ export default function GitHubOAuthSetup() {
                   Open GitHub Developer Settings <ExternalLink className="h-4 w-4 ml-2" />
                 </a>
               </Button>
-              <p className="text-sm text-gray-600">Click on your "AssetTracker Pro" OAuth app to edit it.</p>
+              <p className="text-sm text-gray-600">
+                Click on your "AssetTracker Pro" OAuth app to edit it.
+              </p>
             </div>
           </div>
 
@@ -59,13 +63,19 @@ export default function GitHubOAuthSetup() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => copyToClipboard(currentOrigin, "homepage")}
+                    onClick={() => copyToClipboard(currentOrigin, 'homepage')}
                     className="h-6 px-2"
                   >
-                    {copied === "homepage" ? <CheckCircle className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    {copied === 'homepage' ? (
+                      <CheckCircle className="h-3 w-3" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
                   </Button>
                 </div>
-                <code className="bg-white px-3 py-2 rounded border text-sm block break-all">{currentOrigin}</code>
+                <code className="bg-white px-3 py-2 rounded border text-sm block break-all">
+                  {currentOrigin}
+                </code>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg">
@@ -74,13 +84,19 @@ export default function GitHubOAuthSetup() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => copyToClipboard(callbackUrl, "callback")}
+                    onClick={() => copyToClipboard(callbackUrl, 'callback')}
                     className="h-6 px-2"
                   >
-                    {copied === "callback" ? <CheckCircle className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    {copied === 'callback' ? (
+                      <CheckCircle className="h-3 w-3" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
                   </Button>
                 </div>
-                <code className="bg-white px-3 py-2 rounded border text-sm block break-all">{callbackUrl}</code>
+                <code className="bg-white px-3 py-2 rounded border text-sm block break-all">
+                  {callbackUrl}
+                </code>
               </div>
             </div>
           </div>
@@ -97,8 +113,8 @@ export default function GitHubOAuthSetup() {
 
           <Alert>
             <AlertDescription>
-              <strong>Alternative:</strong> You can also download this code and run it locally at http://localhost:3000
-              where GitHub OAuth is already configured to work.
+              <strong>Alternative:</strong> You can also download this code and run it locally at
+              http://localhost:3000 where GitHub OAuth is already configured to work.
             </AlertDescription>
           </Alert>
 

@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { createContext, useContext, useEffect, useState } from "react"
-import type { User, Session } from "@supabase/supabase-js"
+import type React from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+import type { User, Session } from '@supabase/supabase-js'
 import { DEFAULT_ROLE_PERMISSIONS, Role, Permission } from '@/lib/rbac/types'
 import { createClient } from '@/lib/supabase/client'
 
@@ -29,7 +29,7 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => {
   const context = useContext(AuthContext)
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
 }
@@ -37,7 +37,7 @@ export const useAuth = () => {
 export const usePermissions = () => {
   const { permissions, role } = useAuth()
   const hasPermission = (perm: Permission) => permissions.includes(perm)
-  const hasAnyPermission = (perms: Permission[]) => perms.some((p) => permissions.includes(p))
+  const hasAnyPermission = (perms: Permission[]) => perms.some(p => permissions.includes(p))
   return { permissions, role, hasPermission, hasAnyPermission }
 }
 
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const retry = () => {
-    setRetryCount((prev) => prev + 1)
+    setRetryCount(prev => prev + 1)
     setError(null)
     setLoading(true)
   }
@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError(null)
 
         // Dynamic import to prevent SSR issues
-        const { createClient, checkSupabaseConnection } = await import("@/lib/supabase/client")
+        const { createClient, checkSupabaseConnection } = await import('@/lib/supabase/client')
 
         // First check if Supabase is properly configured
         const healthCheck = await checkSupabaseConnection()
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } = await supabase.auth.getSession()
 
         if (sessionError) {
-          console.error("Session error:", sessionError)
+          console.error('Session error:', sessionError)
           throw new Error(`Authentication error: ${sessionError.message}`)
         }
 
@@ -120,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const {
           data: { subscription },
         } = supabase.auth.onAuthStateChange(async (event: string, session: Session | null) => {
-          console.log("Auth state changed:", event, session?.user?.id)
+          console.log('Auth state changed:', event, session?.user?.id)
           if (isMounted) {
             setUser(session?.user ?? null)
             setLoading(false)
@@ -150,9 +150,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           subscription.unsubscribe()
         }
       } catch (error) {
-        console.error("Auth initialization error:", error)
+        console.error('Auth initialization error:', error)
         if (isMounted) {
-          setError(error instanceof Error ? error.message : "Authentication initialization failed")
+          setError(error instanceof Error ? error.message : 'Authentication initialization failed')
           setLoading(false)
         }
       }
@@ -162,23 +162,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       isMounted = false
-      cleanup?.then((unsubscribe) => unsubscribe?.())
+      cleanup?.then(unsubscribe => unsubscribe?.())
     }
   }, [mounted, retryCount])
 
   const signOut = async () => {
     try {
-      const { createClient } = await import("@/lib/supabase/client")
+      const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
       const { error } = await supabase.auth.signOut()
 
       if (error) {
-        console.error("Sign out error:", error)
+        console.error('Sign out error:', error)
         setError(`Sign out failed: ${error.message}`)
       }
     } catch (error) {
-      console.error("Sign out error:", error)
-      setError("Sign out failed")
+      console.error('Sign out error:', error)
+      setError('Sign out failed')
     }
   }
 
@@ -200,7 +200,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50">
         <div className="text-center max-w-md mx-auto p-6">
           <div className="bg-red-100 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-4">
-            <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              className="h-8 w-8 text-red-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -222,5 +227,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     )
   }
 
-  return <AuthContext.Provider value={{ user, loading, error, signOut, retry, role, permissions }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, loading, error, signOut, retry, role, permissions }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }

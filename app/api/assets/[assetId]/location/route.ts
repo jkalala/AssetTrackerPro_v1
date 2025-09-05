@@ -69,4 +69,4 @@ export async function PUT(request: Request, { params }: { params: { assetId: str
     prev_location_lng: prevAsset?.location_lng ?? null,
   })
   return NextResponse.json({ location: updated })
-} 
+}

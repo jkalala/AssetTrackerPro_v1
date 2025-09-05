@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import { useSearchParams } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertTriangle, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { useSearchParams } from 'next/navigation'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 export default function AuthCodeErrorPage() {
   const searchParams = useSearchParams()
-  const error = searchParams.get("error") || "Authentication failed"
+  const error = searchParams.get('error') || 'Authentication failed'
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -19,7 +19,9 @@ export default function AuthCodeErrorPage() {
             <AlertTriangle className="h-6 w-6 text-red-500 mr-2" />
             Authentication Error
           </CardTitle>
-          <CardDescription className="text-center">There was a problem confirming your account</CardDescription>
+          <CardDescription className="text-center">
+            There was a problem confirming your account
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert variant="destructive">

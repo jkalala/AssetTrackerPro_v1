@@ -4,12 +4,12 @@
 // Service for managing SSO providers, SAML, OAuth, and OIDC integration
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  SsoProvider, 
-  SsoProviderInsert, 
+import {
+  SsoProvider,
+  SsoProviderInsert,
   SsoProviderUpdate,
   SsoSession,
-  SecurityEventInsert
+  SecurityEventInsert,
 } from '@/lib/types/database'
 import crypto from 'crypto'
 
@@ -30,7 +30,7 @@ export interface SsoProviderConfig {
       groups?: string
     }
   }
-  
+
   // OAuth 2.0 / OIDC Configuration
   oauth?: {
     clientId: string
@@ -107,7 +107,7 @@ export class SsoService {
         provider_name: providerName,
         provider_type: providerType,
         configuration: encryptedConfig,
-        is_enabled: true
+        is_enabled: true,
       }
 
       // Set type-specific fields
@@ -142,7 +142,7 @@ export class SsoService {
       await this.logSecurityEvent(tenantId, userId, 'login_success', {
         action: 'sso_provider_created',
         provider_name: providerName,
-        provider_type: providerType
+        provider_type: providerType,
       })
 
       return { success: true, provider }
@@ -150,7 +150,7 @@ export class SsoService {
       console.error('Error creating SSO provider:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -195,7 +195,10 @@ export class SsoService {
 
       if (updates.config) {
         // Validate new configuration
-        const validation = this.validateProviderConfig(existingProvider.provider_type, updates.config)
+        const validation = this.validateProviderConfig(
+          existingProvider.provider_type,
+          updates.config
+        )
         if (!validation.valid) {
           return { success: false, error: validation.error }
         }
@@ -211,7 +214,11 @@ export class SsoService {
           updateData.slo_url = updates.config.saml.sloUrl
           updateData.certificate = updates.config.saml.certificate
           updateData.attribute_mapping = updates.config.saml.attributeMapping || {}
-        } else if ((existingProvider.provider_type === 'oauth2' || existingProvider.provider_type === 'oidc') && updates.config.oauth) {
+        } else if (
+          (existingProvider.provider_type === 'oauth2' ||
+            existingProvider.provider_type === 'oidc') &&
+          updates.config.oauth
+        ) {
           updateData.client_id = updates.config.oauth.clientId
           updateData.client_secret_encrypted = this.encryptSecret(updates.config.oauth.clientSecret)
           updateData.authorization_url = updates.config.oauth.authorizationUrl
@@ -240,7 +247,7 @@ export class SsoService {
       console.error('Error updating SSO provider:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -275,7 +282,7 @@ export class SsoService {
       // Decrypt sensitive configuration for admin use
       const decryptedProviders = providers?.map(provider => ({
         ...provider,
-        configuration: this.decryptSensitiveConfig(provider.configuration)
+        configuration: this.decryptSensitiveConfig(provider.configuration),
       }))
 
       return { success: true, providers: decryptedProviders }
@@ -283,7 +290,7 @@ export class SsoService {
       console.error('Error getting SSO providers:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -322,18 +329,16 @@ export class SsoService {
 
       // Create SSO session record
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
-      
-      await supabase
-        .from('sso_sessions')
-        .insert({
-          id: sessionId,
-          tenant_id: tenantId,
-          user_id: '', // Will be set after successful authentication
-          provider_id: providerId,
-          oauth_state: sessionState,
-          attributes: { return_url: returnUrl },
-          expires_at: expiresAt.toISOString()
-        })
+
+      await supabase.from('sso_sessions').insert({
+        id: sessionId,
+        tenant_id: tenantId,
+        user_id: '', // Will be set after successful authentication
+        provider_id: providerId,
+        oauth_state: sessionState,
+        attributes: { return_url: returnUrl },
+        expires_at: expiresAt.toISOString(),
+      })
 
       let redirectUrl: string
 
@@ -346,13 +351,13 @@ export class SsoService {
       return {
         success: true,
         redirectUrl,
-        sessionId
+        sessionId,
       }
     } catch (error) {
       console.error('Error initiating SSO auth:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -404,20 +409,20 @@ export class SsoService {
       await supabase
         .from('sso_sessions')
         .update({
-          attributes: { ...callbackData, user_info: userInfo }
+          attributes: { ...callbackData, user_info: userInfo },
         })
         .eq('id', sessionId)
 
       return {
         success: true,
         userInfo,
-        sessionId
+        sessionId,
       }
     } catch (error) {
       console.error('Error handling SSO callback:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -429,7 +434,7 @@ export class SsoService {
   private async buildSamlAuthRequest(provider: SsoProvider, sessionState: string): Promise<string> {
     // This is a simplified SAML implementation
     // In production, use a proper SAML library like @node-saml/node-saml
-    
+
     const samlRequest = `
       <samlp:AuthnRequest 
         xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
@@ -446,20 +451,20 @@ export class SsoService {
     const encodedRequest = Buffer.from(samlRequest).toString('base64')
     const params = new URLSearchParams({
       SAMLRequest: encodedRequest,
-      RelayState: sessionState
+      RelayState: sessionState,
     })
 
     return `${provider.sso_url}?${params.toString()}`
   }
 
   private async processSamlResponse(
-    provider: SsoProvider, 
+    provider: SsoProvider,
     callbackData: Record<string, any>
   ): Promise<{ success: boolean; userInfo?: any; sessionId?: string; error?: string }> {
     try {
       // This is a simplified SAML response processing
       // In production, use a proper SAML library for validation and parsing
-      
+
       const samlResponse = callbackData.SAMLResponse
       const relayState = callbackData.RelayState
 
@@ -469,29 +474,29 @@ export class SsoService {
 
       // Decode and parse SAML response
       const decodedResponse = Buffer.from(samlResponse, 'base64').toString('utf-8')
-      
+
       // Validate signature and extract user attributes
       // This would involve XML parsing and signature verification
-      
+
       // Mock user info extraction
       const userInfo = {
         email: 'user@example.com', // Would be extracted from SAML assertion
         firstName: 'John',
         lastName: 'Doe',
         displayName: 'John Doe',
-        groups: ['users']
+        groups: ['users'],
       }
 
       return {
         success: true,
         userInfo,
-        sessionId: relayState
+        sessionId: relayState,
       }
     } catch (error) {
       console.error('Error processing SAML response:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'SAML processing error'
+        error: error instanceof Error ? error.message : 'SAML processing error',
       }
     }
   }
@@ -501,8 +506,8 @@ export class SsoService {
   // =====================================================
 
   private async buildOAuthAuthRequest(
-    provider: SsoProvider, 
-    sessionState: string, 
+    provider: SsoProvider,
+    sessionState: string,
     returnUrl?: string
   ): Promise<string> {
     const config = this.decryptSensitiveConfig(provider.configuration)
@@ -517,14 +522,14 @@ export class SsoService {
       client_id: oauth.clientId,
       redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/sso/callback/${provider.id}`,
       scope: oauth.scopes?.join(' ') || 'openid email profile',
-      state: sessionState
+      state: sessionState,
     })
 
     return `${oauth.authorizationUrl}?${params.toString()}`
   }
 
   private async processOAuthCallback(
-    provider: SsoProvider, 
+    provider: SsoProvider,
     callbackData: Record<string, any>
   ): Promise<{ success: boolean; userInfo?: any; sessionId?: string; error?: string }> {
     try {
@@ -550,15 +555,15 @@ export class SsoService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json'
+          Accept: 'application/json',
         },
         body: new URLSearchParams({
           grant_type: 'authorization_code',
           client_id: oauth.clientId,
           client_secret: oauth.clientSecret,
           code,
-          redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/sso/callback/${provider.id}`
-        })
+          redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/sso/callback/${provider.id}`,
+        }),
       })
 
       if (!tokenResponse.ok) {
@@ -573,8 +578,8 @@ export class SsoService {
       if (oauth.userinfoUrl) {
         const userResponse = await fetch(oauth.userinfoUrl, {
           headers: {
-            'Authorization': `Bearer ${tokens.access_token}`
-          }
+            Authorization: `Bearer ${tokens.access_token}`,
+          },
         })
 
         if (userResponse.ok) {
@@ -591,13 +596,13 @@ export class SsoService {
       return {
         success: true,
         userInfo: mappedUserInfo,
-        sessionId: state
+        sessionId: state,
       }
     } catch (error) {
       console.error('Error processing OAuth callback:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'OAuth processing error'
+        error: error instanceof Error ? error.message : 'OAuth processing error',
       }
     }
   }
@@ -607,7 +612,7 @@ export class SsoService {
   // =====================================================
 
   private validateProviderConfig(
-    providerType: 'saml2' | 'oauth2' | 'oidc', 
+    providerType: 'saml2' | 'oauth2' | 'oidc',
     config: SsoProviderConfig
   ): { valid: boolean; error?: string } {
     if (providerType === 'saml2') {
@@ -621,8 +626,12 @@ export class SsoService {
       if (!config.oauth) {
         return { valid: false, error: 'OAuth configuration is required' }
       }
-      if (!config.oauth.clientId || !config.oauth.clientSecret || 
-          !config.oauth.authorizationUrl || !config.oauth.tokenUrl) {
+      if (
+        !config.oauth.clientId ||
+        !config.oauth.clientSecret ||
+        !config.oauth.authorizationUrl ||
+        !config.oauth.tokenUrl
+      ) {
         return { valid: false, error: 'Missing required OAuth configuration fields' }
       }
     }
@@ -645,11 +654,11 @@ export class SsoService {
     const algorithm = 'aes-256-gcm'
     const key = crypto.scryptSync(process.env.ENCRYPTION_KEY || 'default-key', 'salt', 32)
     const iv = crypto.randomBytes(16)
-    
+
     const cipher = crypto.createCipheriv(algorithm, key, iv)
     let encrypted = cipher.update(secret, 'utf8', 'hex')
     encrypted += cipher.final('hex')
-    
+
     return `${iv.toString('hex')}:${encrypted}`
   }
 
@@ -702,12 +711,10 @@ export class SsoService {
         event_type: eventType,
         severity: 'low',
         description: `SSO ${eventType.replace('_', ' ')}`,
-        details
+        details,
       }
 
-      await supabase
-        .from('security_events')
-        .insert(eventData)
+      await supabase.from('security_events').insert(eventData)
     } catch (error) {
       console.error('Error logging security event:', error)
     }

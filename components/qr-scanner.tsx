@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useEffect, useRef, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Camera, Upload, X, Scan, AlertTriangle, CheckCircle } from "lucide-react"
-import { lookupAssetByQR } from "@/lib/qr-actions"
-import { QRCodeScanner } from "@/lib/qr-code-utils"
-import { useAuth } from "@/components/auth/auth-provider"
+import { useEffect, useRef, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Camera, Upload, X, Scan, AlertTriangle, CheckCircle } from 'lucide-react'
+import { lookupAssetByQR } from '@/lib/qr-actions'
+import { QRCodeScanner } from '@/lib/qr-code-utils'
+import { useAuth } from '@/components/auth/auth-provider'
 
 interface QRScannerProps {
   onScanSuccess?: (assetData: any) => void
@@ -28,7 +28,7 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
   const [scanResult, setScanResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const { user } = useAuth()
-  const [userRole, setUserRole] = useState<string>("user")
+  const [userRole, setUserRole] = useState<string>('user')
   const [scanAgain, setScanAgain] = useState(false)
 
   useEffect(() => {
@@ -38,9 +38,9 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
       try {
         const res = await fetch(`/api/profiles/${user.id}`)
         const data = await res.json()
-        setUserRole(data.profile?.role || "user")
+        setUserRole(data.profile?.role || 'user')
       } catch {
-        setUserRole("user")
+        setUserRole('user')
       }
     }
     fetchUserRole()
@@ -52,7 +52,7 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
   const checkCameraAvailability = async () => {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices()
-      const videoDevices = devices.filter((device) => device.kind === "videoinput")
+      const videoDevices = devices.filter(device => device.kind === 'videoinput')
       setHasCamera(videoDevices.length > 0)
     } catch (err) {
       setHasCamera(false)
@@ -64,7 +64,7 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
       setError(null)
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: "environment", // Use back camera if available
+          facingMode: 'environment', // Use back camera if available
           width: { ideal: 640 },
           height: { ideal: 480 },
         },
@@ -81,14 +81,14 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
       // Start scanning loop
       scanQRCode()
     } catch (err) {
-      setError("Failed to access camera. Please check permissions.")
+      setError('Failed to access camera. Please check permissions.')
       setIsScanning(false)
     }
   }
 
   const stopCamera = () => {
     if (stream) {
-      stream.getTracks().forEach((track) => track.stop())
+      stream.getTracks().forEach(track => track.stop())
       setStream(null)
     }
     setIsScanning(false)
@@ -99,7 +99,7 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
 
     const video = videoRef.current
     const canvas = canvasRef.current
-    const context = canvas.getContext("2d")
+    const context = canvas.getContext('2d')
 
     if (!context || video.readyState !== video.HAVE_ENOUGH_DATA) {
       setTimeout(scanQRCode, 100)
@@ -139,7 +139,7 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
       if (scanResult.success && scanResult.data) {
         // Convert the scanned data to the expected format
         const qrDataString = JSON.stringify({
-          type: "asset",
+          type: 'asset',
           id: scanResult.data.assetId,
           name: scanResult.data.name,
           category: scanResult.data.category,
@@ -149,10 +149,10 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
 
         await processQRData(qrDataString)
       } else {
-        setError(scanResult.error || "Failed to scan QR code from image")
+        setError(scanResult.error || 'Failed to scan QR code from image')
       }
     } catch (err) {
-      setError("Failed to process uploaded image")
+      setError('Failed to process uploaded image')
     } finally {
       setLoading(false)
     }
@@ -170,23 +170,23 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
         setScanResult(result)
         // Log scan event to analytics_events
         if (user && result.asset) {
-          const supabase = (await import("@/lib/supabase/client")).createClient();
-          await supabase.from("analytics_events").insert({
-            event_type: "asset_scanned",
+          const supabase = (await import('@/lib/supabase/client')).createClient()
+          await supabase.from('analytics_events').insert({
+            event_type: 'asset_scanned',
             asset_id: result.asset.id,
             user_id: user.id,
             metadata: {
               asset_name: result.asset.name,
               category: result.asset.category,
-              url: result.asset.url || undefined
+              url: result.asset.url || undefined,
             },
-            created_at: new Date().toISOString()
-          });
+            created_at: new Date().toISOString(),
+          })
         }
         onScanSuccess?.(result)
       }
     } catch (err) {
-      const errorMsg = "Failed to lookup asset"
+      const errorMsg = 'Failed to lookup asset'
       setError(errorMsg)
       onScanError?.(errorMsg)
     } finally {
@@ -197,11 +197,11 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
   const simulateSuccessfulScan = async () => {
     // Demo function to simulate a successful QR scan
     const sampleQRData = JSON.stringify({
-      type: "asset",
-      id: "AST-001",
+      type: 'asset',
+      id: 'AST-001',
       name: 'MacBook Pro 16"',
-      category: "it-equipment",
-      url: "http://localhost:3000/asset/AST-001",
+      category: 'it-equipment',
+      url: 'http://localhost:3000/asset/AST-001',
     })
 
     await processQRData(sampleQRData)
@@ -289,7 +289,8 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
             <Alert className="border-green-200 bg-green-50">
               <CheckCircle className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800">
-                <strong>Asset Found:</strong> {scanResult.asset?.name} ({scanResult.asset?.asset_id})
+                <strong>Asset Found:</strong> {scanResult.asset?.name} ({scanResult.asset?.asset_id}
+                )
               </AlertDescription>
             </Alert>
           )}
@@ -315,8 +316,8 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
                   <div className="relative">
                     <video
                       ref={videoRef}
-                      className={`w-full rounded-lg border ${isScanning ? "block" : "hidden"}`}
-                      style={{ maxHeight: "300px" }}
+                      className={`w-full rounded-lg border ${isScanning ? 'block' : 'hidden'}`}
+                      style={{ maxHeight: '300px' }}
                     />
                     {isScanning && (
                       <div className="absolute inset-0 border-2 border-blue-500 rounded-lg pointer-events-none">
@@ -336,7 +337,13 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
             {/* File Upload */}
             <div className="space-y-3">
               <h4 className="font-medium">Upload QR Image</h4>
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 variant="outline"
@@ -344,11 +351,16 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
                 disabled={loading}
               >
                 <Upload className="h-4 w-4 mr-2" />
-                {loading ? "Processing..." : "Upload QR Image"}
+                {loading ? 'Processing...' : 'Upload QR Image'}
               </Button>
 
               <div className="text-center">
-                <Button onClick={simulateSuccessfulScan} variant="outline" size="sm" className="text-xs">
+                <Button
+                  onClick={simulateSuccessfulScan}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                >
                   Demo: Simulate Scan
                 </Button>
               </div>
@@ -389,31 +401,42 @@ export default function QRScanner({ onScanSuccess, onScanError }: QRScannerProps
                   <div>
                     <strong>Location:</strong>
                   </div>
-                  <div>{scanResult.asset.location || "Not set"}</div>
+                  <div>{scanResult.asset.location || 'Not set'}</div>
 
                   <div>
                     <strong>Assignee:</strong>
                   </div>
-                  <div>{scanResult.asset.assignee?.full_name || "Unassigned"}</div>
+                  <div>{scanResult.asset.assignee?.full_name || 'Unassigned'}</div>
                 </div>
 
                 <div className="flex flex-col gap-2 mt-4">
                   <Button className="w-full" asChild>
-                    <a href={`/asset/${scanResult.asset.asset_id}`} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={`/asset/${scanResult.asset.asset_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       View Full Asset Details
                     </a>
                   </Button>
                   {/* Quick Actions */}
-                  {['admin', 'manager'].includes(userRole) && scanResult.asset.status === 'available' && (
-                    <Button className="w-full" onClick={handleAssignToMe} disabled={loading}>
-                      {loading ? 'Assigning...' : 'Check Out / Assign to Me'}
-                    </Button>
-                  )}
-                  {['admin', 'manager'].includes(userRole) && scanResult.asset.status === 'checked_out' && (
-                    <Button className="w-full" onClick={handleCheckIn} disabled={loading} variant="destructive">
-                      {loading ? 'Checking In...' : 'Check In'}
-                    </Button>
-                  )}
+                  {['admin', 'manager'].includes(userRole) &&
+                    scanResult.asset.status === 'available' && (
+                      <Button className="w-full" onClick={handleAssignToMe} disabled={loading}>
+                        {loading ? 'Assigning...' : 'Check Out / Assign to Me'}
+                      </Button>
+                    )}
+                  {['admin', 'manager'].includes(userRole) &&
+                    scanResult.asset.status === 'checked_out' && (
+                      <Button
+                        className="w-full"
+                        onClick={handleCheckIn}
+                        disabled={loading}
+                        variant="destructive"
+                      >
+                        {loading ? 'Checking In...' : 'Check In'}
+                      </Button>
+                    )}
                   <Button className="w-full" variant="outline" onClick={handleScanAgain}>
                     Scan Again
                   </Button>

@@ -33,7 +33,7 @@ export function PermissionGuard({
   loading = null,
   onUnauthorized,
   tenantId,
-  userId
+  userId,
 }: PermissionGuardProps): JSX.Element {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -50,11 +50,11 @@ export function PermissionGuard({
     try {
       const response = await fetch('/api/auth/me')
       const data = await response.json()
-      
+
       if (data.user && data.tenant) {
         setUserContext({
           tenantId: data.tenant.id,
-          userId: data.user.id
+          userId: data.user.id,
         })
       }
     } catch (error) {
@@ -80,24 +80,20 @@ export function PermissionGuard({
 
     try {
       setIsLoading(true)
-      
+
       const permissionArray = Array.isArray(permissions) ? permissions : [permissions]
       const results = await Promise.all(
         permissionArray.map(permission =>
-          permissionService.checkPermission(
-            currentUserId,
-            resourceId || 'default',
-            permission
-          )
+          permissionService.checkPermission(currentUserId, resourceId || 'default', permission)
         )
       )
 
-      const hasAccess = requireAll 
+      const hasAccess = requireAll
         ? results.every(result => result)
         : results.some(result => result)
 
       setHasPermission(hasAccess)
-      
+
       if (!hasAccess && onUnauthorized) {
         onUnauthorized()
       }
@@ -107,7 +103,17 @@ export function PermissionGuard({
     } finally {
       setIsLoading(false)
     }
-  }, [userContext, permissions, resourceId, context, tenantId, userId, requireAll, onUnauthorized, permissionService])
+  }, [
+    userContext,
+    permissions,
+    resourceId,
+    context,
+    tenantId,
+    userId,
+    requireAll,
+    onUnauthorized,
+    permissionService,
+  ])
 
   useEffect(() => {
     loadUserContext()
@@ -162,8 +168,11 @@ export function usePermissions(
 
     try {
       const supabase = createClient()
-      const { data: { user }, error } = await supabase.auth.getUser()
-      
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
+
       if (error || !user) {
         setHasPermission(false)
         setIsLoading(false)
@@ -184,7 +193,7 @@ export function usePermissions(
 
       setUserContext({
         tenantId: profile.tenant_id,
-        userId: user.id
+        userId: user.id,
       })
     } catch (error) {
       console.error('Error loading user context:', error)
@@ -207,7 +216,7 @@ export function usePermissions(
       setIsLoading(true)
 
       const permissionList = Array.isArray(permissions) ? permissions : [permissions]
-      
+
       if (permissionList.length === 0) {
         setHasPermission(true)
         setIsLoading(false)
@@ -220,8 +229,8 @@ export function usePermissions(
         context: {
           ...options.context,
           hook: 'usePermissions',
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       }))
 
       const results = await permissionService.checkMultiplePermissions(
@@ -260,7 +269,7 @@ export function usePermissions(
   return {
     hasPermission,
     isLoading,
-    refetch
+    refetch,
   }
 }
 
@@ -301,7 +310,11 @@ interface ConditionalRenderProps {
   fallback?: ReactNode
 }
 
-export function ConditionalRender({ children, condition, fallback = null }: ConditionalRenderProps) {
+export function ConditionalRender({
+  children,
+  condition,
+  fallback = null,
+}: ConditionalRenderProps) {
   return condition ? <>{children}</> : <>{fallback}</>
 }
 
@@ -332,16 +345,12 @@ export function PermissionButton({
   const { hasPermission, isLoading } = usePermissions(permissions, {
     requireAll,
     resourceId,
-    context
+    context,
   })
 
   if (isLoading) {
     return (
-      <button 
-        {...buttonProps} 
-        disabled 
-        className={`${className} opacity-50 cursor-not-allowed`}
-      >
+      <button {...buttonProps} disabled className={`${className} opacity-50 cursor-not-allowed`}>
         <div className="animate-pulse">Loading...</div>
       </button>
     )
@@ -381,12 +390,12 @@ export function PermissionLink({
   fallback = null,
   children,
   href,
-  className = ''
+  className = '',
 }: PermissionLinkProps) {
   const { hasPermission, isLoading } = usePermissions(permissions, {
     requireAll,
     resourceId,
-    context
+    context,
   })
 
   if (isLoading) {
@@ -420,43 +429,43 @@ export const PERMISSIONS = {
     DELETE: 'delete:asset',
     ASSIGN: 'assign:asset',
     TRANSFER: 'transfer:asset',
-    MANAGE: 'manage:asset'
+    MANAGE: 'manage:asset',
   },
   USERS: {
     CREATE: 'create:user',
     READ: 'read:user',
     UPDATE: 'update:user',
     DELETE: 'delete:user',
-    MANAGE: 'manage:user'
+    MANAGE: 'manage:user',
   },
   ROLES: {
     CREATE: 'create:role',
     READ: 'read:role',
     UPDATE: 'update:role',
     DELETE: 'delete:role',
-    MANAGE: 'manage:role'
+    MANAGE: 'manage:role',
   },
   DEPARTMENTS: {
     CREATE: 'create:department',
     READ: 'read:department',
     UPDATE: 'update:department',
     DELETE: 'delete:department',
-    MANAGE: 'manage:department'
+    MANAGE: 'manage:department',
   },
   REPORTS: {
     CREATE: 'create:report',
     READ: 'read:report',
     UPDATE: 'update:report',
     DELETE: 'delete:report',
-    EXPORT: 'export:report'
+    EXPORT: 'export:report',
   },
   SETTINGS: {
     READ: 'read:setting',
     UPDATE: 'update:setting',
-    MANAGE: 'manage:setting'
+    MANAGE: 'manage:setting',
   },
   AUDIT: {
     READ: 'read:audit',
-    EXPORT: 'export:audit'
-  }
+    EXPORT: 'export:audit',
+  },
 } as const

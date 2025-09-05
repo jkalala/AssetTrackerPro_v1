@@ -1,34 +1,36 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertTriangle, CheckCircle, RefreshCw, User } from "lucide-react"
-import { createUserProfile, checkUserProfile } from "@/lib/profile-actions"
+import { useEffect, useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertTriangle, CheckCircle, RefreshCw, User } from 'lucide-react'
+import { createUserProfile, checkUserProfile } from '@/lib/profile-actions'
 
 export default function ProfileSetup() {
-  const [profileStatus, setProfileStatus] = useState<"checking" | "exists" | "missing" | "error">("checking")
+  const [profileStatus, setProfileStatus] = useState<'checking' | 'exists' | 'missing' | 'error'>(
+    'checking'
+  )
   const [error, setError] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
   const [userInfo, setUserInfo] = useState<any>(null)
   const [formData, setFormData] = useState({
-    full_name: "",
-    role: "user",
+    full_name: '',
+    role: 'user',
   })
 
   const checkProfile = async () => {
     try {
-      setProfileStatus("checking")
+      setProfileStatus('checking')
       setError(null)
 
       const result = await checkUserProfile()
 
       if (result.error) {
         setError(result.error)
-        setProfileStatus("error")
+        setProfileStatus('error')
         return
       }
 
@@ -39,21 +41,21 @@ export default function ProfileSetup() {
           full_name:
             result.user.user_metadata?.full_name ||
             result.user.user_metadata?.name ||
-            result.user.email?.split("@")[0] ||
-            "",
-          role: "user",
+            result.user.email?.split('@')[0] ||
+            '',
+          role: 'user',
         })
       }
 
       if (result.exists) {
-        setProfileStatus("exists")
+        setProfileStatus('exists')
       } else {
-        setProfileStatus("missing")
+        setProfileStatus('missing')
       }
     } catch (err) {
-      console.error("Unexpected error checking profile:", err)
-      setError("Failed to check profile")
-      setProfileStatus("error")
+      console.error('Unexpected error checking profile:', err)
+      setError('Failed to check profile')
+      setProfileStatus('error')
     }
   }
 
@@ -70,15 +72,15 @@ export default function ProfileSetup() {
       if (result.error) {
         setError(result.error)
       } else {
-        setProfileStatus("exists")
+        setProfileStatus('exists')
         // Refresh the page to update all components
         setTimeout(() => {
           window.location.reload()
         }, 1000)
       }
     } catch (err) {
-      console.error("Unexpected error creating profile:", err)
-      setError("An unexpected error occurred while creating your profile")
+      console.error('Unexpected error creating profile:', err)
+      setError('An unexpected error occurred while creating your profile')
     } finally {
       setCreating(false)
     }
@@ -88,7 +90,7 @@ export default function ProfileSetup() {
     checkProfile()
   }, [])
 
-  if (profileStatus === "checking") {
+  if (profileStatus === 'checking') {
     return (
       <Alert>
         <RefreshCw className="h-4 w-4 animate-spin" />
@@ -97,7 +99,7 @@ export default function ProfileSetup() {
     )
   }
 
-  if (profileStatus === "exists") {
+  if (profileStatus === 'exists') {
     return (
       <Alert className="border-green-200 bg-green-50">
         <CheckCircle className="h-4 w-4 text-green-600" />
@@ -108,7 +110,7 @@ export default function ProfileSetup() {
     )
   }
 
-  if (profileStatus === "missing") {
+  if (profileStatus === 'missing') {
     return (
       <Card className="border-orange-200 bg-orange-50">
         <CardHeader>
@@ -124,8 +126,8 @@ export default function ProfileSetup() {
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              <strong>Profile Required:</strong> Your user profile is missing from the database. This is required to
-              create and manage assets.
+              <strong>Profile Required:</strong> Your user profile is missing from the database.
+              This is required to create and manage assets.
             </AlertDescription>
           </Alert>
 
@@ -140,7 +142,7 @@ export default function ProfileSetup() {
                   <strong>User ID:</strong> {userInfo.id}
                 </p>
                 <p>
-                  <strong>Auth Provider:</strong> {userInfo.app_metadata?.provider || "email"}
+                  <strong>Auth Provider:</strong> {userInfo.app_metadata?.provider || 'email'}
                 </p>
               </div>
             </div>
@@ -153,7 +155,7 @@ export default function ProfileSetup() {
                 id="full_name"
                 placeholder="Enter your full name"
                 value={formData.full_name}
-                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                onChange={e => setFormData({ ...formData, full_name: e.target.value })}
               />
             </div>
 
@@ -162,7 +164,7 @@ export default function ProfileSetup() {
               <select
                 id="role"
                 value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                onChange={e => setFormData({ ...formData, role: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="user">User</option>
@@ -201,8 +203,8 @@ export default function ProfileSetup() {
           )}
 
           <div className="text-xs text-gray-600 bg-gray-50 p-3 rounded">
-            <strong>Why is this needed?</strong> Your profile stores essential information like your name and role,
-            which is required for asset ownership and team collaboration features.
+            <strong>Why is this needed?</strong> Your profile stores essential information like your
+            name and role, which is required for asset ownership and team collaboration features.
           </div>
         </CardContent>
       </Card>

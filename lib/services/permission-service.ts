@@ -4,7 +4,7 @@
 // Service for checking and managing user permissions
 
 import { createClient } from '@/lib/supabase/server'
-import { 
+import {
   UserPermission,
   PermissionCheckRequest,
   PermissionCheckResponse,
@@ -12,7 +12,7 @@ import {
   PermissionUsageInsert,
   ResourceType,
   PermissionAction,
-  PermissionScope
+  PermissionScope,
 } from '@/lib/types/rbac'
 import { Database } from '@/lib/types/database'
 import { globalPermissionCache, hashContext } from '@/lib/utils/permission-cache'
@@ -27,13 +27,13 @@ export class PermissionService {
   // =====================================================
 
   async checkPermission(
-    tenantId: string, 
-    userId: string, 
+    tenantId: string,
+    userId: string,
     request: PermissionCheckRequest
   ): Promise<PermissionCheckResponse> {
     const startTime = Date.now()
     const contextHash = hashContext(request.context)
-    
+
     // Check cache first
     const cachedResult = globalPermissionCache.getPermissionCheck(
       tenantId,
@@ -46,28 +46,40 @@ export class PermissionService {
     if (cachedResult !== null) {
       return {
         granted: cachedResult,
-        reason: cachedResult ? undefined : 'Cached denial'
+        reason: cachedResult ? undefined : 'Cached denial',
       }
     }
-    
+
     try {
       // Get user permissions (with caching)
       const userPermissions = await this.getUserPermissions(tenantId, userId)
-      
+
       // Find matching permission
-      const matchingPermission = userPermissions.find(p => 
-        p.permission_name === request.permission_name
+      const matchingPermission = userPermissions.find(
+        p => p.permission_name === request.permission_name
       )
 
       if (!matchingPermission) {
         const result = false
         globalPermissionCache.setPermissionCheck(
-          tenantId, userId, request.permission_name, result, request.resource_id, contextHash
+          tenantId,
+          userId,
+          request.permission_name,
+          result,
+          request.resource_id,
+          contextHash
         )
-        await this.logPermissionUsage(tenantId, userId, request, result, 'Permission not found', Date.now() - startTime)
+        await this.logPermissionUsage(
+          tenantId,
+          userId,
+          request,
+          result,
+          'Permission not found',
+          Date.now() - startTime
+        )
         return {
           granted: result,
-          reason: 'Permission not found'
+          reason: 'Permission not found',
         }
       }
 
@@ -78,16 +90,28 @@ export class PermissionService {
           request.resource_id,
           request.context
         )
-        
+
         if (!resourceAllowed) {
           const result = false
           globalPermissionCache.setPermissionCheck(
-            tenantId, userId, request.permission_name, result, request.resource_id, contextHash
+            tenantId,
+            userId,
+            request.permission_name,
+            result,
+            request.resource_id,
+            contextHash
           )
-          await this.logPermissionUsage(tenantId, userId, request, result, 'Resource access denied', Date.now() - startTime)
+          await this.logPermissionUsage(
+            tenantId,
+            userId,
+            request,
+            result,
+            'Resource access denied',
+            Date.now() - startTime
+          )
           return {
             granted: result,
-            reason: 'Resource access denied'
+            reason: 'Resource access denied',
           }
         }
       }
@@ -100,16 +124,28 @@ export class PermissionService {
           tenantId,
           userId
         )
-        
+
         if (!conditionsMet) {
           const result = false
           globalPermissionCache.setPermissionCheck(
-            tenantId, userId, request.permission_name, result, request.resource_id, contextHash
+            tenantId,
+            userId,
+            request.permission_name,
+            result,
+            request.resource_id,
+            contextHash
           )
-          await this.logPermissionUsage(tenantId, userId, request, result, 'Conditions not met', Date.now() - startTime)
+          await this.logPermissionUsage(
+            tenantId,
+            userId,
+            request,
+            result,
+            'Conditions not met',
+            Date.now() - startTime
+          )
           return {
             granted: result,
-            reason: 'Conditions not met'
+            reason: 'Conditions not met',
           }
         }
       }
@@ -117,26 +153,43 @@ export class PermissionService {
       // Permission granted
       const result = true
       globalPermissionCache.setPermissionCheck(
-        tenantId, userId, request.permission_name, result, request.resource_id, contextHash
+        tenantId,
+        userId,
+        request.permission_name,
+        result,
+        request.resource_id,
+        contextHash
       )
       await this.logPermissionUsage(tenantId, userId, request, result, null, Date.now() - startTime)
-      
+
       return {
         granted: result,
         source: matchingPermission.source,
-        conditions: matchingPermission.conditions
+        conditions: matchingPermission.conditions,
       }
     } catch (error) {
       console.error('Error checking permission:', error)
       const result = false
       globalPermissionCache.setPermissionCheck(
-        tenantId, userId, request.permission_name, result, request.resource_id, contextHash
+        tenantId,
+        userId,
+        request.permission_name,
+        result,
+        request.resource_id,
+        contextHash
       )
-      await this.logPermissionUsage(tenantId, userId, request, result, 'System error', Date.now() - startTime)
-      
+      await this.logPermissionUsage(
+        tenantId,
+        userId,
+        request,
+        result,
+        'System error',
+        Date.now() - startTime
+      )
+
       return {
         granted: result,
-        reason: 'System error'
+        reason: 'System error',
       }
     }
   }
@@ -147,22 +200,22 @@ export class PermissionService {
     requests: PermissionCheckRequest[]
   ): Promise<Record<string, PermissionCheckResponse>> {
     const results: Record<string, PermissionCheckResponse> = {}
-    
+
     // Get user permissions once for all checks
     const userPermissions = await this.getUserPermissions(tenantId, userId)
-    
+
     for (const request of requests) {
       const startTime = Date.now()
-      
+
       try {
-        const matchingPermission = userPermissions.find(p => 
-          p.permission_name === request.permission_name
+        const matchingPermission = userPermissions.find(
+          p => p.permission_name === request.permission_name
         )
 
         if (!matchingPermission) {
           results[request.permission_name] = {
             granted: false,
-            reason: 'Permission not found'
+            reason: 'Permission not found',
           }
           continue
         }
@@ -178,7 +231,7 @@ export class PermissionService {
             request.resource_id,
             request.context
           )
-          
+
           if (!resourceAllowed) {
             granted = false
             reason = 'Resource access denied'
@@ -186,14 +239,18 @@ export class PermissionService {
         }
 
         // Conditions check
-        if (granted && matchingPermission.conditions && Object.keys(matchingPermission.conditions).length > 0) {
+        if (
+          granted &&
+          matchingPermission.conditions &&
+          Object.keys(matchingPermission.conditions).length > 0
+        ) {
           const conditionsMet = await this.checkConditions(
             matchingPermission.conditions,
             request.context,
             tenantId,
             userId
           )
-          
+
           if (!conditionsMet) {
             granted = false
             reason = 'Conditions not met'
@@ -204,24 +261,35 @@ export class PermissionService {
           granted,
           reason,
           source: granted ? matchingPermission.source : undefined,
-          conditions: granted ? matchingPermission.conditions : undefined
+          conditions: granted ? matchingPermission.conditions : undefined,
         }
 
         // Log usage
-        await this.logPermissionUsage(tenantId, userId, request, granted, reason, Date.now() - startTime)
+        await this.logPermissionUsage(
+          tenantId,
+          userId,
+          request,
+          granted,
+          reason,
+          Date.now() - startTime
+        )
       } catch (error) {
         console.error(`Error checking permission ${request.permission_name}:`, error)
         results[request.permission_name] = {
           granted: false,
-          reason: 'System error'
+          reason: 'System error',
         }
       }
     }
-    
+
     return results
   }
 
-  async getUserPermissions(tenantId: string, userId: string, useCache = true): Promise<UserPermission[]> {
+  async getUserPermissions(
+    tenantId: string,
+    userId: string,
+    useCache = true
+  ): Promise<UserPermission[]> {
     // Check cache first
     if (useCache) {
       const cached = globalPermissionCache.getUserPermissions(tenantId, userId)
@@ -232,13 +300,12 @@ export class PermissionService {
 
     try {
       const supabase = await this.getSupabaseClient()
-      
+
       // Use database function to get all permissions including inherited and delegated
-      const { data: permissions, error } = await supabase
-        .rpc('get_user_permissions', {
-          p_tenant_id: tenantId,
-          p_user_id: userId
-        })
+      const { data: permissions, error } = await supabase.rpc('get_user_permissions', {
+        p_tenant_id: tenantId,
+        p_user_id: userId,
+      })
 
       if (error) {
         throw new Error(`Failed to get user permissions: ${error.message}`)
@@ -267,14 +334,13 @@ export class PermissionService {
   ): Promise<boolean> {
     try {
       const supabase = await this.getSupabaseClient()
-      const { data: hasPermission, error } = await supabase
-        .rpc('user_has_permission', {
-          p_tenant_id: tenantId,
-          p_user_id: userId,
-          p_permission_name: permissionName,
-          p_resource_id: resourceId || null,
-          p_context: context || {}
-        })
+      const { data: hasPermission, error } = await supabase.rpc('user_has_permission', {
+        p_tenant_id: tenantId,
+        p_user_id: userId,
+        p_permission_name: permissionName,
+        p_resource_id: resourceId || null,
+        p_context: context || {},
+      })
 
       if (error) {
         console.error('Error checking permission:', error)
@@ -404,7 +470,7 @@ export class PermissionService {
   ): Promise<boolean> {
     // Implement custom condition evaluation logic
     // This could include database queries, external API calls, etc.
-    
+
     switch (condition.type) {
       case 'asset_ownership':
         // Check if user owns or is assigned to the asset
@@ -463,7 +529,7 @@ export class PermissionService {
   ): Promise<void> {
     try {
       const supabase = await this.getSupabaseClient()
-      
+
       // Get permission ID
       const { data: permission } = await supabase
         .from('permissions')
@@ -488,12 +554,10 @@ export class PermissionService {
         session_id: request.context?.session_id,
         was_granted: wasGranted,
         denial_reason: denialReason || undefined,
-        response_time_ms: responseTimeMs
+        response_time_ms: responseTimeMs,
       }
 
-      await supabase
-        .from('permission_usage')
-        .insert(usage)
+      await supabase.from('permission_usage').insert(usage)
     } catch (error) {
       // Don't throw errors for logging failures
       console.error('Error logging permission usage:', error)
@@ -538,15 +602,17 @@ export class PermissionService {
   }> {
     try {
       const supabase = await this.getSupabaseClient()
-      
+
       let query = supabase
         .from('permission_usage')
-        .select(`
+        .select(
+          `
           was_granted,
           response_time_ms,
           denial_reason,
           permissions (name)
-        `)
+        `
+        )
         .eq('tenant_id', tenantId)
         .gte('timestamp', new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString())
 
@@ -563,26 +629,40 @@ export class PermissionService {
       const totalChecks = usage?.length || 0
       const grantedChecks = usage?.filter((u: any) => u.was_granted).length || 0
       const deniedChecks = totalChecks - grantedChecks
-      const avgResponseTime = usage?.reduce((sum: number, u: any) => sum + (u.response_time_ms || 0), 0) / totalChecks || 0
+      const avgResponseTime =
+        usage?.reduce((sum: number, u: any) => sum + (u.response_time_ms || 0), 0) / totalChecks ||
+        0
 
       // Top permissions
-      const permissionCounts = usage?.reduce((acc: Record<string, number>, u: any) => {
-        const permName = (u.permissions as any)?.name || 'Unknown'
-        acc[permName] = (acc[permName] || 0) + 1
-        return acc
-      }, {} as Record<string, number>) || {}
+      const permissionCounts =
+        usage?.reduce(
+          (acc: Record<string, number>, u: any) => {
+            const permName = (u.permissions as any)?.name || 'Unknown'
+            acc[permName] = (acc[permName] || 0) + 1
+            return acc
+          },
+          {} as Record<string, number>
+        ) || {}
 
       const topPermissions = Object.entries(permissionCounts)
         .sort(([, a], [, b]) => (b as number) - (a as number))
         .slice(0, 10)
-        .map(([permission_name, usage_count]) => ({ permission_name, usage_count: usage_count as number }))
+        .map(([permission_name, usage_count]) => ({
+          permission_name,
+          usage_count: usage_count as number,
+        }))
 
       // Denial reasons
-      const denialCounts = usage?.filter((u: any) => !u.was_granted && u.denial_reason)
-        .reduce((acc: Record<string, number>, u: any) => {
-          acc[u.denial_reason!] = (acc[u.denial_reason!] || 0) + 1
-          return acc
-        }, {} as Record<string, number>) || {}
+      const denialCounts =
+        usage
+          ?.filter((u: any) => !u.was_granted && u.denial_reason)
+          .reduce(
+            (acc: Record<string, number>, u: any) => {
+              acc[u.denial_reason!] = (acc[u.denial_reason!] || 0) + 1
+              return acc
+            },
+            {} as Record<string, number>
+          ) || {}
 
       const denialReasons = Object.entries(denialCounts)
         .sort(([, a], [, b]) => (b as number) - (a as number))
@@ -594,7 +674,7 @@ export class PermissionService {
         denied_checks: deniedChecks,
         avg_response_time_ms: avgResponseTime,
         top_permissions: topPermissions,
-        denial_reasons: denialReasons
+        denial_reasons: denialReasons,
       }
     } catch (error) {
       console.error('Error getting permission usage stats:', error)

@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
 import { MapContainer, TileLayer, Polygon, FeatureGroup, useMap, Popup } from 'react-leaflet'
@@ -37,20 +37,20 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
       const layer = e.layer
       const latlngs = layer.getLatLngs()[0].map((latlng: any) => [latlng.lng, latlng.lat])
       const polygon = { type: 'Polygon', coordinates: [latlngs] }
-      
+
       // Prompt for zone details
       const name = prompt('Enter zone name:') || 'New Zone'
       if (!name.trim()) {
         toast({
-          title: "Error",
-          description: "Zone name is required",
-          variant: "destructive"
+          title: 'Error',
+          description: 'Zone name is required',
+          variant: 'destructive',
         })
         return
       }
-      
+
       const description = prompt('Enter zone description (optional):') || ''
-      
+
       const res = await fetch('/api/geofence/zones', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -62,17 +62,17 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
       }
 
       toast({
-        title: "Success",
-        description: `Geofence zone "${name}" created successfully`
+        title: 'Success',
+        description: `Geofence zone "${name}" created successfully`,
       })
-      
+
       onChange()
     } catch (error) {
       console.error('Error creating geofence:', error)
       toast({
-        title: "Error",
-        description: "Failed to create geofence zone",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to create geofence zone',
+        variant: 'destructive',
       })
     } finally {
       setIsCreating(false)
@@ -88,19 +88,20 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
         const id = l.options.zoneId
         const currentName = l.options.zoneName || 'Unnamed Zone'
         const currentDescription = l.options.zoneDescription || ''
-        
+
         const name = prompt('Enter zone name:', currentName) || currentName
         if (!name.trim()) {
           toast({
-            title: "Error",
-            description: "Zone name is required",
-            variant: "destructive"
+            title: 'Error',
+            description: 'Zone name is required',
+            variant: 'destructive',
           })
           return
         }
-        
-        const description = prompt('Enter zone description:', currentDescription) || currentDescription
-        
+
+        const description =
+          prompt('Enter zone description:', currentDescription) || currentDescription
+
         const res = await fetch('/api/geofence/zones', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -113,17 +114,17 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
       }
 
       toast({
-        title: "Success",
-        description: "Geofence zone updated successfully"
+        title: 'Success',
+        description: 'Geofence zone updated successfully',
       })
-      
+
       onChange()
     } catch (error) {
       console.error('Error updating geofence:', error)
       toast({
-        title: "Error",
-        description: "Failed to update geofence zone",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to update geofence zone',
+        variant: 'destructive',
       })
     }
   }
@@ -134,11 +135,14 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
         const l = layer as any
         const id = l.options.zoneId
         const name = l.options.zoneName || 'this zone'
-        
-        if (typeof window !== 'undefined' && !window.confirm(`Are you sure you want to delete "${name}"?`)) {
+
+        if (
+          typeof window !== 'undefined' &&
+          !window.confirm(`Are you sure you want to delete "${name}"?`)
+        ) {
           return
         }
-        
+
         const res = await fetch('/api/geofence/zones', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
@@ -151,17 +155,17 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
       }
 
       toast({
-        title: "Success",
-        description: "Geofence zone deleted successfully"
+        title: 'Success',
+        description: 'Geofence zone deleted successfully',
       })
-      
+
       onChange()
     } catch (error) {
       console.error('Error deleting geofence:', error)
       toast({
-        title: "Error",
-        description: "Failed to delete geofence zone",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to delete geofence zone',
+        variant: 'destructive',
       })
     }
   }
@@ -169,25 +173,25 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
   // Add polygons to map with zone info
   useEffect(() => {
     if (!map || !featureGroupRef.current) return
-    
+
     // Clear existing layers
     featureGroupRef.current.clearLayers()
-    
+
     geofences.forEach(zone => {
       try {
         const latlngs = zone.polygon.coordinates[0].map(([lng, lat]) => [lat, lng])
         if (typeof window !== 'undefined' && (window as any).L) {
-          const polygon = (window as any).L.polygon(latlngs, { 
-            zoneId: zone.id, 
-            zoneName: zone.name, 
+          const polygon = (window as any).L.polygon(latlngs, {
+            zoneId: zone.id,
+            zoneName: zone.name,
             zoneDescription: zone.description,
             color: '#3B82F6',
             weight: 2,
             opacity: 0.8,
             fillColor: '#3B82F6',
-            fillOpacity: 0.2
+            fillOpacity: 0.2,
           })
-          
+
           // Create popup content
           const popupContent = `
             <div style="min-width: 200px;">
@@ -197,13 +201,17 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
                 <span style="background: #E5E7EB; padding: 2px 8px; border-radius: 12px; font-size: 12px; color: #374151;">
                   ${zone.polygon.coordinates[0].length} points
                 </span>
-                ${zone.created_at ? `<span style="background: #E5E7EB; padding: 2px 8px; border-radius: 12px; font-size: 12px; color: #374151;">
+                ${
+                  zone.created_at
+                    ? `<span style="background: #E5E7EB; padding: 2px 8px; border-radius: 12px; font-size: 12px; color: #374151;">
                   Created ${new Date(zone.created_at).toLocaleDateString()}
-                </span>` : ''}
+                </span>`
+                    : ''
+                }
               </div>
             </div>
           `
-          
+
           polygon.bindPopup(popupContent)
           featureGroupRef.current.addLayer(polygon)
         }
@@ -221,27 +229,27 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
           onCreated={handleCreated}
           onEdited={handleEdited}
           onDeleted={handleDeleted}
-          draw={{ 
-            rectangle: false, 
-            circle: false, 
-            marker: false, 
-            polyline: false, 
+          draw={{
+            rectangle: false,
+            circle: false,
+            marker: false,
+            polyline: false,
             circlemarker: false,
             polygon: {
               allowIntersection: false,
               drawError: {
                 color: '#e1e100',
-                message: '<strong>Error:</strong> Shape edges cannot cross!'
+                message: '<strong>Error:</strong> Shape edges cannot cross!',
               },
               shapeOptions: {
                 color: '#3B82F6',
-                weight: 2
-              }
-            }
+                weight: 2,
+              },
+            },
           }}
           edit={{
             featureGroup: featureGroupRef.current,
-            remove: true
+            remove: true,
           }}
         />
       )}
@@ -249,10 +257,14 @@ function GeofenceDraw({ geofences, onChange, userRole }: GeofenceMapEditorProps)
   )
 }
 
-export default function GeofenceMapEditor({ geofences, onChange, userRole }: GeofenceMapEditorProps) {
+export default function GeofenceMapEditor({
+  geofences,
+  onChange,
+  userRole,
+}: GeofenceMapEditorProps) {
   const [mapKey, setMapKey] = useState(0)
-  const mapRef = useRef<any>(null);
-  
+  const mapRef = useRef<any>(null)
+
   // Force map re-render when geofences change
   useEffect(() => {
     setMapKey(prev => prev + 1)
@@ -261,21 +273,16 @@ export default function GeofenceMapEditor({ geofences, onChange, userRole }: Geo
   useEffect(() => {
     return () => {
       if (mapRef.current && mapRef.current._leaflet_id) {
-        mapRef.current.remove();
+        mapRef.current.remove()
       }
-    };
-  }, []);
+    }
+  }, [])
 
   return (
     <div className="space-y-4">
       <div style={{ height: 500, width: '100%' }} className="rounded-lg overflow-hidden border">
-        <MapContainer 
-          ref={mapRef}
-          style={{ height: '100%', width: '100%' }}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+        <MapContainer ref={mapRef} style={{ height: '100%', width: '100%' }}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <GeofenceDraw geofences={geofences} onChange={onChange} userRole={userRole} />
         </MapContainer>
       </div>
@@ -300,7 +307,7 @@ export default function GeofenceMapEditor({ geofences, onChange, userRole }: Geo
             )}
           </div>
         </div>
-        
+
         {geofences.length > 0 && (
           <div className="mt-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
             {geofences.slice(0, 6).map((zone, index) => (
@@ -312,13 +319,11 @@ export default function GeofenceMapEditor({ geofences, onChange, userRole }: Geo
               </div>
             ))}
             {geofences.length > 6 && (
-              <div className="text-xs text-gray-500 p-2">
-                +{geofences.length - 6} more zones
-              </div>
+              <div className="text-xs text-gray-500 p-2">+{geofences.length - 6} more zones</div>
             )}
           </div>
         )}
       </div>
     </div>
   )
-} 
+}

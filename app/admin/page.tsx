@@ -301,7 +301,7 @@ export default function AdminPanelPage() {
   // Fetch API keys when API tab is selected
   useEffect(() => {
     if (tab === 'apikeys') {
-      ;(async () => {
+      (async () => {
         try {
           const { createClient } = await import('@/lib/supabase/client')
           const supabase = createClient()

@@ -1,31 +1,31 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { createClient } from "@/lib/supabase/client"
-import { Mail, Send } from "lucide-react"
-import Link from "next/link"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { createClient } from '@/lib/supabase/client'
+import { Mail, Send } from 'lucide-react'
+import Link from 'next/link'
 
 export default function ResendConfirmation() {
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
   const supabase = createClient()
 
   const handleResend = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError("")
+    setError('')
 
     try {
       const { error } = await supabase.auth.resend({
-        type: "signup",
+        type: 'signup',
         email,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
@@ -38,7 +38,7 @@ export default function ResendConfirmation() {
         setSuccess(true)
       }
     } catch (err) {
-      setError("An unexpected error occurred")
+      setError('An unexpected error occurred')
     } finally {
       setLoading(false)
     }
@@ -49,7 +49,9 @@ export default function ResendConfirmation() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center">Email Sent!</CardTitle>
-          <CardDescription className="text-center">Check your email for the confirmation link</CardDescription>
+          <CardDescription className="text-center">
+            Check your email for the confirmation link
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Alert>
@@ -70,7 +72,9 @@ export default function ResendConfirmation() {
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-center">Resend Confirmation</CardTitle>
-        <CardDescription className="text-center">Enter your email to receive a new confirmation link</CardDescription>
+        <CardDescription className="text-center">
+          Enter your email to receive a new confirmation link
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {error && (
@@ -91,7 +95,7 @@ export default function ResendConfirmation() {
                 type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 className="pl-10"
                 required
               />
@@ -100,7 +104,7 @@ export default function ResendConfirmation() {
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? (
-              "Sending..."
+              'Sending...'
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />

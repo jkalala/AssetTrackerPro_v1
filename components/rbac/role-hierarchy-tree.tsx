@@ -9,16 +9,7 @@ import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { 
-  ChevronDown, 
-  ChevronRight, 
-  Shield, 
-  Users, 
-  Key,
-  Plus,
-  Edit,
-  Trash2
-} from 'lucide-react'
+import { ChevronDown, ChevronRight, Shield, Users, Key, Plus, Edit, Trash2 } from 'lucide-react'
 import { RoleHierarchyNode, Role } from '@/lib/types/rbac'
 
 interface RoleHierarchyTreeProps {
@@ -36,7 +27,7 @@ export function RoleHierarchyTree({
   onCreateChildRole,
   onEditRole,
   onDeleteRole,
-  canManageRoles = false
+  canManageRoles = false,
 }: RoleHierarchyTreeProps) {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set())
 
@@ -80,33 +71,26 @@ export function RoleHierarchyTree({
 
                 {/* Role Icon */}
                 <div className="flex-shrink-0">
-                  <Shield className={`h-5 w-5 ${
-                    node.role.is_system_role 
-                      ? 'text-red-600' 
-                      : node.role.is_default_role 
-                        ? 'text-blue-600' 
-                        : 'text-gray-600'
-                  }`} />
+                  <Shield
+                    className={`h-5 w-5 ${
+                      node.role.is_system_role
+                        ? 'text-red-600'
+                        : node.role.is_default_role
+                          ? 'text-blue-600'
+                          : 'text-gray-600'
+                    }`}
+                  />
                 </div>
 
                 {/* Role Information */}
-                <div 
-                  className="flex-1 cursor-pointer"
-                  onClick={() => onRoleSelect?.(node.role.id)}
-                >
+                <div className="flex-1 cursor-pointer" onClick={() => onRoleSelect?.(node.role.id)}>
                   <div className="flex items-center space-x-2">
-                    <h3 className="font-semibold text-gray-900">
-                      {node.role.display_name}
-                    </h3>
-                    <span className="text-sm text-gray-500">
-                      ({node.role.name})
-                    </span>
+                    <h3 className="font-semibold text-gray-900">{node.role.display_name}</h3>
+                    <span className="text-sm text-gray-500">({node.role.name})</span>
                   </div>
-                  
+
                   {node.role.description && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      {node.role.description}
-                    </p>
+                    <p className="text-sm text-gray-600 mt-1">{node.role.description}</p>
                   )}
 
                   {/* Role Stats */}
@@ -150,7 +134,7 @@ export function RoleHierarchyTree({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation()
                         onCreateChildRole?.(node.role)
                       }}
@@ -159,13 +143,13 @@ export function RoleHierarchyTree({
                     >
                       <Plus className="h-4 w-4" />
                     </Button>
-                    
+
                     {!node.role.is_system_role && (
                       <>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation()
                             onEditRole?.(node.role)
                           }}
@@ -174,11 +158,11 @@ export function RoleHierarchyTree({
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
-                        
+
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation()
                             onDeleteRole?.(node.role)
                           }}
@@ -198,12 +182,8 @@ export function RoleHierarchyTree({
             {node.permissions.length > 0 && (
               <div className="mt-3 pt-3 border-t border-gray-200">
                 <div className="flex flex-wrap gap-1">
-                  {node.permissions.slice(0, 5).map((permission) => (
-                    <Badge 
-                      key={permission.id} 
-                      variant="outline" 
-                      className="text-xs"
-                    >
+                  {node.permissions.slice(0, 5).map(permission => (
+                    <Badge key={permission.id} variant="outline" className="text-xs">
                       {permission.display_name}
                     </Badge>
                   ))}
@@ -221,7 +201,7 @@ export function RoleHierarchyTree({
         {/* Render Children */}
         {hasChildren && isExpanded && (
           <div className="ml-4 border-l-2 border-gray-200 pl-2">
-            {node.children.map((child) => renderNode(child, level + 1))}
+            {node.children.map(child => renderNode(child, level + 1))}
           </div>
         )}
       </div>
@@ -234,10 +214,7 @@ export function RoleHierarchyTree({
         <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
         <p className="text-gray-600">No roles found in the hierarchy.</p>
         {canManageRoles && (
-          <Button 
-            className="mt-4"
-            onClick={() => onCreateChildRole?.(null as any)}
-          >
+          <Button className="mt-4" onClick={() => onCreateChildRole?.(null as any)}>
             <Plus className="h-4 w-4 mr-2" />
             Create Root Role
           </Button>
@@ -268,11 +245,7 @@ export function RoleHierarchyTree({
           >
             Expand All
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setExpandedNodes(new Set())}
-          >
+          <Button variant="outline" size="sm" onClick={() => setExpandedNodes(new Set())}>
             Collapse All
           </Button>
         </div>
@@ -283,9 +256,7 @@ export function RoleHierarchyTree({
       </div>
 
       {/* Hierarchy Tree */}
-      <div className="space-y-2">
-        {hierarchy.map((node) => renderNode(node))}
-      </div>
+      <div className="space-y-2">{hierarchy.map(node => renderNode(node))}</div>
 
       {/* Legend */}
       <Card className="bg-gray-50">
@@ -305,7 +276,9 @@ export function RoleHierarchyTree({
               <span>Custom Role</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="text-xs">Level</Badge>
+              <Badge variant="outline" className="text-xs">
+                Level
+              </Badge>
               <span>Hierarchy Level</span>
             </div>
           </div>

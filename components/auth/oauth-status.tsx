@@ -1,22 +1,22 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { ExternalLink, Copy, CheckCircle, AlertTriangle, RefreshCw, Clock } from "lucide-react"
-import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { ExternalLink, Copy, CheckCircle, AlertTriangle, RefreshCw, Clock } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 export default function OAuthStatus() {
   const [copied, setCopied] = useState<string | null>(null)
   const [timeWaited, setTimeWaited] = useState(0)
 
-  const currentOrigin = typeof window !== "undefined" ? window.location.origin : ""
-  const callbackUrl = "https://wyqohljdnrouovuqqdlt.supabase.co/auth/v1/callback"
+  const currentOrigin = typeof window !== 'undefined' ? window.location.origin : ''
+  const callbackUrl = 'https://wyqohljdnrouovuqqdlt.supabase.co/auth/v1/callback'
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeWaited((prev) => prev + 1)
+      setTimeWaited(prev => prev + 1)
     }, 1000)
 
     return () => clearInterval(timer)
@@ -31,7 +31,7 @@ export default function OAuthStatus() {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, "0")}`
+    return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
   return (
@@ -50,7 +50,7 @@ export default function OAuthStatus() {
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              <strong>Current Status:</strong> GitHub OAuth is still blocking access to{" "}
+              <strong>Current Status:</strong> GitHub OAuth is still blocking access to{' '}
               <code className="bg-red-100 px-1 rounded">{currentOrigin}</code>
             </AlertDescription>
           </Alert>
@@ -59,10 +59,13 @@ export default function OAuthStatus() {
           <div className="bg-blue-50 p-4 rounded-lg">
             <div className="flex items-center space-x-2">
               <Clock className="h-4 w-4 text-blue-600" />
-              <span className="text-blue-800 font-medium">Time since page load: {formatTime(timeWaited)}</span>
+              <span className="text-blue-800 font-medium">
+                Time since page load: {formatTime(timeWaited)}
+              </span>
             </div>
             <p className="text-blue-700 text-sm mt-1">
-              GitHub changes can take 2-5 minutes to propagate. If it's been less than 5 minutes, please wait.
+              GitHub changes can take 2-5 minutes to propagate. If it's been less than 5 minutes,
+              please wait.
             </p>
           </div>
 
@@ -70,13 +73,14 @@ export default function OAuthStatus() {
           <Card className="border-green-200 bg-green-50">
             <CardHeader>
               <CardTitle className="text-green-800 text-lg flex items-center">
-                <CheckCircle className="h-5 w-5 mr-2" />✅ Immediate Solution: Use Email Authentication
+                <CheckCircle className="h-5 w-5 mr-2" />✅ Immediate Solution: Use Email
+                Authentication
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-green-700 text-sm mb-3">
-                Skip GitHub OAuth entirely. Email authentication works perfectly and gives you full access to all
-                features.
+                Skip GitHub OAuth entirely. Email authentication works perfectly and gives you full
+                access to all features.
               </p>
               <div className="space-y-2">
                 <Button asChild className="w-full">
@@ -96,11 +100,15 @@ export default function OAuthStatus() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card className="border-orange-200">
                 <CardHeader>
-                  <CardTitle className="text-orange-800 text-base">🔍 Check Current Settings</CardTitle>
+                  <CardTitle className="text-orange-800 text-base">
+                    🔍 Check Current Settings
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <label className="text-xs font-medium text-gray-600">Your Homepage URL should be:</label>
+                    <label className="text-xs font-medium text-gray-600">
+                      Your Homepage URL should be:
+                    </label>
                     <div className="flex items-center space-x-2">
                       <code className="bg-white px-2 py-1 rounded border text-xs flex-1 break-all">
                         {currentOrigin}
@@ -108,29 +116,45 @@ export default function OAuthStatus() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => copyToClipboard(currentOrigin, "homepage")}
+                        onClick={() => copyToClipboard(currentOrigin, 'homepage')}
                         className="h-6 px-2"
                       >
-                        {copied === "homepage" ? <CheckCircle className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                        {copied === 'homepage' ? (
+                          <CheckCircle className="h-3 w-3" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
                       </Button>
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-gray-600">Your Callback URL should be:</label>
+                    <label className="text-xs font-medium text-gray-600">
+                      Your Callback URL should be:
+                    </label>
                     <div className="flex items-center space-x-2">
-                      <code className="bg-white px-2 py-1 rounded border text-xs flex-1 break-all">{callbackUrl}</code>
+                      <code className="bg-white px-2 py-1 rounded border text-xs flex-1 break-all">
+                        {callbackUrl}
+                      </code>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => copyToClipboard(callbackUrl, "callback")}
+                        onClick={() => copyToClipboard(callbackUrl, 'callback')}
                         className="h-6 px-2"
                       >
-                        {copied === "callback" ? <CheckCircle className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                        {copied === 'callback' ? (
+                          <CheckCircle className="h-3 w-3" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
                       </Button>
                     </div>
                   </div>
                   <Button asChild variant="outline" className="w-full">
-                    <a href="https://github.com/settings/developers" target="_blank" rel="noopener noreferrer">
+                    <a
+                      href="https://github.com/settings/developers"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Verify Settings <ExternalLink className="h-4 w-4 ml-1" />
                     </a>
                   </Button>
@@ -139,7 +163,9 @@ export default function OAuthStatus() {
 
               <Card className="border-blue-200">
                 <CardHeader>
-                  <CardTitle className="text-blue-800 text-base">🆕 Create Fresh OAuth App</CardTitle>
+                  <CardTitle className="text-blue-800 text-base">
+                    🆕 Create Fresh OAuth App
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <p className="text-blue-700 text-sm">
@@ -152,7 +178,11 @@ export default function OAuthStatus() {
                     <li>Update Supabase with new credentials</li>
                   </ol>
                   <Button asChild variant="outline" className="w-full">
-                    <a href="https://github.com/settings/applications/new" target="_blank" rel="noopener noreferrer">
+                    <a
+                      href="https://github.com/settings/applications/new"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Create New App <ExternalLink className="h-4 w-4 ml-1" />
                     </a>
                   </Button>
@@ -272,8 +302,9 @@ export default function OAuthStatus() {
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              <strong>Recommendation:</strong> While troubleshooting GitHub OAuth, use email authentication to test the
-              full asset management system. You can always switch to GitHub OAuth later once it's working.
+              <strong>Recommendation:</strong> While troubleshooting GitHub OAuth, use email
+              authentication to test the full asset management system. You can always switch to
+              GitHub OAuth later once it's working.
             </AlertDescription>
           </Alert>
         </CardContent>

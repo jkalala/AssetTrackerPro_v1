@@ -16,7 +16,15 @@ interface AssetInteractiveMapProps {
   onMove?: (lat: number, lng: number) => void
 }
 
-function AssetMarker({ lat, lng, onMove }: { lat: number, lng: number, onMove?: (lat: number, lng: number) => void }) {
+function AssetMarker({
+  lat,
+  lng,
+  onMove,
+}: {
+  lat: number
+  lng: number
+  onMove?: (lat: number, lng: number) => void
+}) {
   const map = useMap()
   React.useEffect(() => {
     map.setView([lat, lng], 16)
@@ -24,15 +32,20 @@ function AssetMarker({ lat, lng, onMove }: { lat: number, lng: number, onMove?: 
   return (
     <Marker
       position={[lat, lng]}
-      eventHandlers={onMove ? {
-        dragend: (e: { target: { getLatLng: () => { lat: number; lng: number } } }) => {
-          const { lat, lng } = e.target.getLatLng()
-          onMove(lat, lng)
-        }
-      } : undefined}
+      eventHandlers={
+        onMove
+          ? {
+              dragend: (e: { target: { getLatLng: () => { lat: number; lng: number } } }) => {
+                const { lat, lng } = e.target.getLatLng()
+                onMove(lat, lng)
+              },
+            }
+          : undefined
+      }
     >
       <Popup>
-        Asset Location<br />
+        Asset Location
+        <br />
         {lat}, {lng}
       </Popup>
     </Marker>
@@ -44,17 +57,17 @@ function AssetInteractiveMap({ assetLat, assetLng, geofences, onMove }: AssetInt
   const center: [number, number] = assetLat && assetLng ? [assetLat, assetLng] : [0, 0]
   return (
     <div style={{ height: 300, width: '100%' }}>
-      <MapContainer 
-        style={{ height: '100%', width: '100%' }}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+      <MapContainer style={{ height: '100%', width: '100%' }}>
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {assetLat && assetLng && <AssetMarker lat={assetLat} lng={assetLng} onMove={onMove} />}
         {geofences.map(zone => (
-          <Polygon key={zone.id} positions={zone.polygon.coordinates[0].map(([lng, lat]) => [lat, lng])}>
+          <Polygon
+            key={zone.id}
+            positions={zone.polygon.coordinates[0].map(([lng, lat]) => [lat, lng])}
+          >
             <Popup>
-              <strong>{zone.name}</strong><br />
+              <strong>{zone.name}</strong>
+              <br />
               {zone.description}
             </Popup>
           </Polygon>
@@ -64,4 +77,4 @@ function AssetInteractiveMap({ assetLat, assetLng, geofences, onMove }: AssetInt
   )
 }
 
-export default AssetInteractiveMap; 
+export default AssetInteractiveMap

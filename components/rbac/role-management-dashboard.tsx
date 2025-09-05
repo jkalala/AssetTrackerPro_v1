@@ -12,30 +12,25 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle
-} from '@/components/ui/dialog'
-import { 
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { 
-  Plus, 
-  Search, 
-  MoreVertical, 
-  Users, 
-  Shield, 
+import {
+  Plus,
+  Search,
+  MoreVertical,
+  Users,
+  Shield,
   Settings,
   Trash2,
   Edit,
   Eye,
   UserPlus,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react'
 import { RoleHierarchyTree } from './role-hierarchy-tree'
 import { CreateRoleDialog } from './create-role-dialog'
@@ -50,9 +45,9 @@ interface RoleManagementDashboardProps {
   canManageRoles?: boolean
 }
 
-export function RoleManagementDashboard({ 
-  tenantId, 
-  canManageRoles = false 
+export function RoleManagementDashboard({
+  tenantId,
+  canManageRoles = false,
 }: RoleManagementDashboardProps) {
   const [roles, setRoles] = useState<Role[]>([])
   const [roleHierarchy, setRoleHierarchy] = useState<RoleHierarchyNode[]>([])
@@ -61,7 +56,7 @@ export function RoleManagementDashboard({
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [activeTab, setActiveTab] = useState('overview')
-  
+
   // Dialog states
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
@@ -73,11 +68,11 @@ export function RoleManagementDashboard({
       setLoading(true)
       const response = await fetch(`/api/roles?tenant_id=${tenantId}`)
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       setRoles(data.roles || [])
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load roles')
@@ -90,14 +85,17 @@ export function RoleManagementDashboard({
     try {
       const response = await fetch(`/api/roles/hierarchy?tenant_id=${tenantId}`)
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       setRoleHierarchy(data.hierarchy || [])
     } catch (err: unknown) {
-      console.error('Error loading role hierarchy:', err instanceof Error ? err.message : 'Unknown error')
+      console.error(
+        'Error loading role hierarchy:',
+        err instanceof Error ? err.message : 'Unknown error'
+      )
     }
   }
 
@@ -110,11 +108,11 @@ export function RoleManagementDashboard({
     try {
       const response = await fetch(`/api/roles/${roleId}?tenant_id=${tenantId}`)
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       setSelectedRole(data.role)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load role details')
@@ -126,15 +124,15 @@ export function RoleManagementDashboard({
       const response = await fetch('/api/roles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...roleData, tenant_id: tenantId })
+        body: JSON.stringify({ ...roleData, tenant_id: tenantId }),
       })
-      
+
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       await loadRoles()
       await loadRoleHierarchy()
       setShowCreateDialog(false)
@@ -148,15 +146,15 @@ export function RoleManagementDashboard({
       const response = await fetch(`/api/roles/${roleId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...updates, tenant_id: tenantId })
+        body: JSON.stringify({ ...updates, tenant_id: tenantId }),
       })
-      
+
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       await loadRoles()
       await loadRoleHierarchy()
       if (selectedRole?.id === roleId) {
@@ -171,15 +169,15 @@ export function RoleManagementDashboard({
   const handleDeleteRole = async (roleId: string) => {
     try {
       const response = await fetch(`/api/roles/${roleId}?tenant_id=${tenantId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       })
-      
+
       const data = await response.json()
-      
+
       if (data.error) {
         throw new Error(data.error)
       }
-      
+
       await loadRoles()
       await loadRoleHierarchy()
       if (selectedRole?.id === roleId) {
@@ -191,9 +189,10 @@ export function RoleManagementDashboard({
     }
   }
 
-  const filteredRoles = roles.filter(role =>
-    role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    role.display_name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredRoles = roles.filter(
+    role =>
+      role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      role.display_name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   if (loading) {
@@ -240,7 +239,7 @@ export function RoleManagementDashboard({
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
@@ -252,7 +251,7 @@ export function RoleManagementDashboard({
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
@@ -264,7 +263,7 @@ export function RoleManagementDashboard({
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
@@ -295,7 +294,7 @@ export function RoleManagementDashboard({
               <Input
                 placeholder="Search roles..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -303,7 +302,7 @@ export function RoleManagementDashboard({
 
           {/* Roles List */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredRoles.map((role) => (
+            {filteredRoles.map(role => (
               <Card key={role.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -325,21 +324,25 @@ export function RoleManagementDashboard({
                           </DropdownMenuItem>
                           {!role.is_system_role && (
                             <>
-                              <DropdownMenuItem onClick={() => {
-                                setSelectedRole(role as RoleWithPermissions)
-                                setShowEditDialog(true)
-                              }}>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedRole(role as RoleWithPermissions)
+                                  setShowEditDialog(true)
+                                }}
+                              >
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit Role
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => {
-                                setSelectedRole(role as RoleWithPermissions)
-                                setShowAssignDialog(true)
-                              }}>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedRole(role as RoleWithPermissions)
+                                  setShowAssignDialog(true)
+                                }}
+                              >
                                 <UserPlus className="h-4 w-4 mr-2" />
                                 Assign Users
                               </DropdownMenuItem>
-                              <DropdownMenuItem 
+                              <DropdownMenuItem
                                 onClick={() => {
                                   setSelectedRole(role as RoleWithPermissions)
                                   setShowDeleteConfirm(true)
@@ -359,25 +362,17 @@ export function RoleManagementDashboard({
                 <CardContent>
                   <div className="space-y-3">
                     <p className="text-sm text-gray-600">{role.description || 'No description'}</p>
-                    
+
                     <div className="flex flex-wrap gap-1">
-                      {role.is_system_role && (
-                        <Badge variant="secondary">System</Badge>
-                      )}
-                      {role.is_default_role && (
-                        <Badge variant="outline">Default</Badge>
-                      )}
-                      {!role.is_active && (
-                        <Badge variant="destructive">Inactive</Badge>
-                      )}
+                      {role.is_system_role && <Badge variant="secondary">System</Badge>}
+                      {role.is_default_role && <Badge variant="outline">Default</Badge>}
+                      {!role.is_active && <Badge variant="destructive">Inactive</Badge>}
                       <Badge variant="outline">Level {role.level}</Badge>
                     </div>
-                    
+
                     <div className="flex items-center justify-between text-sm text-gray-500">
                       <span>Created: {new Date(role.created_at).toLocaleDateString()}</span>
-                      {role.max_users && (
-                        <span>Max Users: {role.max_users}</span>
-                      )}
+                      {role.max_users && <span>Max Users: {role.max_users}</span>}
                     </div>
                   </div>
                 </CardContent>
@@ -402,7 +397,7 @@ export function RoleManagementDashboard({
               </p>
             </CardHeader>
             <CardContent>
-              <RoleHierarchyTree 
+              <RoleHierarchyTree
                 hierarchy={roleHierarchy}
                 onRoleSelect={loadRoleDetails}
                 canManageRoles={canManageRoles}
@@ -412,18 +407,11 @@ export function RoleManagementDashboard({
         </TabsContent>
 
         <TabsContent value="permissions">
-          <PermissionMatrix 
-            tenantId={tenantId}
-            roles={roles}
-            canManageRoles={canManageRoles}
-          />
+          <PermissionMatrix tenantId={tenantId} roles={roles} canManageRoles={canManageRoles} />
         </TabsContent>
 
         <TabsContent value="analytics">
-          <RoleAnalytics 
-            tenantId={tenantId}
-            roles={roles}
-          />
+          <RoleAnalytics tenantId={tenantId} roles={roles} />
         </TabsContent>
       </Tabs>
 
@@ -464,20 +452,14 @@ export function RoleManagementDashboard({
               </DialogHeader>
               <div className="space-y-4">
                 <p>
-                  Are you sure you want to delete the role &quot;{selectedRole.display_name}&quot;? 
+                  Are you sure you want to delete the role &quot;{selectedRole.display_name}&quot;?
                   This action cannot be undone.
                 </p>
                 <div className="flex justify-end space-x-2">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowDeleteConfirm(false)}
-                  >
+                  <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
                     Cancel
                   </Button>
-                  <Button 
-                    variant="destructive"
-                    onClick={() => handleDeleteRole(selectedRole.id)}
-                  >
+                  <Button variant="destructive" onClick={() => handleDeleteRole(selectedRole.id)}>
                     Delete Role
                   </Button>
                 </div>

@@ -14,7 +14,10 @@ export function calculateBookValue({
   if (!purchase_value || !purchase_date || !depreciation_period_years) return 0
   const now = new Date()
   const start = new Date(purchase_date)
-  const yearsElapsed = Math.max(0, (now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 365.25))
+  const yearsElapsed = Math.max(
+    0,
+    (now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24 * 365.25)
+  )
   if (depreciation_method === 'straight_line') {
     const annualDep = (purchase_value - (salvage_value || 0)) / depreciation_period_years
     const depreciated = annualDep * yearsElapsed
@@ -23,4 +26,4 @@ export function calculateBookValue({
   }
   // Add other methods as needed
   return purchase_value
-} 
+}

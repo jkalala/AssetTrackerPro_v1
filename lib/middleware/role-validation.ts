@@ -50,15 +50,17 @@ export class RoleValidationMiddleware {
           method: req.method,
           ip_address: this.getClientIP(req),
           user_agent: req.headers.get('user-agent') || undefined,
-          session_id: userContext.sessionId
+          session_id: userContext.sessionId,
         }
 
         // Check permissions
-        const permissionChecks: PermissionCheckRequest[] = options.requiredPermissions.map(permission => ({
-          permission_name: permission,
-          resource_id: resourceId,
-          context
-        }))
+        const permissionChecks: PermissionCheckRequest[] = options.requiredPermissions.map(
+          permission => ({
+            permission_name: permission,
+            resource_id: resourceId,
+            context,
+          })
+        )
 
         const results = await this.permissionService.checkMultiplePermissions(
           userContext.tenantId,
@@ -67,9 +69,10 @@ export class RoleValidationMiddleware {
         )
 
         // Evaluate results based on requireAllPermissions setting
-        const hasRequiredPermissions = options.requireAllPermissions !== false
-          ? options.requiredPermissions.every(permission => results[permission]?.granted)
-          : options.requiredPermissions.some(permission => results[permission]?.granted)
+        const hasRequiredPermissions =
+          options.requireAllPermissions !== false
+            ? options.requiredPermissions.every(permission => results[permission]?.granted)
+            : options.requiredPermissions.some(permission => results[permission]?.granted)
 
         if (!hasRequiredPermissions) {
           const deniedPermissions = options.requiredPermissions.filter(
@@ -87,13 +90,13 @@ export class RoleValidationMiddleware {
             .filter(([, result]) => result.granted)
             .map(([permission]) => permission),
           resourceId,
-          context
+          context,
         }
 
         // Store in request headers (will be available in API routes)
         const response = NextResponse.next()
         response.headers.set('x-permission-context', JSON.stringify(permissionContext))
-        
+
         return response
       } catch (error) {
         console.error('Error in role validation middleware:', error)
@@ -132,13 +135,13 @@ export class RoleValidationMiddleware {
         method: req.method,
         ip_address: this.getClientIP(req),
         user_agent: req.headers.get('user-agent') || undefined,
-        session_id: userContext.sessionId
+        session_id: userContext.sessionId,
       }
 
       const permissionChecks: PermissionCheckRequest[] = requiredPermissions.map(permission => ({
         permission_name: permission,
         resource_id: resourceId,
-        context
+        context,
       }))
 
       const results = await this.permissionService.checkMultiplePermissions(
@@ -147,9 +150,10 @@ export class RoleValidationMiddleware {
         permissionChecks
       )
 
-      const hasRequiredPermissions = options.requireAllPermissions !== false
-        ? requiredPermissions.every(permission => results[permission]?.granted)
-        : requiredPermissions.some(permission => results[permission]?.granted)
+      const hasRequiredPermissions =
+        options.requireAllPermissions !== false
+          ? requiredPermissions.every(permission => results[permission]?.granted)
+          : requiredPermissions.some(permission => results[permission]?.granted)
 
       if (!hasRequiredPermissions) {
         const deniedPermissions = requiredPermissions.filter(
@@ -159,14 +163,14 @@ export class RoleValidationMiddleware {
           valid: false,
           userContext,
           reason: `Missing required permissions: ${deniedPermissions.join(', ')}`,
-          permissionResults: results
+          permissionResults: results,
         }
       }
 
       return {
         valid: true,
         userContext,
-        permissionResults: results
+        permissionResults: results,
       }
     } catch (error) {
       console.error('Error validating API route:', error)
@@ -192,10 +196,7 @@ export class RoleValidationMiddleware {
         )
 
         if (!validation.valid) {
-          return NextResponse.json(
-            { error: validation.reason || 'Unauthorized' },
-            { status: 403 }
-          )
+          return NextResponse.json({ error: validation.reason || 'Unauthorized' }, { status: 403 })
         }
 
         // Add user context to request for handler use
@@ -214,9 +215,12 @@ export class RoleValidationMiddleware {
   private async extractUserContext(req: NextRequest): Promise<UserContext | null> {
     try {
       const supabase = await createClient()
-      
+
       // Get user from Supabase auth
-      const { data: { user }, error } = await supabase.auth.getUser()
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
       if (error || !user) {
         return null
       }
@@ -233,9 +237,10 @@ export class RoleValidationMiddleware {
       }
 
       // Extract session ID from request headers or generate one
-      const sessionId = req.headers.get('x-session-id') || 
-                       req.headers.get('authorization')?.split(' ')[1]?.slice(-8) ||
-                       'unknown'
+      const sessionId =
+        req.headers.get('x-session-id') ||
+        req.headers.get('authorization')?.split(' ')[1]?.slice(-8) ||
+        'unknown'
 
       return {
         userId: user.id,
@@ -243,7 +248,7 @@ export class RoleValidationMiddleware {
         role: profile.role,
         department: profile.department,
         sessionId,
-        email: user.email || ''
+        email: user.email || '',
       }
     } catch (error) {
       console.error('Error extracting user context:', error)
@@ -255,11 +260,11 @@ export class RoleValidationMiddleware {
     const forwarded = req.headers.get('x-forwarded-for')
     const realIP = req.headers.get('x-real-ip')
     const cfConnectingIP = req.headers.get('cf-connecting-ip')
-    
+
     if (forwarded) {
       return forwarded.split(',')[0].trim()
     }
-    
+
     return realIP || cfConnectingIP || 'unknown'
   }
 
@@ -273,10 +278,7 @@ export class RoleValidationMiddleware {
     }
 
     // Default unauthorized response
-    return NextResponse.json(
-      { error: reason },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: reason }, { status: 403 })
   }
 }
 
@@ -307,7 +309,7 @@ export function requirePermissions(
   const middleware = new RoleValidationMiddleware()
   return middleware.createValidator({
     ...options,
-    requiredPermissions: permissions
+    requiredPermissions: permissions,
   })
 }
 
@@ -376,7 +378,7 @@ export function createRequestContext(req: NextRequest): Record<string, any> {
     endpoint: req.nextUrl.pathname,
     method: req.method,
     query_params: Object.fromEntries(req.nextUrl.searchParams),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   }
 }
 
@@ -393,55 +395,55 @@ export const PERMISSIONS = {
     DELETE: 'delete:asset',
     ASSIGN: 'assign:asset',
     TRANSFER: 'transfer:asset',
-    MANAGE: 'manage:asset'
+    MANAGE: 'manage:asset',
   },
-  
+
   // User permissions
   USERS: {
     CREATE: 'create:user',
     READ: 'read:user',
     UPDATE: 'update:user',
     DELETE: 'delete:user',
-    MANAGE: 'manage:user'
+    MANAGE: 'manage:user',
   },
-  
+
   // Role permissions
   ROLES: {
     CREATE: 'create:role',
     READ: 'read:role',
     UPDATE: 'update:role',
     DELETE: 'delete:role',
-    MANAGE: 'manage:role'
+    MANAGE: 'manage:role',
   },
-  
+
   // Department permissions
   DEPARTMENTS: {
     CREATE: 'create:department',
     READ: 'read:department',
     UPDATE: 'update:department',
     DELETE: 'delete:department',
-    MANAGE: 'manage:department'
+    MANAGE: 'manage:department',
   },
-  
+
   // Report permissions
   REPORTS: {
     CREATE: 'create:report',
     READ: 'read:report',
     UPDATE: 'update:report',
     DELETE: 'delete:report',
-    EXPORT: 'export:report'
+    EXPORT: 'export:report',
   },
-  
+
   // Setting permissions
   SETTINGS: {
     READ: 'read:setting',
     UPDATE: 'update:setting',
-    MANAGE: 'manage:setting'
+    MANAGE: 'manage:setting',
   },
-  
+
   // Audit permissions
   AUDIT: {
     READ: 'read:audit',
-    EXPORT: 'export:audit'
-  }
+    EXPORT: 'export:audit',
+  },
 } as const

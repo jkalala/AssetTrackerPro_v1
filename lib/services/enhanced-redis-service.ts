@@ -4,13 +4,13 @@
  */
 
 import { redis, hasRedis, redisUtils } from '@/lib/config/redis'
-import { Ratelimit } from "@upstash/ratelimit"
+import { Ratelimit } from '@upstash/ratelimit'
 
 export class EnhancedRedisService {
   private static instance: EnhancedRedisService
-  
+
   private constructor() {}
-  
+
   public static getInstance(): EnhancedRedisService {
     if (!EnhancedRedisService.instance) {
       EnhancedRedisService.instance = new EnhancedRedisService()
@@ -29,8 +29,8 @@ export class EnhancedRedisService {
    * Cache management
    */
   public async cache<T>(
-    key: string, 
-    fetchFunction: () => Promise<T>, 
+    key: string,
+    fetchFunction: () => Promise<T>,
     ttlSeconds: number = 300
   ): Promise<T> {
     if (!this.isAvailable()) {
@@ -46,10 +46,10 @@ export class EnhancedRedisService {
 
       // Fetch fresh data
       const freshData = await fetchFunction()
-      
+
       // Cache the result
       await redisUtils.set(key, JSON.stringify(freshData), ttlSeconds)
-      
+
       return freshData
     } catch (error) {
       console.error('Cache operation failed:', error)
@@ -60,7 +60,11 @@ export class EnhancedRedisService {
   /**
    * Session management
    */
-  public async setSession(sessionId: string, data: any, ttlSeconds: number = 3600): Promise<boolean> {
+  public async setSession(
+    sessionId: string,
+    data: any,
+    ttlSeconds: number = 3600
+  ): Promise<boolean> {
     const key = `session:${sessionId}`
     return await redisUtils.set(key, JSON.stringify(data), ttlSeconds)
   }
@@ -80,8 +84,8 @@ export class EnhancedRedisService {
    * Rate limiting
    */
   public async checkRateLimit(
-    identifier: string, 
-    limit: number = 60, 
+    identifier: string,
+    limit: number = 60,
     windowSeconds: number = 60
   ): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
     if (!this.isAvailable()) {
@@ -96,11 +100,11 @@ export class EnhancedRedisService {
       })
 
       const result = await ratelimit.limit(identifier)
-      
+
       return {
         allowed: result.success,
         remaining: result.remaining,
-        resetTime: result.reset
+        resetTime: result.reset,
       }
     } catch (error) {
       console.error('Rate limit check failed:', error)
@@ -112,7 +116,7 @@ export class EnhancedRedisService {
    * Distributed locking
    */
   public async acquireLock(
-    lockKey: string, 
+    lockKey: string,
     ttlSeconds: number = 30,
     retryAttempts: number = 3
   ): Promise<string | null> {
@@ -129,7 +133,7 @@ export class EnhancedRedisService {
         if (result === 'OK') {
           return lockValue
         }
-        
+
         // Wait before retry
         await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1)))
       } catch (error) {
@@ -154,7 +158,7 @@ export class EnhancedRedisService {
           return 0
         end
       `
-      
+
       const result = await redis!.eval(script, [key], [lockValue])
       return result === 1
     } catch (error) {
@@ -185,8 +189,8 @@ export class EnhancedRedisService {
    * Analytics and metrics
    */
   public async incrementCounter(
-    key: string, 
-    increment: number = 1, 
+    key: string,
+    increment: number = 1,
     ttlSeconds?: number
   ): Promise<number> {
     if (!this.isAvailable()) {
@@ -229,12 +233,12 @@ export class EnhancedRedisService {
 
       return {
         status: 'healthy',
-        latency
+        latency,
       }
     } catch (error) {
       return {
         status: 'unhealthy',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }

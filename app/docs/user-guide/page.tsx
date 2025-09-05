@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Users,
   Package,
@@ -27,7 +27,7 @@ import {
   DollarSign,
   Shield,
   ExternalLink,
-} from "lucide-react"
+} from 'lucide-react'
 
 export default function UserGuidePage() {
   return (
@@ -39,7 +39,9 @@ export default function UserGuidePage() {
             <Users className="h-10 w-10 mr-4 text-blue-600" />
             User Guide
           </h1>
-          <p className="text-xl text-gray-600">Complete guide to using your Asset Management System effectively</p>
+          <p className="text-xl text-gray-600">
+            Complete guide to using your Asset Management System effectively
+          </p>
         </div>
 
         <Tabs defaultValue="assets" className="space-y-6">
@@ -57,7 +59,9 @@ export default function UserGuidePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Asset Management</CardTitle>
-                  <CardDescription>Learn how to create, edit, and manage your assets effectively</CardDescription>
+                  <CardDescription>
+                    Learn how to create, edit, and manage your assets effectively
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
@@ -106,8 +110,8 @@ export default function UserGuidePage() {
                       <Alert>
                         <Lightbulb className="h-4 w-4" />
                         <AlertDescription>
-                          <strong>Pro Tip:</strong> Use consistent naming conventions like "Brand - Model - Identifier"
-                          for easier searching.
+                          <strong>Pro Tip:</strong> Use consistent naming conventions like "Brand -
+                          Model - Identifier" for easier searching.
                         </AlertDescription>
                       </Alert>
 
@@ -209,22 +213,30 @@ export default function UserGuidePage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <p className="text-gray-600">Efficiently manage multiple assets at once using bulk operations:</p>
+                    <p className="text-gray-600">
+                      Efficiently manage multiple assets at once using bulk operations:
+                    </p>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="p-4 border rounded-lg">
                         <Upload className="h-6 w-6 text-blue-600 mb-2" />
                         <h5 className="font-medium">Bulk Import</h5>
-                        <p className="text-sm text-gray-600">Import multiple assets from CSV files</p>
+                        <p className="text-sm text-gray-600">
+                          Import multiple assets from CSV files
+                        </p>
                       </div>
                       <div className="p-4 border rounded-lg">
                         <Edit className="h-6 w-6 text-green-600 mb-2" />
                         <h5 className="font-medium">Bulk Edit</h5>
-                        <p className="text-sm text-gray-600">Update multiple assets simultaneously</p>
+                        <p className="text-sm text-gray-600">
+                          Update multiple assets simultaneously
+                        </p>
                       </div>
                       <div className="p-4 border rounded-lg">
                         <QrCode className="h-6 w-6 text-purple-600 mb-2" />
                         <h5 className="font-medium">Bulk QR Generation</h5>
-                        <p className="text-sm text-gray-600">Generate QR codes for multiple assets</p>
+                        <p className="text-sm text-gray-600">
+                          Generate QR codes for multiple assets
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -238,7 +250,9 @@ export default function UserGuidePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>QR Code Management</CardTitle>
-                  <CardDescription>Complete guide to generating, printing, and scanning QR codes</CardDescription>
+                  <CardDescription>
+                    Complete guide to generating, printing, and scanning QR codes
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
@@ -273,8 +287,8 @@ export default function UserGuidePage() {
                       <Alert>
                         <QrCode className="h-4 w-4" />
                         <AlertDescription>
-                          <strong>QR Code Formats:</strong> Available in PNG, SVG, and PDF formats. SVG is recommended
-                          for high-quality printing.
+                          <strong>QR Code Formats:</strong> Available in PNG, SVG, and PDF formats.
+                          SVG is recommended for high-quality printing.
                         </AlertDescription>
                       </Alert>
                     </div>
@@ -321,26 +335,34 @@ export default function UserGuidePage() {
                             <QrCode className="h-6 w-6 text-blue-600" />
                           </div>
                           <h5 className="font-medium">Built-in Scanner</h5>
-                          <p className="text-sm text-gray-600">Use the app's built-in QR scanner for best results</p>
+                          <p className="text-sm text-gray-600">
+                            Use the app's built-in QR scanner for best results
+                          </p>
                         </div>
                         <div className="p-4 border rounded-lg text-center">
                           <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
                             <Eye className="h-6 w-6 text-green-600" />
                           </div>
                           <h5 className="font-medium">Camera App</h5>
-                          <p className="text-sm text-gray-600">Most smartphone cameras can scan QR codes directly</p>
+                          <p className="text-sm text-gray-600">
+                            Most smartphone cameras can scan QR codes directly
+                          </p>
                         </div>
                         <div className="p-4 border rounded-lg text-center">
                           <div className="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
                             <Settings className="h-6 w-6 text-purple-600" />
                           </div>
                           <h5 className="font-medium">Third-party Apps</h5>
-                          <p className="text-sm text-gray-600">Compatible with popular QR scanner apps</p>
+                          <p className="text-sm text-gray-600">
+                            Compatible with popular QR scanner apps
+                          </p>
                         </div>
                       </div>
 
                       <div className="bg-blue-50 p-4 rounded-lg">
-                        <h5 className="font-medium text-blue-900 mb-2">What Happens When You Scan?</h5>
+                        <h5 className="font-medium text-blue-900 mb-2">
+                          What Happens When You Scan?
+                        </h5>
                         <ul className="space-y-1 text-sm text-blue-800">
                           <li>• Instant access to asset details</li>
                           <li>• Scan location and timestamp recorded</li>
@@ -415,7 +437,9 @@ export default function UserGuidePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Search and Filtering</CardTitle>
-                  <CardDescription>Master the search and filtering capabilities to find assets quickly</CardDescription>
+                  <CardDescription>
+                    Master the search and filtering capabilities to find assets quickly
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
@@ -454,7 +478,9 @@ export default function UserGuidePage() {
                           </div>
                           <div className="p-3 border rounded-lg">
                             <div className="font-medium text-sm">Status</div>
-                            <div className="text-xs text-gray-600">Active, inactive, maintenance, retired</div>
+                            <div className="text-xs text-gray-600">
+                              Active, inactive, maintenance, retired
+                            </div>
                           </div>
                           <div className="p-3 border rounded-lg">
                             <div className="font-medium text-sm">Location</div>
@@ -471,15 +497,21 @@ export default function UserGuidePage() {
                         <div className="space-y-3">
                           <div className="p-3 bg-blue-50 rounded-lg">
                             <div className="font-medium text-sm text-blue-900">Example 1</div>
-                            <div className="text-xs text-blue-700">Category: IT Equipment + Status: Active</div>
+                            <div className="text-xs text-blue-700">
+                              Category: IT Equipment + Status: Active
+                            </div>
                           </div>
                           <div className="p-3 bg-green-50 rounded-lg">
                             <div className="font-medium text-sm text-green-900">Example 2</div>
-                            <div className="text-xs text-green-700">Location: Office A + Date: Last 30 days</div>
+                            <div className="text-xs text-green-700">
+                              Location: Office A + Date: Last 30 days
+                            </div>
                           </div>
                           <div className="p-3 bg-purple-50 rounded-lg">
                             <div className="font-medium text-sm text-purple-900">Example 3</div>
-                            <div className="text-xs text-purple-700">Status: Maintenance + Category: Vehicles</div>
+                            <div className="text-xs text-purple-700">
+                              Status: Maintenance + Category: Vehicles
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -559,7 +591,9 @@ export default function UserGuidePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Reports and Analytics</CardTitle>
-                  <CardDescription>Generate comprehensive reports and analyze your asset data</CardDescription>
+                  <CardDescription>
+                    Generate comprehensive reports and analyze your asset data
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
@@ -570,7 +604,9 @@ export default function UserGuidePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="p-4 border rounded-lg">
                         <h5 className="font-medium">Asset Inventory Report</h5>
-                        <p className="text-sm text-gray-600 mb-3">Complete list of all assets with details</p>
+                        <p className="text-sm text-gray-600 mb-3">
+                          Complete list of all assets with details
+                        </p>
                         <div className="flex items-center space-x-2">
                           <Badge variant="outline">PDF</Badge>
                           <Badge variant="outline">Excel</Badge>
@@ -579,7 +615,9 @@ export default function UserGuidePage() {
                       </div>
                       <div className="p-4 border rounded-lg">
                         <h5 className="font-medium">Asset Utilization Report</h5>
-                        <p className="text-sm text-gray-600 mb-3">Usage patterns and utilization metrics</p>
+                        <p className="text-sm text-gray-600 mb-3">
+                          Usage patterns and utilization metrics
+                        </p>
                         <div className="flex items-center space-x-2">
                           <Badge variant="outline">PDF</Badge>
                           <Badge variant="outline">Excel</Badge>
@@ -587,7 +625,9 @@ export default function UserGuidePage() {
                       </div>
                       <div className="p-4 border rounded-lg">
                         <h5 className="font-medium">QR Code Activity Report</h5>
-                        <p className="text-sm text-gray-600 mb-3">QR code scan history and analytics</p>
+                        <p className="text-sm text-gray-600 mb-3">
+                          QR code scan history and analytics
+                        </p>
                         <div className="flex items-center space-x-2">
                           <Badge variant="outline">PDF</Badge>
                           <Badge variant="outline">Excel</Badge>
@@ -595,7 +635,9 @@ export default function UserGuidePage() {
                       </div>
                       <div className="p-4 border rounded-lg">
                         <h5 className="font-medium">Asset Lifecycle Report</h5>
-                        <p className="text-sm text-gray-600 mb-3">Asset age, depreciation, and lifecycle status</p>
+                        <p className="text-sm text-gray-600 mb-3">
+                          Asset age, depreciation, and lifecycle status
+                        </p>
                         <div className="flex items-center space-x-2">
                           <Badge variant="outline">PDF</Badge>
                           <Badge variant="outline">Excel</Badge>
@@ -607,22 +649,30 @@ export default function UserGuidePage() {
                   <div>
                     <h4 className="font-semibold mb-4">Custom Reports</h4>
                     <div className="space-y-4">
-                      <p className="text-gray-600">Create custom reports tailored to your specific needs:</p>
+                      <p className="text-gray-600">
+                        Create custom reports tailored to your specific needs:
+                      </p>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="p-4 border rounded-lg">
                           <Filter className="h-6 w-6 text-blue-600 mb-2" />
                           <h5 className="font-medium">Filter Data</h5>
-                          <p className="text-sm text-gray-600">Choose specific categories, locations, or date ranges</p>
+                          <p className="text-sm text-gray-600">
+                            Choose specific categories, locations, or date ranges
+                          </p>
                         </div>
                         <div className="p-4 border rounded-lg">
                           <Settings className="h-6 w-6 text-green-600 mb-2" />
                           <h5 className="font-medium">Select Fields</h5>
-                          <p className="text-sm text-gray-600">Include only the data fields you need</p>
+                          <p className="text-sm text-gray-600">
+                            Include only the data fields you need
+                          </p>
                         </div>
                         <div className="p-4 border rounded-lg">
                           <Download className="h-6 w-6 text-purple-600 mb-2" />
                           <h5 className="font-medium">Export Format</h5>
-                          <p className="text-sm text-gray-600">Choose from PDF, Excel, CSV, or JSON formats</p>
+                          <p className="text-sm text-gray-600">
+                            Choose from PDF, Excel, CSV, or JSON formats
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -631,7 +681,9 @@ export default function UserGuidePage() {
                   <div>
                     <h4 className="font-semibold mb-4">Scheduled Reports</h4>
                     <div className="space-y-4">
-                      <p className="text-gray-600">Set up automatic report generation and delivery:</p>
+                      <p className="text-gray-600">
+                        Set up automatic report generation and delivery:
+                      </p>
                       <div className="bg-blue-50 p-4 rounded-lg">
                         <h5 className="font-medium text-blue-900 mb-2">Schedule Options</h5>
                         <ul className="space-y-1 text-sm text-blue-800">
@@ -653,7 +705,9 @@ export default function UserGuidePage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <p className="text-gray-600">Monitor your assets in real-time with interactive dashboards:</p>
+                    <p className="text-gray-600">
+                      Monitor your assets in real-time with interactive dashboards:
+                    </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-3">
                         <h5 className="font-medium">Key Metrics</h5>
@@ -687,7 +741,9 @@ export default function UserGuidePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>System Settings</CardTitle>
-                  <CardDescription>Configure your system preferences and account settings</CardDescription>
+                  <CardDescription>
+                    Configure your system preferences and account settings
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
@@ -699,7 +755,9 @@ export default function UserGuidePage() {
                       <div className="space-y-4">
                         <div className="p-4 border rounded-lg">
                           <h5 className="font-medium">Profile Information</h5>
-                          <p className="text-sm text-gray-600 mb-3">Update your name, email, and contact details</p>
+                          <p className="text-sm text-gray-600 mb-3">
+                            Update your name, email, and contact details
+                          </p>
                           <Button variant="outline" size="sm">
                             Edit Profile
                           </Button>
@@ -726,7 +784,9 @@ export default function UserGuidePage() {
                         </div>
                         <div className="p-4 border rounded-lg">
                           <h5 className="font-medium">API Access</h5>
-                          <p className="text-sm text-gray-600 mb-3">Generate and manage API keys for integrations</p>
+                          <p className="text-sm text-gray-600 mb-3">
+                            Generate and manage API keys for integrations
+                          </p>
                           <Button variant="outline" size="sm">
                             API Keys
                           </Button>
@@ -741,7 +801,9 @@ export default function UserGuidePage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="p-4 border rounded-lg">
                           <h5 className="font-medium">Default Categories</h5>
-                          <p className="text-sm text-gray-600 mb-3">Customize asset categories for your organization</p>
+                          <p className="text-sm text-gray-600 mb-3">
+                            Customize asset categories for your organization
+                          </p>
                           <div className="space-y-2">
                             <Badge variant="outline">IT Equipment</Badge>
                             <Badge variant="outline">Furniture</Badge>
@@ -750,7 +812,9 @@ export default function UserGuidePage() {
                         </div>
                         <div className="p-4 border rounded-lg">
                           <h5 className="font-medium">Location Management</h5>
-                          <p className="text-sm text-gray-600 mb-3">Set up and manage your organization's locations</p>
+                          <p className="text-sm text-gray-600 mb-3">
+                            Set up and manage your organization's locations
+                          </p>
                           <div className="space-y-2">
                             <Badge variant="outline">Office A</Badge>
                             <Badge variant="outline">Warehouse</Badge>
@@ -764,19 +828,27 @@ export default function UserGuidePage() {
                   <div>
                     <h4 className="font-semibold mb-4">Team Management</h4>
                     <div className="space-y-4">
-                      <p className="text-gray-600">Manage team members and their access permissions:</p>
+                      <p className="text-gray-600">
+                        Manage team members and their access permissions:
+                      </p>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="p-4 border rounded-lg">
                           <h5 className="font-medium">Admin</h5>
-                          <p className="text-sm text-gray-600">Full system access and management capabilities</p>
+                          <p className="text-sm text-gray-600">
+                            Full system access and management capabilities
+                          </p>
                         </div>
                         <div className="p-4 border rounded-lg">
                           <h5 className="font-medium">Manager</h5>
-                          <p className="text-sm text-gray-600">Asset management and team oversight</p>
+                          <p className="text-sm text-gray-600">
+                            Asset management and team oversight
+                          </p>
                         </div>
                         <div className="p-4 border rounded-lg">
                           <h5 className="font-medium">User</h5>
-                          <p className="text-sm text-gray-600">Basic asset viewing and QR scanning</p>
+                          <p className="text-sm text-gray-600">
+                            Basic asset viewing and QR scanning
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -791,7 +863,9 @@ export default function UserGuidePage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Tips and Best Practices</CardTitle>
-                  <CardDescription>Expert tips to maximize your asset management efficiency</CardDescription>
+                  <CardDescription>
+                    Expert tips to maximize your asset management efficiency
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
@@ -806,7 +880,9 @@ export default function UserGuidePage() {
                           <p className="text-sm text-green-800 mt-1">
                             Use consistent naming: "Brand - Model - Location - Number"
                           </p>
-                          <p className="text-xs text-green-700 mt-2">Example: "Dell - Laptop - OfficeA - 001"</p>
+                          <p className="text-xs text-green-700 mt-2">
+                            Example: "Dell - Laptop - OfficeA - 001"
+                          </p>
                         </div>
                         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                           <h5 className="font-medium text-blue-900">Category Structure</h5>
@@ -915,8 +991,8 @@ export default function UserGuidePage() {
                   <Alert>
                     <Lightbulb className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Pro Tip:</strong> Set up automated workflows and notifications to reduce manual tasks and
-                      ensure nothing falls through the cracks.
+                      <strong>Pro Tip:</strong> Set up automated workflows and notifications to
+                      reduce manual tasks and ensure nothing falls through the cracks.
                     </AlertDescription>
                   </Alert>
                 </CardContent>

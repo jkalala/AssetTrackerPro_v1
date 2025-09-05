@@ -1,13 +1,20 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Progress } from '@/components/ui/progress'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import {
   BarChart3,
   QrCode,
@@ -36,128 +43,139 @@ import {
   Laptop,
   Printer,
   Camera,
-} from "lucide-react"
-import Link from "next/link"
-import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useRouter } from "next/navigation";
+} from 'lucide-react'
+import Link from 'next/link'
+import { useToast } from '@/hooks/use-toast'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { useRouter } from 'next/navigation'
 
 export default function AssetTrackerPreview() {
-  const [activeTab, setActiveTab] = useState("dashboard")
-  const [searchTerm, setSearchTerm] = useState("")
+  const [activeTab, setActiveTab] = useState('dashboard')
+  const [searchTerm, setSearchTerm] = useState('')
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null)
-  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; asset: any | null }>({ open: false, asset: null });
-  const { toast } = useToast();
-  const router = useRouter();
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; asset: any | null }>({
+    open: false,
+    asset: null,
+  })
+  const { toast } = useToast()
+  const router = useRouter()
 
   // Add state for bulk selection and dialogs
-  const [bulkSelected, setBulkSelected] = useState<string[]>([]);
-  const [bulkUpdateDialog, setBulkUpdateDialog] = useState(false);
-  const [bulkUpdateStatus, setBulkUpdateStatus] = useState("");
-  const [bulkUpdateCategory, setBulkUpdateCategory] = useState("");
-  const [bulkUpdateLocation, setBulkUpdateLocation] = useState("");
-  const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false);
-  const [undoBulkUpdateData, setUndoBulkUpdateData] = useState<any[]>([]);
-  const [undoBulkUpdateIds, setUndoBulkUpdateIds] = useState<string[]>([]);
-  const [undoBulkDeleteData, setUndoBulkDeleteData] = useState<any[]>([]);
-  const [undoBulkDeleteIds, setUndoBulkDeleteIds] = useState<string[]>([]);
+  const [bulkSelected, setBulkSelected] = useState<string[]>([])
+  const [bulkUpdateDialog, setBulkUpdateDialog] = useState(false)
+  const [bulkUpdateStatus, setBulkUpdateStatus] = useState('')
+  const [bulkUpdateCategory, setBulkUpdateCategory] = useState('')
+  const [bulkUpdateLocation, setBulkUpdateLocation] = useState('')
+  const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false)
+  const [undoBulkUpdateData, setUndoBulkUpdateData] = useState<any[]>([])
+  const [undoBulkUpdateIds, setUndoBulkUpdateIds] = useState<string[]>([])
+  const [undoBulkDeleteData, setUndoBulkDeleteData] = useState<any[]>([])
+  const [undoBulkDeleteIds, setUndoBulkDeleteIds] = useState<string[]>([])
 
   // Mock data for preview
   const mockUser = {
-    email: "demo@assettracker.com",
-    full_name: "Demo User",
-    role: "admin",
+    email: 'demo@assettracker.com',
+    full_name: 'Demo User',
+    role: 'admin',
     avatar_url: null,
   }
 
   const mockAssets = [
     {
-      id: "1",
-      asset_id: "AT-001",
+      id: '1',
+      asset_id: 'AT-001',
       name: 'MacBook Pro 16"',
-      category: "it-equipment",
-      status: "active",
-      location: "Office A - Desk 12",
+      category: 'it-equipment',
+      status: 'active',
+      location: 'Office A - Desk 12',
       value: 2499.99,
-      assignee: { full_name: "John Doe" },
-      created_at: "2024-01-15T10:00:00Z",
-      qr_code: "generated",
+      assignee: { full_name: 'John Doe' },
+      created_at: '2024-01-15T10:00:00Z',
+      qr_code: 'generated',
     },
     {
-      id: "2",
-      asset_id: "AT-002",
-      name: "iPhone 14 Pro",
-      category: "mobile-device",
-      status: "active",
-      location: "Office B - Mobile Pool",
+      id: '2',
+      asset_id: 'AT-002',
+      name: 'iPhone 14 Pro',
+      category: 'mobile-device',
+      status: 'active',
+      location: 'Office B - Mobile Pool',
       value: 999.99,
-      assignee: { full_name: "Jane Smith" },
-      created_at: "2024-01-20T14:30:00Z",
-      qr_code: "generated",
+      assignee: { full_name: 'Jane Smith' },
+      created_at: '2024-01-20T14:30:00Z',
+      qr_code: 'generated',
     },
     {
-      id: "3",
-      asset_id: "AT-003",
+      id: '3',
+      asset_id: 'AT-003',
       name: 'Dell Monitor 27"',
-      category: "it-equipment",
-      status: "maintenance",
-      location: "IT Storage",
+      category: 'it-equipment',
+      status: 'maintenance',
+      location: 'IT Storage',
       value: 299.99,
       assignee: null,
-      created_at: "2024-01-10T09:15:00Z",
-      qr_code: "generated",
+      created_at: '2024-01-10T09:15:00Z',
+      qr_code: 'generated',
     },
     {
-      id: "4",
-      asset_id: "AT-004",
-      name: "Office Chair",
-      category: "furniture",
-      status: "active",
-      location: "Office A - Desk 5",
+      id: '4',
+      asset_id: 'AT-004',
+      name: 'Office Chair',
+      category: 'furniture',
+      status: 'active',
+      location: 'Office A - Desk 5',
       value: 199.99,
-      assignee: { full_name: "Mike Johnson" },
-      created_at: "2024-01-25T11:45:00Z",
+      assignee: { full_name: 'Mike Johnson' },
+      created_at: '2024-01-25T11:45:00Z',
       qr_code: null,
     },
     {
-      id: "5",
-      asset_id: "AT-005",
-      name: "Canon Printer",
-      category: "office-equipment",
-      status: "retired",
-      location: "Storage Room",
+      id: '5',
+      asset_id: 'AT-005',
+      name: 'Canon Printer',
+      category: 'office-equipment',
+      status: 'retired',
+      location: 'Storage Room',
       value: 149.99,
       assignee: null,
-      created_at: "2024-01-05T16:20:00Z",
-      qr_code: "generated",
+      created_at: '2024-01-05T16:20:00Z',
+      qr_code: 'generated',
     },
   ]
 
   // Calculate analytics
   const analytics = {
     totalAssets: mockAssets.length,
-    activeAssets: mockAssets.filter((asset) => asset.status === "active").length,
-    maintenanceAssets: mockAssets.filter((asset) => asset.status === "maintenance").length,
-    retiredAssets: mockAssets.filter((asset) => asset.status === "retired").length,
+    activeAssets: mockAssets.filter(asset => asset.status === 'active').length,
+    maintenanceAssets: mockAssets.filter(asset => asset.status === 'maintenance').length,
+    retiredAssets: mockAssets.filter(asset => asset.status === 'retired').length,
     totalValue: mockAssets.reduce((sum, asset) => sum + asset.value, 0),
     utilizationRate: Math.round(
-      (mockAssets.filter((asset) => asset.status === "active").length / mockAssets.length) * 100,
+      (mockAssets.filter(asset => asset.status === 'active').length / mockAssets.length) * 100
     ),
-    maintenanceAlerts: mockAssets.filter((asset) => asset.status === "maintenance").length,
-    qrCoverage: Math.round((mockAssets.filter((asset) => asset.qr_code).length / mockAssets.length) * 100),
+    maintenanceAlerts: mockAssets.filter(asset => asset.status === 'maintenance').length,
+    qrCoverage: Math.round(
+      (mockAssets.filter(asset => asset.qr_code).length / mockAssets.length) * 100
+    ),
   }
 
   const filteredAssets = mockAssets.filter(
-    (asset) =>
+    asset =>
       asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset.asset_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.category.toLowerCase().includes(searchTerm.toLowerCase()),
+      asset.category.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
     }).format(value)
   }
 
@@ -167,24 +185,24 @@ export default function AssetTrackerPreview() {
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case "active":
-        return "default"
-      case "maintenance":
-        return "destructive"
-      case "retired":
-        return "secondary"
+      case 'active':
+        return 'default'
+      case 'maintenance':
+        return 'destructive'
+      case 'retired':
+        return 'secondary'
       default:
-        return "outline"
+        return 'outline'
     }
   }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "active":
+      case 'active':
         return <CheckCircle className="h-4 w-4 text-green-600" />
-      case "maintenance":
+      case 'maintenance':
         return <Clock className="h-4 w-4 text-orange-600" />
-      case "retired":
+      case 'retired':
         return <XCircle className="h-4 w-4 text-gray-600" />
       default:
         return <Activity className="h-4 w-4 text-blue-600" />
@@ -193,13 +211,13 @@ export default function AssetTrackerPreview() {
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case "it-equipment":
+      case 'it-equipment':
         return <Laptop className="h-4 w-4" />
-      case "mobile-device":
+      case 'mobile-device':
         return <Smartphone className="h-4 w-4" />
-      case "office-equipment":
+      case 'office-equipment':
         return <Printer className="h-4 w-4" />
-      case "furniture":
+      case 'furniture':
         return <Package className="h-4 w-4" />
       default:
         return <Package className="h-4 w-4" />
@@ -213,124 +231,146 @@ export default function AssetTrackerPreview() {
   )
 
   const handleDelete = async (asset: any) => {
-    setDeleteDialog({ open: false, asset: null });
+    setDeleteDialog({ open: false, asset: null })
     try {
-      const res = await fetch(`/api/assets/${asset.id}`, { method: "DELETE" });
-      const data = await res.json();
+      const res = await fetch(`/api/assets/${asset.id}`, { method: 'DELETE' })
+      const data = await res.json()
       if (!res.ok) {
-        toast({ title: "Delete Failed", description: data.error || "Failed to delete asset", variant: "destructive" });
+        toast({
+          title: 'Delete Failed',
+          description: data.error || 'Failed to delete asset',
+          variant: 'destructive',
+        })
       } else {
-        toast({ title: "Asset Deleted", description: `${asset.name} has been deleted.` });
+        toast({ title: 'Asset Deleted', description: `${asset.name} has been deleted.` })
         // Remove from local state if using mock data
         // setAssets((prev) => prev.filter((a) => a.id !== asset.id));
       }
     } catch (e) {
-      toast({ title: "Delete Failed", description: "An unexpected error occurred", variant: "destructive" });
+      toast({
+        title: 'Delete Failed',
+        description: 'An unexpected error occurred',
+        variant: 'destructive',
+      })
     }
-  };
+  }
 
   // Bulk select handler
   const handleBulkSelect = (assetId: string) => {
-    setBulkSelected(prev => prev.includes(assetId) ? prev.filter(id => id !== assetId) : [...prev, assetId]);
-  };
+    setBulkSelected(prev =>
+      prev.includes(assetId) ? prev.filter(id => id !== assetId) : [...prev, assetId]
+    )
+  }
   const handleBulkSelectAll = () => {
-    if (bulkSelected.length === filteredAssets.length) setBulkSelected([]);
-    else setBulkSelected(filteredAssets.map(a => a.id));
-  };
+    if (bulkSelected.length === filteredAssets.length) setBulkSelected([])
+    else setBulkSelected(filteredAssets.map(a => a.id))
+  }
   // Bulk update handler
   const handleBulkUpdate = async () => {
     try {
       // Fetch previous asset data for undo
-      const res = await fetch("/api/assets/bulk-fetch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/assets/bulk-fetch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ assetIds: bulkSelected }),
-      });
-      const prevData = await res.json();
-      setUndoBulkUpdateData(prevData.assets || []);
-      setUndoBulkUpdateIds(bulkSelected);
+      })
+      const prevData = await res.json()
+      setUndoBulkUpdateData(prevData.assets || [])
+      setUndoBulkUpdateIds(bulkSelected)
       // Prepare update fields
-      const updateFields: any = {};
-      if (bulkUpdateStatus) updateFields.status = bulkUpdateStatus;
-      if (bulkUpdateCategory) updateFields.category = bulkUpdateCategory;
-      if (bulkUpdateLocation) updateFields.location = bulkUpdateLocation;
+      const updateFields: any = {}
+      if (bulkUpdateStatus) updateFields.status = bulkUpdateStatus
+      if (bulkUpdateCategory) updateFields.category = bulkUpdateCategory
+      if (bulkUpdateLocation) updateFields.location = bulkUpdateLocation
       // Update assets (mock: just show toast)
       toast({
-        title: "Assets updated",
-        description: `${bulkSelected.length} assets updated` + (Object.keys(updateFields).length ? ` (${Object.keys(updateFields).join(", ")})` : ""),
+        title: 'Assets updated',
+        description:
+          `${bulkSelected.length} assets updated` +
+          (Object.keys(updateFields).length ? ` (${Object.keys(updateFields).join(', ')})` : ''),
         action: (
-          <Button variant="outline" onClick={handleUndoBulkUpdate}>Undo</Button>
+          <Button variant="outline" onClick={handleUndoBulkUpdate}>
+            Undo
+          </Button>
         ),
-      });
-      setBulkUpdateDialog(false);
-      setBulkSelected([]);
-      setBulkUpdateStatus("");
-      setBulkUpdateCategory("");
-      setBulkUpdateLocation("");
+      })
+      setBulkUpdateDialog(false)
+      setBulkSelected([])
+      setBulkUpdateStatus('')
+      setBulkUpdateCategory('')
+      setBulkUpdateLocation('')
       // In real app: refetch assets
     } catch {
-      toast({ title: "Error", description: "Failed to update assets", variant: "destructive" });
+      toast({ title: 'Error', description: 'Failed to update assets', variant: 'destructive' })
     }
-  };
+  }
   // Undo bulk update handler
   const handleUndoBulkUpdate = async () => {
     try {
-      await fetch("/api/assets/bulk-restore", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      await fetch('/api/assets/bulk-restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ assets: undoBulkUpdateData }),
-      });
-      toast({ title: "Undo successful", description: `${undoBulkUpdateIds.length} assets restored` });
-      setUndoBulkUpdateData([]);
-      setUndoBulkUpdateIds([]);
+      })
+      toast({
+        title: 'Undo successful',
+        description: `${undoBulkUpdateIds.length} assets restored`,
+      })
+      setUndoBulkUpdateData([])
+      setUndoBulkUpdateIds([])
       // In real app: refetch assets
     } catch {
-      toast({ title: "Error", description: "Failed to undo update", variant: "destructive" });
+      toast({ title: 'Error', description: 'Failed to undo update', variant: 'destructive' })
     }
-  };
+  }
   // Bulk delete handler
   const handleBulkDelete = async () => {
     try {
       // Fetch previous asset data for undo
-      const res = await fetch("/api/assets/bulk-fetch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/assets/bulk-fetch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ assetIds: bulkSelected }),
-      });
-      const prevData = await res.json();
-      setUndoBulkDeleteData(prevData.assets || []);
-      setUndoBulkDeleteIds(bulkSelected);
+      })
+      const prevData = await res.json()
+      setUndoBulkDeleteData(prevData.assets || [])
+      setUndoBulkDeleteIds(bulkSelected)
       // Delete assets (mock: just show toast)
       toast({
-        title: "Assets deleted",
+        title: 'Assets deleted',
         description: `${bulkSelected.length} assets deleted`,
         action: (
-          <Button variant="outline" onClick={handleUndoBulkDelete}>Undo</Button>
+          <Button variant="outline" onClick={handleUndoBulkDelete}>
+            Undo
+          </Button>
         ),
-      });
-      setBulkDeleteDialog(false);
-      setBulkSelected([]);
+      })
+      setBulkDeleteDialog(false)
+      setBulkSelected([])
       // In real app: refetch assets
     } catch {
-      toast({ title: "Error", description: "Failed to delete assets", variant: "destructive" });
+      toast({ title: 'Error', description: 'Failed to delete assets', variant: 'destructive' })
     }
-  };
+  }
   // Undo bulk delete handler
   const handleUndoBulkDelete = async () => {
     try {
-      await fetch("/api/assets/bulk-restore", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      await fetch('/api/assets/bulk-restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ assets: undoBulkDeleteData }),
-      });
-      toast({ title: "Undo successful", description: `${undoBulkDeleteIds.length} assets restored` });
-      setUndoBulkDeleteData([]);
-      setUndoBulkDeleteIds([]);
+      })
+      toast({
+        title: 'Undo successful',
+        description: `${undoBulkDeleteIds.length} assets restored`,
+      })
+      setUndoBulkDeleteData([])
+      setUndoBulkDeleteIds([])
       // In real app: refetch assets
     } catch {
-      toast({ title: "Error", description: "Failed to undo delete", variant: "destructive" });
+      toast({ title: 'Error', description: 'Failed to undo delete', variant: 'destructive' })
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -384,41 +424,41 @@ export default function AssetTrackerPreview() {
         <aside className="w-64 bg-white border-r border-gray-200 min-h-screen sticky top-16">
           <nav className="p-4 space-y-2">
             <Button
-              variant={activeTab === "dashboard" ? "default" : "ghost"}
+              variant={activeTab === 'dashboard' ? 'default' : 'ghost'}
               className="w-full justify-start"
-              onClick={() => setActiveTab("dashboard")}
+              onClick={() => setActiveTab('dashboard')}
             >
               <BarChart3 className="h-4 w-4 mr-2" />
               Dashboard
             </Button>
             <Button
-              variant={activeTab === "assets" ? "default" : "ghost"}
+              variant={activeTab === 'assets' ? 'default' : 'ghost'}
               className="w-full justify-start"
-              onClick={() => setActiveTab("assets")}
+              onClick={() => setActiveTab('assets')}
             >
               <Package className="h-4 w-4 mr-2" />
               Asset Management
             </Button>
             <Button
-              variant={activeTab === "qr" ? "default" : "ghost"}
+              variant={activeTab === 'qr' ? 'default' : 'ghost'}
               className="w-full justify-start"
-              onClick={() => setActiveTab("qr")}
+              onClick={() => setActiveTab('qr')}
             >
               <QrCode className="h-4 w-4 mr-2" />
               QR Code Tools
             </Button>
             <Button
-              variant={activeTab === "team" ? "default" : "ghost"}
+              variant={activeTab === 'team' ? 'default' : 'ghost'}
               className="w-full justify-start"
-              onClick={() => setActiveTab("team")}
+              onClick={() => setActiveTab('team')}
             >
               <Users className="h-4 w-4 mr-2" />
               Team Collaboration
             </Button>
             <Button
-              variant={activeTab === "security" ? "default" : "ghost"}
+              variant={activeTab === 'security' ? 'default' : 'ghost'}
               className="w-full justify-start"
-              onClick={() => setActiveTab("security")}
+              onClick={() => setActiveTab('security')}
             >
               <Shield className="h-4 w-4 mr-2" />
               Security
@@ -447,7 +487,7 @@ export default function AssetTrackerPreview() {
 
         {/* Main Content */}
         <main className="flex-1 p-6 overflow-auto">
-          {activeTab === "dashboard" && (
+          {activeTab === 'dashboard' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -513,7 +553,7 @@ export default function AssetTrackerPreview() {
                   <CardContent>
                     <div className="text-2xl font-bold">{analytics.qrCoverage}%</div>
                     <p className="text-xs text-muted-foreground">
-                      {mockAssets.filter((a) => a.qr_code).length} of {analytics.totalAssets} assets
+                      {mockAssets.filter(a => a.qr_code).length} of {analytics.totalAssets} assets
                     </p>
                   </CardContent>
                 </Card>
@@ -537,7 +577,9 @@ export default function AssetTrackerPreview() {
                         <div className="w-16 bg-gray-200 rounded-full h-2">
                           <div
                             className="bg-green-500 h-2 rounded-full"
-                            style={{ width: `${(analytics.activeAssets / analytics.totalAssets) * 100}%` }}
+                            style={{
+                              width: `${(analytics.activeAssets / analytics.totalAssets) * 100}%`,
+                            }}
                           ></div>
                         </div>
                       </div>
@@ -552,7 +594,9 @@ export default function AssetTrackerPreview() {
                         <div className="w-16 bg-gray-200 rounded-full h-2">
                           <div
                             className="bg-orange-500 h-2 rounded-full"
-                            style={{ width: `${(analytics.maintenanceAssets / analytics.totalAssets) * 100}%` }}
+                            style={{
+                              width: `${(analytics.maintenanceAssets / analytics.totalAssets) * 100}%`,
+                            }}
                           ></div>
                         </div>
                       </div>
@@ -567,7 +611,9 @@ export default function AssetTrackerPreview() {
                         <div className="w-16 bg-gray-200 rounded-full h-2">
                           <div
                             className="bg-gray-500 h-2 rounded-full"
-                            style={{ width: `${(analytics.retiredAssets / analytics.totalAssets) * 100}%` }}
+                            style={{
+                              width: `${(analytics.retiredAssets / analytics.totalAssets) * 100}%`,
+                            }}
                           ></div>
                         </div>
                       </div>
@@ -586,14 +632,18 @@ export default function AssetTrackerPreview() {
                         <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                         <div className="flex-1">
                           <p className="text-sm font-medium">New asset added</p>
-                          <p className="text-xs text-gray-500">Office Chair (AT-004) • 2 hours ago</p>
+                          <p className="text-xs text-gray-500">
+                            Office Chair (AT-004) • 2 hours ago
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start space-x-3">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                         <div className="flex-1">
                           <p className="text-sm font-medium">QR code generated</p>
-                          <p className="text-xs text-gray-500">iPhone 14 Pro (AT-002) • 4 hours ago</p>
+                          <p className="text-xs text-gray-500">
+                            iPhone 14 Pro (AT-002) • 4 hours ago
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-start space-x-3">
@@ -607,7 +657,9 @@ export default function AssetTrackerPreview() {
                         <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
                         <div className="flex-1">
                           <p className="text-sm font-medium">Asset assigned</p>
-                          <p className="text-xs text-gray-500">MacBook Pro to John Doe • 2 days ago</p>
+                          <p className="text-xs text-gray-500">
+                            MacBook Pro to John Doe • 2 days ago
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -626,10 +678,15 @@ export default function AssetTrackerPreview() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-orange-700 mb-3">
-                      {analytics.maintenanceAssets} asset{analytics.maintenanceAssets !== 1 ? "s" : ""} require
-                      {analytics.maintenanceAssets === 1 ? "s" : ""} attention
+                      {analytics.maintenanceAssets} asset
+                      {analytics.maintenanceAssets !== 1 ? 's' : ''} require
+                      {analytics.maintenanceAssets === 1 ? 's' : ''} attention
                     </p>
-                    <Button size="sm" variant="outline" className="border-orange-300 text-orange-700">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-orange-300 text-orange-700"
+                    >
                       View Details
                     </Button>
                   </CardContent>
@@ -644,8 +701,8 @@ export default function AssetTrackerPreview() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-blue-700 mb-3">
-                      {mockAssets.filter((a) => !a.qr_code).length} asset
-                      {mockAssets.filter((a) => !a.qr_code).length !== 1 ? "s" : ""} missing QR codes
+                      {mockAssets.filter(a => !a.qr_code).length} asset
+                      {mockAssets.filter(a => !a.qr_code).length !== 1 ? 's' : ''} missing QR codes
                     </p>
                     <Button size="sm" variant="outline" className="border-blue-300 text-blue-700">
                       Generate QR Codes
@@ -671,7 +728,7 @@ export default function AssetTrackerPreview() {
             </div>
           )}
 
-          {activeTab === "assets" && (
+          {activeTab === 'assets' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-bold text-gray-900">Asset Management</h2>
@@ -688,7 +745,7 @@ export default function AssetTrackerPreview() {
                   <Input
                     placeholder="Search assets..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={e => setSearchTerm(e.target.value)}
                     className="pl-10"
                   />
                 </div>
@@ -728,7 +785,14 @@ export default function AssetTrackerPreview() {
                         <TableHeader>
                           <TableRow>
                             <TableHead>
-                              <input type="checkbox" checked={bulkSelected.length === filteredAssets.length && filteredAssets.length > 0} onChange={handleBulkSelectAll} />
+                              <input
+                                type="checkbox"
+                                checked={
+                                  bulkSelected.length === filteredAssets.length &&
+                                  filteredAssets.length > 0
+                                }
+                                onChange={handleBulkSelectAll}
+                              />
                             </TableHead>
                             <TableHead>Asset</TableHead>
                             <TableHead>Category</TableHead>
@@ -741,10 +805,14 @@ export default function AssetTrackerPreview() {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {filteredAssets.map((asset) => (
+                          {filteredAssets.map(asset => (
                             <TableRow key={asset.id} className="hover:bg-gray-50">
                               <TableCell>
-                                <input type="checkbox" checked={bulkSelected.includes(asset.id)} onChange={() => handleBulkSelect(asset.id)} />
+                                <input
+                                  type="checkbox"
+                                  checked={bulkSelected.includes(asset.id)}
+                                  onChange={() => handleBulkSelect(asset.id)}
+                                />
                               </TableCell>
                               <TableCell>
                                 <div className="flex items-center space-x-3">
@@ -757,11 +825,16 @@ export default function AssetTrackerPreview() {
                                   </div>
                                 </div>
                               </TableCell>
-                              <TableCell className="capitalize">{asset.category.replace("-", " ")}</TableCell>
+                              <TableCell className="capitalize">
+                                {asset.category.replace('-', ' ')}
+                              </TableCell>
                               <TableCell>
                                 <div className="flex items-center space-x-2">
                                   {getStatusIcon(asset.status)}
-                                  <Badge variant={getStatusVariant(asset.status)} className="capitalize">
+                                  <Badge
+                                    variant={getStatusVariant(asset.status)}
+                                    className="capitalize"
+                                  >
                                     {asset.status}
                                   </Badge>
                                 </div>
@@ -772,8 +845,10 @@ export default function AssetTrackerPreview() {
                                   <span className="text-sm">{asset.location}</span>
                                 </div>
                               </TableCell>
-                              <TableCell>{asset.assignee?.full_name || "Unassigned"}</TableCell>
-                              <TableCell className="font-medium">{formatCurrency(asset.value)}</TableCell>
+                              <TableCell>{asset.assignee?.full_name || 'Unassigned'}</TableCell>
+                              <TableCell className="font-medium">
+                                {formatCurrency(asset.value)}
+                              </TableCell>
                               <TableCell>
                                 {asset.qr_code ? (
                                   <Badge variant="default" className="bg-green-100 text-green-800">
@@ -785,13 +860,28 @@ export default function AssetTrackerPreview() {
                               </TableCell>
                               <TableCell>
                                 <div className="flex space-x-1">
-                                  <Button variant="ghost" size="sm" onClick={() => router.push(`/asset/${asset.id}`)} title="Preview">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => router.push(`/asset/${asset.id}`)}
+                                    title="Preview"
+                                  >
                                     <Eye className="h-4 w-4" />
                                   </Button>
-                                  <Button variant="ghost" size="sm" onClick={() => router.push(`/asset/${asset.id}/edit`)} title="Edit">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => router.push(`/asset/${asset.id}/edit`)}
+                                    title="Edit"
+                                  >
                                     <Edit className="h-4 w-4" />
                                   </Button>
-                                  <Button variant="ghost" size="sm" onClick={() => setDeleteDialog({ open: true, asset })} title="Delete">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setDeleteDialog({ open: true, asset })}
+                                    title="Delete"
+                                  >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
                                 </div>
@@ -809,9 +899,24 @@ export default function AssetTrackerPreview() {
                         <DialogTitle>Update Selected Assets</DialogTitle>
                       </DialogHeader>
                       <div className="flex flex-col gap-2">
-                        <Input placeholder="Status" value={bulkUpdateStatus} onChange={e => setBulkUpdateStatus(e.target.value)} className="mb-2" />
-                        <Input placeholder="Category" value={bulkUpdateCategory} onChange={e => setBulkUpdateCategory(e.target.value)} className="mb-2" />
-                        <Input placeholder="Location" value={bulkUpdateLocation} onChange={e => setBulkUpdateLocation(e.target.value)} className="mb-2" />
+                        <Input
+                          placeholder="Status"
+                          value={bulkUpdateStatus}
+                          onChange={e => setBulkUpdateStatus(e.target.value)}
+                          className="mb-2"
+                        />
+                        <Input
+                          placeholder="Category"
+                          value={bulkUpdateCategory}
+                          onChange={e => setBulkUpdateCategory(e.target.value)}
+                          className="mb-2"
+                        />
+                        <Input
+                          placeholder="Location"
+                          value={bulkUpdateLocation}
+                          onChange={e => setBulkUpdateLocation(e.target.value)}
+                          className="mb-2"
+                        />
                       </div>
                       <DialogFooter>
                         <Button onClick={handleBulkUpdate}>Update All</Button>
@@ -824,9 +929,13 @@ export default function AssetTrackerPreview() {
                       <DialogHeader>
                         <DialogTitle>Delete Selected Assets</DialogTitle>
                       </DialogHeader>
-                      <div>Are you sure you want to delete <b>{bulkSelected.length}</b> assets?</div>
+                      <div>
+                        Are you sure you want to delete <b>{bulkSelected.length}</b> assets?
+                      </div>
                       <DialogFooter>
-                        <Button variant="destructive" onClick={handleBulkDelete}>Delete All</Button>
+                        <Button variant="destructive" onClick={handleBulkDelete}>
+                          Delete All
+                        </Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
@@ -834,8 +943,11 @@ export default function AssetTrackerPreview() {
 
                 <TabsContent value="grid">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredAssets.map((asset) => (
-                      <Card key={asset.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                    {filteredAssets.map(asset => (
+                      <Card
+                        key={asset.id}
+                        className="hover:shadow-lg transition-shadow cursor-pointer"
+                      >
                         <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
@@ -863,7 +975,9 @@ export default function AssetTrackerPreview() {
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-600">Assignee:</span>
-                            <span className="text-sm">{asset.assignee?.full_name || "Unassigned"}</span>
+                            <span className="text-sm">
+                              {asset.assignee?.full_name || 'Unassigned'}
+                            </span>
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-600">QR Code:</span>
@@ -893,7 +1007,7 @@ export default function AssetTrackerPreview() {
             </div>
           )}
 
-          {activeTab === "qr" && (
+          {activeTab === 'qr' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-bold text-gray-900">QR Code Tools</h2>
@@ -917,7 +1031,9 @@ export default function AssetTrackerPreview() {
                       <QrCode className="h-8 w-8 text-blue-600" />
                       <div className="ml-4">
                         <p className="text-sm font-medium text-gray-600">Total QR Codes</p>
-                        <p className="text-2xl font-bold">{mockAssets.filter((a) => a.qr_code).length}</p>
+                        <p className="text-2xl font-bold">
+                          {mockAssets.filter(a => a.qr_code).length}
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -941,7 +1057,9 @@ export default function AssetTrackerPreview() {
                       <AlertTriangle className="h-8 w-8 text-orange-600" />
                       <div className="ml-4">
                         <p className="text-sm font-medium text-gray-600">Missing QR</p>
-                        <p className="text-2xl font-bold">{mockAssets.filter((a) => !a.qr_code).length}</p>
+                        <p className="text-2xl font-bold">
+                          {mockAssets.filter(a => !a.qr_code).length}
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -975,7 +1093,7 @@ export default function AssetTrackerPreview() {
                       <label className="text-sm font-medium">Select Asset</label>
                       <select className="w-full p-2 border rounded-md">
                         <option value="">Choose an asset...</option>
-                        {mockAssets.map((asset) => (
+                        {mockAssets.map(asset => (
                           <option key={asset.id} value={asset.id}>
                             {asset.name} - {asset.asset_id}
                           </option>
@@ -1023,7 +1141,8 @@ export default function AssetTrackerPreview() {
                     </div>
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                       <p className="text-sm text-green-800">
-                        <strong>Demo:</strong> Scan functionality works with real camera access when deployed
+                        <strong>Demo:</strong> Scan functionality works with real camera access when
+                        deployed
                       </p>
                     </div>
                   </CardContent>
@@ -1041,8 +1160,8 @@ export default function AssetTrackerPreview() {
                     <div className="space-y-3">
                       <h4 className="font-medium">Assets without QR codes:</h4>
                       {mockAssets
-                        .filter((asset) => !asset.qr_code)
-                        .map((asset) => (
+                        .filter(asset => !asset.qr_code)
+                        .map(asset => (
                           <div key={asset.id} className="flex items-center space-x-2">
                             <input type="checkbox" className="rounded" />
                             <span className="text-sm">
@@ -1074,7 +1193,7 @@ export default function AssetTrackerPreview() {
             </div>
           )}
 
-          {activeTab === "team" && (
+          {activeTab === 'team' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-bold text-gray-900">Team Collaboration</h2>
@@ -1143,8 +1262,12 @@ export default function AssetTrackerPreview() {
 
                       <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
                         <Users className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">Invite more team members</h3>
-                        <p className="text-gray-500 mb-4">Collaborate with your team on asset management</p>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                          Invite more team members
+                        </h3>
+                        <p className="text-gray-500 mb-4">
+                          Collaborate with your team on asset management
+                        </p>
                         <Button>
                           <Plus className="h-4 w-4 mr-2" />
                           Send Invitation
@@ -1189,7 +1312,7 @@ export default function AssetTrackerPreview() {
             </div>
           )}
 
-          {activeTab === "security" && (
+          {activeTab === 'security' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-bold text-gray-900">Security Settings</h2>
@@ -1206,7 +1329,9 @@ export default function AssetTrackerPreview() {
                       <Shield className="h-5 w-5 mr-2" />
                       Authentication & Access
                     </CardTitle>
-                    <CardDescription>Manage authentication methods and access control</CardDescription>
+                    <CardDescription>
+                      Manage authentication methods and access control
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
@@ -1338,7 +1463,7 @@ export default function AssetTrackerPreview() {
             </CardHeader>
             <CardContent>
               {(() => {
-                const asset = mockAssets.find((a) => a.id === selectedAsset)
+                const asset = mockAssets.find(a => a.id === selectedAsset)
                 if (!asset) return null
                 return (
                   <div className="space-y-4">
@@ -1353,7 +1478,7 @@ export default function AssetTrackerPreview() {
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-600">Category</label>
-                        <p className="text-lg capitalize">{asset.category.replace("-", " ")}</p>
+                        <p className="text-lg capitalize">{asset.category.replace('-', ' ')}</p>
                       </div>
                       <div>
                         <label className="text-sm font-medium text-gray-600">Status</label>
@@ -1392,14 +1517,24 @@ export default function AssetTrackerPreview() {
         </div>
       )}
 
-      <Dialog open={deleteDialog.open} onOpenChange={open => setDeleteDialog({ open, asset: deleteDialog.asset })}>
+      <Dialog
+        open={deleteDialog.open}
+        onOpenChange={open => setDeleteDialog({ open, asset: deleteDialog.asset })}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Asset</DialogTitle>
           </DialogHeader>
-          <div>Are you sure you want to delete <b>{deleteDialog.asset?.name}</b>?</div>
+          <div>
+            Are you sure you want to delete <b>{deleteDialog.asset?.name}</b>?
+          </div>
           <DialogFooter>
-            <Button variant="destructive" onClick={() => deleteDialog.asset && handleDelete(deleteDialog.asset)}>Delete</Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteDialog.asset && handleDelete(deleteDialog.asset)}
+            >
+              Delete
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

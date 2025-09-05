@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import ProfileSetup from "@/components/profile-setup"
-import { createClient } from "@/lib/supabase/client"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2 } from "lucide-react"
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import ProfileSetup from '@/components/profile-setup'
+import { createClient } from '@/lib/supabase/client'
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Loader2 } from 'lucide-react'
 
 export default function ProfileSetupPage() {
   const [user, setUser] = useState(null)
@@ -21,13 +21,13 @@ export default function ProfileSetupPage() {
         } = await supabase.auth.getUser()
 
         if (!user) {
-          router.push("/login")
+          router.push('/login')
           return
         }
 
         setUser(user)
       } catch (error) {
-        console.log("Auth check failed, continuing in demo mode")
+        console.log('Auth check failed, continuing in demo mode')
       } finally {
         setLoading(false)
       }

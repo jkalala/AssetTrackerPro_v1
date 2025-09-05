@@ -1,34 +1,35 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, Mail, Lock, Github, AlertTriangle, ExternalLink } from "lucide-react"
-import Link from "next/link"
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Eye, EyeOff, Mail, Lock, Github, AlertTriangle, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [githubLoading, setGithubLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
   const router = useRouter()
   const supabase = createClient()
 
-  const isV0Preview = typeof window !== "undefined" && window.location.hostname.includes("vusercontent.net")
-  const isLocalhost = typeof window !== "undefined" && window.location.hostname === "localhost"
+  const isV0Preview =
+    typeof window !== 'undefined' && window.location.hostname.includes('vusercontent.net')
+  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost'
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError("")
+    setError('')
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -37,14 +38,16 @@ export default function LoginForm() {
       })
 
       if (error) {
-        if (error.message.includes("Email not confirmed")) {
-          setError("Please check your email and click the confirmation link before signing in.")
+        if (error.message.includes('Email not confirmed')) {
+          setError('Please check your email and click the confirmation link before signing in.')
         } else {
           setError(error.message)
         }
       } else {
         // Sync session for server-side
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
         if (session) {
           await fetch('/api/auth/set-session', {
             method: 'POST',
@@ -53,13 +56,13 @@ export default function LoginForm() {
               access_token: session.access_token,
               refresh_token: session.refresh_token,
             }),
-          });
+          })
         }
-        router.push("/")
+        router.push('/')
         router.refresh()
       }
     } catch (err) {
-      setError("An unexpected error occurred")
+      setError('An unexpected error occurred')
     } finally {
       setLoading(false)
     }
@@ -68,26 +71,26 @@ export default function LoginForm() {
   const handleGithubLogin = async () => {
     try {
       setGithubLoading(true)
-      setError("")
+      setError('')
 
-      console.log("GitHub OAuth redirect URL:", `${window.location.origin}/auth/callback`)
+      console.log('GitHub OAuth redirect URL:', `${window.location.origin}/auth/callback`)
 
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "github",
+        provider: 'github',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       })
 
-      console.log("GitHub auth response:", { data, error })
+      console.log('GitHub auth response:', { data, error })
 
       if (error) {
-        console.error("GitHub auth error:", error)
+        console.error('GitHub auth error:', error)
         setError(`GitHub authentication error: ${error.message}`)
       }
     } catch (err) {
-      console.error("Unexpected GitHub auth error:", err)
-      setError("Failed to authenticate with GitHub. Please try again.")
+      console.error('Unexpected GitHub auth error:', err)
+      setError('Failed to authenticate with GitHub. Please try again.')
     } finally {
       setGithubLoading(false)
     }
@@ -96,7 +99,7 @@ export default function LoginForm() {
   const handleGoogleLogin = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
@@ -106,7 +109,7 @@ export default function LoginForm() {
         setError(error.message)
       }
     } catch (err) {
-      setError("Failed to authenticate with Google")
+      setError('Failed to authenticate with Google')
     }
   }
 
@@ -130,12 +133,15 @@ export default function LoginForm() {
                     <strong>v0 Preview Environment Detected</strong>
                   </p>
                   <p className="text-sm">
-                    GitHub OAuth needs to be configured for this preview URL. For full functionality, please:
+                    GitHub OAuth needs to be configured for this preview URL. For full
+                    functionality, please:
                   </p>
                   <ol className="text-sm list-decimal list-inside space-y-1 ml-2">
                     <li>
-                      Update your GitHub OAuth app's Homepage URL to:{" "}
-                      <code className="bg-gray-100 px-1 rounded text-xs">{window.location.origin}</code>
+                      Update your GitHub OAuth app's Homepage URL to:{' '}
+                      <code className="bg-gray-100 px-1 rounded text-xs">
+                        {window.location.origin}
+                      </code>
                     </li>
                     <li>Or download and run locally at http://localhost:3000</li>
                   </ol>
@@ -159,9 +165,12 @@ export default function LoginForm() {
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
                 {error}
-                {error.includes("Email not confirmed") && (
+                {error.includes('Email not confirmed') && (
                   <div className="mt-2">
-                    <Link href="/auth/resend" className="text-blue-600 hover:text-blue-500 underline">
+                    <Link
+                      href="/auth/resend"
+                      className="text-blue-600 hover:text-blue-500 underline"
+                    >
                       Resend confirmation email
                     </Link>
                   </div>
@@ -171,7 +180,7 @@ export default function LoginForm() {
           )}
 
           {/* Quick access to troubleshooting */}
-          {error && error.includes("blocked") && (
+          {error && error.includes('blocked') && (
             <div className="text-center">
               <Button asChild variant="outline" size="sm">
                 <Link href="/auth/oauth-status">Advanced OAuth Troubleshooting</Link>
@@ -180,7 +189,7 @@ export default function LoginForm() {
           )}
 
           {/* Quick access to troubleshooting */}
-          {error && error.includes("blocked") && (
+          {error && error.includes('blocked') && (
             <div className="text-center">
               <Button asChild variant="outline" size="sm">
                 <Link href="/auth/blocked">Fix "Site Blocked" Error</Link>
@@ -250,7 +259,7 @@ export default function LoginForm() {
                   type="email"
                   placeholder="Enter your email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   className="pl-10"
                   required
                 />
@@ -265,10 +274,10 @@ export default function LoginForm() {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   id="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   className="pl-10 pr-10"
                   required
                 />
@@ -293,7 +302,7 @@ export default function LoginForm() {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
 

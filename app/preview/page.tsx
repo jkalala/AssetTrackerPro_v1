@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   QrCode,
   Scan,
@@ -19,63 +19,63 @@ import {
   Zap,
   Smartphone,
   Globe,
-} from "lucide-react"
-import QRGenerator from "@/components/qr-generator"
-import QRScanner from "@/components/qr-scanner"
-import BulkQROperations from "@/components/bulk-qr-operations"
+} from 'lucide-react'
+import QRGenerator from '@/components/qr-generator'
+import QRScanner from '@/components/qr-scanner'
+import BulkQROperations from '@/components/bulk-qr-operations'
 
 export default function PreviewPage() {
-  const [activeDemo, setActiveDemo] = useState("overview")
+  const [activeDemo, setActiveDemo] = useState('overview')
 
   // Mock data for demonstration
   const mockAssets = [
     {
-      id: "1",
-      asset_id: "DEMO-001",
+      id: '1',
+      asset_id: 'DEMO-001',
       name: 'MacBook Pro 16"',
-      category: "it-equipment",
-      status: "active",
-      location: "Office A - Desk 12",
+      category: 'it-equipment',
+      status: 'active',
+      location: 'Office A - Desk 12',
       value: 2499.99,
       qr_code: null,
-      created_at: "2024-01-15T10:00:00Z",
-      updated_at: "2024-01-15T10:00:00Z",
-      assignee: { full_name: "John Doe" },
+      created_at: '2024-01-15T10:00:00Z',
+      updated_at: '2024-01-15T10:00:00Z',
+      assignee: { full_name: 'John Doe' },
     },
     {
-      id: "2",
-      asset_id: "DEMO-002",
-      name: "Ergonomic Office Chair",
-      category: "furniture",
-      status: "active",
-      location: "Office A - Desk 12",
+      id: '2',
+      asset_id: 'DEMO-002',
+      name: 'Ergonomic Office Chair',
+      category: 'furniture',
+      status: 'active',
+      location: 'Office A - Desk 12',
       value: 299.99,
       qr_code:
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
-      created_at: "2024-01-10T09:00:00Z",
-      updated_at: "2024-01-10T09:00:00Z",
-      assignee: { full_name: "Jane Smith" },
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+      created_at: '2024-01-10T09:00:00Z',
+      updated_at: '2024-01-10T09:00:00Z',
+      assignee: { full_name: 'Jane Smith' },
     },
     {
-      id: "3",
-      asset_id: "DEMO-003",
-      name: "4K Projector",
-      category: "av-equipment",
-      status: "maintenance",
-      location: "Conference Room B",
+      id: '3',
+      asset_id: 'DEMO-003',
+      name: '4K Projector',
+      category: 'av-equipment',
+      status: 'maintenance',
+      location: 'Conference Room B',
       value: 899.99,
       qr_code: null,
-      created_at: "2024-01-05T14:30:00Z",
-      updated_at: "2024-01-20T11:15:00Z",
+      created_at: '2024-01-05T14:30:00Z',
+      updated_at: '2024-01-20T11:15:00Z',
       assignee: null,
     },
   ]
 
   const qrStats = {
     totalAssets: mockAssets.length,
-    withQR: mockAssets.filter((a) => a.qr_code).length,
-    withoutQR: mockAssets.filter((a) => !a.qr_code).length,
-    qrCoverage: Math.round((mockAssets.filter((a) => a.qr_code).length / mockAssets.length) * 100),
+    withQR: mockAssets.filter(a => a.qr_code).length,
+    withoutQR: mockAssets.filter(a => !a.qr_code).length,
+    qrCoverage: Math.round((mockAssets.filter(a => a.qr_code).length / mockAssets.length) * 100),
   }
 
   return (
@@ -85,8 +85,12 @@ export default function PreviewPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">AssetTracker Pro - QR Code System</h1>
-              <p className="text-gray-600 mt-1">Complete QR code functionality for asset management</p>
+              <h1 className="text-3xl font-bold text-gray-900">
+                AssetTracker Pro - QR Code System
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Complete QR code functionality for asset management
+              </p>
             </div>
             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
               Live Preview
@@ -168,7 +172,9 @@ export default function PreviewPage() {
                     <QrCode className="h-5 w-5 mr-2" />
                     QR Code System Overview
                   </CardTitle>
-                  <CardDescription>Complete asset tagging and identification solution</CardDescription>
+                  <CardDescription>
+                    Complete asset tagging and identification solution
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
@@ -201,8 +207,8 @@ export default function PreviewPage() {
                   <Alert className="border-blue-200 bg-blue-50">
                     <Zap className="h-4 w-4 text-blue-600" />
                     <AlertDescription className="text-blue-800">
-                      <strong>Live System:</strong> All QR code features are fully functional and ready for production
-                      use.
+                      <strong>Live System:</strong> All QR code features are fully functional and
+                      ready for production use.
                     </AlertDescription>
                   </Alert>
                 </CardContent>
@@ -211,7 +217,9 @@ export default function PreviewPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Sample Asset with QR Code</CardTitle>
-                  <CardDescription>Example of how QR codes integrate with your assets</CardDescription>
+                  <CardDescription>
+                    Example of how QR codes integrate with your assets
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="border rounded-lg p-4 bg-gray-50">
@@ -262,7 +270,9 @@ export default function PreviewPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Technology & Implementation</CardTitle>
-                <CardDescription>Built with modern web technologies for reliability and performance</CardDescription>
+                <CardDescription>
+                  Built with modern web technologies for reliability and performance
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -317,7 +327,9 @@ export default function PreviewPage() {
             <Card>
               <CardHeader>
                 <CardTitle>QR Code Generator Demo</CardTitle>
-                <CardDescription>Generate QR codes for individual assets with customizable options</CardDescription>
+                <CardDescription>
+                  Generate QR codes for individual assets with customizable options
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <QRGenerator assets={mockAssets} />
@@ -336,11 +348,11 @@ export default function PreviewPage() {
               </CardHeader>
               <CardContent>
                 <QRScanner
-                  onScanSuccess={(data) => {
-                    console.log("Demo scan successful:", data)
+                  onScanSuccess={data => {
+                    console.log('Demo scan successful:', data)
                   }}
-                  onScanError={(error) => {
-                    console.error("Demo scan error:", error)
+                  onScanError={error => {
+                    console.error('Demo scan error:', error)
                   }}
                 />
               </CardContent>
@@ -352,7 +364,9 @@ export default function PreviewPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Bulk QR Operations Demo</CardTitle>
-                <CardDescription>Generate QR codes for multiple assets simultaneously</CardDescription>
+                <CardDescription>
+                  Generate QR codes for multiple assets simultaneously
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <BulkQROperations assets={mockAssets} />
@@ -376,21 +390,27 @@ export default function PreviewPage() {
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">Individual Generation</h4>
-                        <p className="text-sm text-gray-600">Create QR codes for single assets with custom settings</p>
+                        <p className="text-sm text-gray-600">
+                          Create QR codes for single assets with custom settings
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">Bulk Processing</h4>
-                        <p className="text-sm text-gray-600">Generate multiple QR codes simultaneously</p>
+                        <p className="text-sm text-gray-600">
+                          Generate multiple QR codes simultaneously
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">Customization Options</h4>
-                        <p className="text-sm text-gray-600">Adjust size, colors, and error correction levels</p>
+                        <p className="text-sm text-gray-600">
+                          Adjust size, colors, and error correction levels
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
@@ -417,7 +437,9 @@ export default function PreviewPage() {
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">Camera Scanning</h4>
-                        <p className="text-sm text-gray-600">Real-time QR code detection using device camera</p>
+                        <p className="text-sm text-gray-600">
+                          Real-time QR code detection using device camera
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
@@ -431,7 +453,9 @@ export default function PreviewPage() {
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">Instant Lookup</h4>
-                        <p className="text-sm text-gray-600">Immediate asset information retrieval</p>
+                        <p className="text-sm text-gray-600">
+                          Immediate asset information retrieval
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
@@ -458,28 +482,36 @@ export default function PreviewPage() {
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">Direct Asset Links</h4>
-                        <p className="text-sm text-gray-600">QR codes link directly to asset detail pages</p>
+                        <p className="text-sm text-gray-600">
+                          QR codes link directly to asset detail pages
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">Real-time Data</h4>
-                        <p className="text-sm text-gray-600">Always shows current asset information</p>
+                        <p className="text-sm text-gray-600">
+                          Always shows current asset information
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">Action Buttons</h4>
-                        <p className="text-sm text-gray-600">Quick access to common asset operations</p>
+                        <p className="text-sm text-gray-600">
+                          Quick access to common asset operations
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">History Tracking</h4>
-                        <p className="text-sm text-gray-600">Audit trail of QR code scans and access</p>
+                        <p className="text-sm text-gray-600">
+                          Audit trail of QR code scans and access
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -499,14 +531,18 @@ export default function PreviewPage() {
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">CSV Import/Export</h4>
-                        <p className="text-sm text-gray-600">Bulk asset management with spreadsheet integration</p>
+                        <p className="text-sm text-gray-600">
+                          Bulk asset management with spreadsheet integration
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">Analytics Dashboard</h4>
-                        <p className="text-sm text-gray-600">Track QR code usage and scan statistics</p>
+                        <p className="text-sm text-gray-600">
+                          Track QR code usage and scan statistics
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start space-x-3">
@@ -520,7 +556,9 @@ export default function PreviewPage() {
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
                         <h4 className="font-medium">API Integration</h4>
-                        <p className="text-sm text-gray-600">RESTful APIs for third-party integrations</p>
+                        <p className="text-sm text-gray-600">
+                          RESTful APIs for third-party integrations
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -534,10 +572,12 @@ export default function PreviewPage() {
         <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
-              <h3 className="text-2xl font-bold text-gray-900">Ready to Transform Your Asset Management?</h3>
+              <h3 className="text-2xl font-bold text-gray-900">
+                Ready to Transform Your Asset Management?
+              </h3>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                This complete QR code system is ready for production use. Download the code and deploy it to start
-                managing your assets with cutting-edge QR technology.
+                This complete QR code system is ready for production use. Download the code and
+                deploy it to start managing your assets with cutting-edge QR technology.
               </p>
               <div className="flex justify-center space-x-4">
                 <Button size="lg">

@@ -19,7 +19,7 @@ export function PermissionMatrix({ tenantId, roles, canManageRoles }: Permission
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {roles.map((role) => (
+          {roles.map(role => (
             <div key={role.id} className="border rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-medium">{role.display_name || role.name}</h3>

@@ -1,52 +1,52 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { QrCode, TestTube, CheckCircle, AlertTriangle } from "lucide-react"
-import QRGenerator from "@/components/qr-generator"
-import QRScanner from "@/components/qr-scanner"
+import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { QrCode, TestTube, CheckCircle, AlertTriangle } from 'lucide-react'
+import QRGenerator from '@/components/qr-generator'
+import QRScanner from '@/components/qr-scanner'
 
 export default function QRTestPage() {
   const [testResults, setTestResults] = useState<any[]>([])
 
   const mockAssets = [
     {
-      id: "1",
-      asset_id: "TEST-001",
-      name: "Test MacBook Pro",
-      category: "it-equipment",
+      id: '1',
+      asset_id: 'TEST-001',
+      name: 'Test MacBook Pro',
+      category: 'it-equipment',
     },
     {
-      id: "2",
-      asset_id: "TEST-002",
-      name: "Test Office Chair",
-      category: "furniture",
+      id: '2',
+      asset_id: 'TEST-002',
+      name: 'Test Office Chair',
+      category: 'furniture',
     },
   ]
 
   const runQRTests = async () => {
     const tests = [
       {
-        name: "QR Code Generation",
+        name: 'QR Code Generation',
         test: async () => {
           // Test QR generation
-          return { success: true, message: "QR generation working" }
+          return { success: true, message: 'QR generation working' }
         },
       },
       {
-        name: "QR Code Parsing",
+        name: 'QR Code Parsing',
         test: async () => {
           // Test QR parsing
-          return { success: true, message: "QR parsing working" }
+          return { success: true, message: 'QR parsing working' }
         },
       },
       {
-        name: "Asset Lookup",
+        name: 'Asset Lookup',
         test: async () => {
           // Test asset lookup
-          return { success: true, message: "Asset lookup working" }
+          return { success: true, message: 'Asset lookup working' }
         },
       },
     ]
@@ -95,7 +95,7 @@ export default function QRTestPage() {
               {testResults.length > 0 && (
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-600">
-                    {testResults.filter((r) => r.success).length} / {testResults.length} tests passed
+                    {testResults.filter(r => r.success).length} / {testResults.length} tests passed
                   </span>
                 </div>
               )}
@@ -106,14 +106,18 @@ export default function QRTestPage() {
                 {testResults.map((result, index) => (
                   <Alert
                     key={index}
-                    className={result.success ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}
+                    className={
+                      result.success ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+                    }
                   >
                     {result.success ? (
                       <CheckCircle className="h-4 w-4 text-green-600" />
                     ) : (
                       <AlertTriangle className="h-4 w-4 text-red-600" />
                     )}
-                    <AlertDescription className={result.success ? "text-green-800" : "text-red-800"}>
+                    <AlertDescription
+                      className={result.success ? 'text-green-800' : 'text-red-800'}
+                    >
                       <strong>{result.name}:</strong> {result.message}
                     </AlertDescription>
                   </Alert>
@@ -135,12 +139,12 @@ export default function QRTestPage() {
           <div>
             <h2 className="text-xl font-semibold mb-4">QR Code Scanner</h2>
             <QRScanner
-              onScanSuccess={(data) => {
-                console.log("Test scan successful:", data)
+              onScanSuccess={data => {
+                console.log('Test scan successful:', data)
                 alert(`QR Scan Success: Found asset ${data.asset?.name}`)
               }}
-              onScanError={(error) => {
-                console.error("Test scan error:", error)
+              onScanError={error => {
+                console.error('Test scan error:', error)
                 alert(`QR Scan Error: ${error}`)
               }}
             />

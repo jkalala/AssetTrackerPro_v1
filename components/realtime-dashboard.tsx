@@ -1,14 +1,25 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Activity, TrendingUp, Users, Package, Scan, AlertCircle, RefreshCw, Zap, BarChart3, Clock } from "lucide-react"
-import { useRealtimeMetrics, useActivityFeed } from "@/hooks/use-realtime-analytics"
-import RealtimeChart from "./realtime-chart"
-import LiveActivityFeed from "./live-activity-feed"
+import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
+import {
+  Activity,
+  TrendingUp,
+  Users,
+  Package,
+  Scan,
+  AlertCircle,
+  RefreshCw,
+  Zap,
+  BarChart3,
+  Clock,
+} from 'lucide-react'
+import { useRealtimeMetrics, useActivityFeed } from '@/hooks/use-realtime-analytics'
+import RealtimeChart from './realtime-chart'
+import LiveActivityFeed from './live-activity-feed'
 
 export default function RealtimeDashboard() {
   const { metrics, loading, error, refresh } = useRealtimeMetrics()
@@ -63,7 +74,7 @@ export default function RealtimeDashboard() {
             </p>
           </div>
           <Button onClick={handleRefresh} disabled={isRefreshing} variant="outline" size="sm">
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
@@ -107,7 +118,9 @@ export default function RealtimeDashboard() {
               </div>
               <div className="mt-2">
                 <Progress
-                  value={metrics.totalAssets > 0 ? (metrics.activeAssets / metrics.totalAssets) * 100 : 0}
+                  value={
+                    metrics.totalAssets > 0 ? (metrics.activeAssets / metrics.totalAssets) * 100 : 0
+                  }
                   className="h-2"
                 />
               </div>
@@ -127,8 +140,8 @@ export default function RealtimeDashboard() {
                 </div>
               </div>
               <div className="mt-2">
-                <Badge variant={metrics.assetsCreatedToday > 0 ? "default" : "secondary"}>
-                  {metrics.assetsCreatedToday > 0 ? "Active" : "No new assets"}
+                <Badge variant={metrics.assetsCreatedToday > 0 ? 'default' : 'secondary'}>
+                  {metrics.assetsCreatedToday > 0 ? 'Active' : 'No new assets'}
                 </Badge>
               </div>
               <div className="absolute top-2 right-2">
@@ -148,7 +161,8 @@ export default function RealtimeDashboard() {
               </div>
               <div className="mt-2">
                 <Badge variant="outline">
-                  <TrendingUp className="h-3 w-3 mr-1" />+{Math.floor(Math.random() * 20)}% vs last week
+                  <TrendingUp className="h-3 w-3 mr-1" />+{Math.floor(Math.random() * 20)}% vs last
+                  week
                 </Badge>
               </div>
               <div className="absolute top-2 right-2">
@@ -250,7 +264,9 @@ export default function RealtimeDashboard() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Peak Usage</span>
-                <Badge variant="outline">{new Date(Date.now() - Math.random() * 3600000).toLocaleTimeString()}</Badge>
+                <Badge variant="outline">
+                  {new Date(Date.now() - Math.random() * 3600000).toLocaleTimeString()}
+                </Badge>
               </div>
             </CardContent>
           </Card>

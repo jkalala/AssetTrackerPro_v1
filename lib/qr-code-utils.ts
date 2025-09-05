@@ -1,4 +1,4 @@
-import QRCode from "qrcode"
+import QRCode from 'qrcode'
 
 export interface QRCodeOptions {
   size?: number
@@ -7,7 +7,7 @@ export interface QRCodeOptions {
     dark?: string
     light?: string
   }
-  errorCorrectionLevel?: "L" | "M" | "Q" | "H"
+  errorCorrectionLevel?: 'L' | 'M' | 'Q' | 'H'
 }
 
 // Add at the top after the existing imports
@@ -29,18 +29,21 @@ export class QRCodeGenerator {
     size: 200,
     margin: 2,
     color: {
-      dark: "#000000",
-      light: "#FFFFFF",
+      dark: '#000000',
+      light: '#FFFFFF',
     },
-    errorCorrectionLevel: "M",
+    errorCorrectionLevel: 'M',
   }
 
-  static async generateAssetQR(assetData: AssetQRData, options: QRCodeOptions = {}): Promise<string> {
+  static async generateAssetQR(
+    assetData: AssetQRData,
+    options: QRCodeOptions = {}
+  ): Promise<string> {
     const qrOptions = { ...this.defaultOptions, ...options }
 
     // Create QR data with asset information
     const qrData = JSON.stringify({
-      type: "asset",
+      type: 'asset',
       id: assetData.assetId,
       name: assetData.name,
       category: assetData.category,
@@ -64,23 +67,23 @@ export class QRCodeGenerator {
 
   static async generateBulkQRCodes(
     assets: AssetQRData[],
-    options: QRCodeOptions = {},
+    options: QRCodeOptions = {}
   ): Promise<{ assetId: string; qrCode: string; success: boolean; error?: string }[]> {
     const results = await Promise.allSettled(
-      assets.map(async (asset) => ({
+      assets.map(async asset => ({
         assetId: asset.assetId,
         qrCode: await this.generateAssetQR(asset, options),
         success: true,
-      })),
+      }))
     )
 
     return results.map((result, index) => {
-      if (result.status === "fulfilled") {
+      if (result.status === 'fulfilled') {
         return result.value
       } else {
         return {
           assetId: assets[index].assetId,
-          qrCode: "",
+          qrCode: '',
           success: false,
           error: result.reason.message,
         }
@@ -91,12 +94,12 @@ export class QRCodeGenerator {
   static parseQRData(qrString: string): AssetQRData | null {
     try {
       const data = JSON.parse(qrString)
-      if (data.type === "asset" && data.id && data.name) {
+      if (data.type === 'asset' && data.id && data.name) {
         return {
           assetId: data.id,
           name: data.name,
-          category: data.category || "unknown",
-          url: data.url || "",
+          category: data.category || 'unknown',
+          url: data.url || '',
         }
       }
       return null
@@ -118,7 +121,7 @@ export class QRCodeScanner {
 
       return {
         success: false,
-        error: "QR scanning requires jsQR library integration",
+        error: 'QR scanning requires jsQR library integration',
       }
     } catch (error) {
       return {
@@ -129,14 +132,14 @@ export class QRCodeScanner {
   }
 
   static async scanFromFile(file: File): Promise<QRCodeScanResult> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const img = new Image()
-      const canvas = document.createElement("canvas")
-      const ctx = canvas.getContext("2d")
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
 
       img.onload = () => {
         if (!ctx) {
-          resolve({ success: false, error: "Canvas context not available" })
+          resolve({ success: false, error: 'Canvas context not available' })
           return
         }
 
@@ -148,9 +151,9 @@ export class QRCodeScanner {
 
         // For demo purposes, simulate successful scan with sample data
         const sampleData: AssetQRData = {
-          assetId: "DEMO-001",
-          name: "Sample Asset from Upload",
-          category: "it-equipment",
+          assetId: 'DEMO-001',
+          name: 'Sample Asset from Upload',
+          category: 'it-equipment',
           url: `${window.location.origin}/asset/DEMO-001`,
         }
 
@@ -161,7 +164,7 @@ export class QRCodeScanner {
       }
 
       img.onerror = () => {
-        resolve({ success: false, error: "Failed to load image" })
+        resolve({ success: false, error: 'Failed to load image' })
       }
 
       img.src = URL.createObjectURL(file)

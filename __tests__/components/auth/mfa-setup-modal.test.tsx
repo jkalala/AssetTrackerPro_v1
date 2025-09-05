@@ -1,6 +1,6 @@
 /**
  * Unit Tests for MFA Setup Modal Component
- * 
+ *
  * Tests the MFA setup modal component functionality including:
  * - Modal rendering with correct test IDs
  * - QR code display and manual secret
@@ -24,12 +24,7 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
   describe('Modal Rendering and Test IDs', () => {
     it('should have correct test IDs for E2E testing', () => {
       // Test that the modal has the expected data-testid attributes
-      const expectedTestIds = [
-        'mfa-setup-modal',
-        'qr-code',
-        'manual-secret',
-        'backup-codes'
-      ]
+      const expectedTestIds = ['mfa-setup-modal', 'qr-code', 'manual-secret', 'backup-codes']
 
       expectedTestIds.forEach(testId => {
         expect(testId).toMatch(/^[a-z-]+$/) // Validate test ID format
@@ -55,7 +50,7 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
   describe('QR Code and Secret Display', () => {
     it('should display QR code with correct format', () => {
       const mockQRCodeData = 'data:image/png;base64,mock-qr-code'
-      
+
       // Test QR code data format
       expect(mockQRCodeData).toMatch(/^data:image\/png;base64,/)
       expect(mockQRCodeData.length).toBeGreaterThan(20)
@@ -63,7 +58,7 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
 
     it('should display manual secret with correct format', () => {
       const mockSecret = 'JBSWY3DPEHPK3PXP'
-      
+
       // Test secret format (base32)
       expect(mockSecret).toMatch(/^[A-Z2-7]+$/)
       expect(mockSecret.length).toBeGreaterThan(10)
@@ -73,13 +68,15 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
       const generateMockBackupCodes = () => {
         const codes = []
         for (let i = 0; i < 10; i++) {
-          codes.push(`${Math.random().toString(16).substr(2, 4).toUpperCase()}-${Math.random().toString(16).substr(2, 4).toUpperCase()}`)
+          codes.push(
+            `${Math.random().toString(16).substr(2, 4).toUpperCase()}-${Math.random().toString(16).substr(2, 4).toUpperCase()}`
+          )
         }
         return codes
       }
 
       const backupCodes = generateMockBackupCodes()
-      
+
       expect(backupCodes).toHaveLength(10)
       backupCodes.forEach(code => {
         expect(code).toMatch(/^[A-F0-9]{4}-[A-F0-9]{4}$/)
@@ -124,7 +121,7 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
     it('should handle setup errors gracefully', () => {
       const mockSetupError = {
         success: false,
-        error: 'Failed to setup MFA'
+        error: 'Failed to setup MFA',
       }
 
       expect(mockSetupError.success).toBe(false)
@@ -134,7 +131,7 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
     it('should handle verification errors gracefully', () => {
       const mockVerifyError = {
         success: false,
-        error: 'Invalid verification code'
+        error: 'Invalid verification code',
       }
 
       expect(mockVerifyError.success).toBe(false)
@@ -145,7 +142,7 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
       const loadingStates = {
         setup: 'Setting up MFA...',
         verification: 'Verifying...',
-        completion: 'Completing setup...'
+        completion: 'Completing setup...',
       }
 
       expect(loadingStates.setup).toBe('Setting up MFA...')
@@ -157,19 +154,19 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
   describe('Modal Interaction and Callbacks', () => {
     it('should handle modal close callback', () => {
       const mockOnClose = jest.fn()
-      
+
       // Simulate close button click
       mockOnClose()
-      
+
       expect(mockOnClose).toHaveBeenCalled()
     })
 
     it('should handle success callback', () => {
       const mockOnSuccess = jest.fn()
-      
+
       // Simulate successful MFA setup
       mockOnSuccess({ method: { id: 'method-123' } })
-      
+
       expect(mockOnSuccess).toHaveBeenCalledWith({ method: { id: 'method-123' } })
     })
 
@@ -177,7 +174,7 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
       const testModalProps = (isOpen: boolean) => {
         return {
           isOpen,
-          style: { display: isOpen ? 'block' : 'none' }
+          style: { display: isOpen ? 'block' : 'none' },
         }
       }
 
@@ -199,7 +196,7 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
         onSuccess: jest.fn(),
         tenantId: 'tenant-123',
         userId: 'user-123',
-        userEmail: 'user@example.com'
+        userEmail: 'user@example.com',
       }
 
       // Validate prop types
@@ -209,7 +206,7 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
       expect(typeof requiredProps.tenantId).toBe('string')
       expect(typeof requiredProps.userId).toBe('string')
       expect(typeof requiredProps.userEmail).toBe('string')
-      
+
       // Validate prop values
       expect(requiredProps.tenantId.length).toBeGreaterThan(0)
       expect(requiredProps.userId.length).toBeGreaterThan(0)
@@ -219,7 +216,7 @@ describe('MFA Setup Modal Component - Unit Tests', () => {
     it('should handle optional props', () => {
       const optionalProps = {
         className: 'custom-modal',
-        title: 'Custom MFA Setup'
+        title: 'Custom MFA Setup',
       }
 
       expect(optionalProps.className).toBeDefined()

@@ -1,5 +1,5 @@
-import { UrlDebug } from "@/components/auth/url-debug"
-import { SupabaseSetupGuide } from "@/components/supabase-setup-guide"
+import { UrlDebug } from '@/components/auth/url-debug'
+import { SupabaseSetupGuide } from '@/components/supabase-setup-guide'
 
 export default function DebugUrlsPage() {
   return (
@@ -7,7 +7,9 @@ export default function DebugUrlsPage() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Fix Localhost Redirect Issue</h1>
-          <p className="text-gray-600 mt-2">Complete setup guide to fix signup confirmation email redirects</p>
+          <p className="text-gray-600 mt-2">
+            Complete setup guide to fix signup confirmation email redirects
+          </p>
         </div>
 
         <SupabaseSetupGuide />

@@ -4,13 +4,13 @@
 // Service for managing permission delegations and guest access
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  PermissionDelegation, 
+import {
+  PermissionDelegation,
   PermissionDelegationUpdate,
   GuestAccess,
   GuestAccessUpdate,
   CreateDelegationRequest,
-  CreateGuestAccessRequest
+  CreateGuestAccessRequest,
 } from '@/lib/types/rbac'
 
 export class DelegationService {
@@ -23,13 +23,13 @@ export class DelegationService {
   // =====================================================
 
   async createDelegation(
-    tenantId: string, 
-    delegatorId: string, 
+    tenantId: string,
+    delegatorId: string,
     request: CreateDelegationRequest
   ): Promise<PermissionDelegation> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Validate delegatee exists
       const { data: delegatee } = await supabase
         .from('profiles')
@@ -104,7 +104,7 @@ export class DelegationService {
           conditions: request.conditions || {},
           expires_at: request.expires_at,
           reason: request.reason,
-          notes: request.notes
+          notes: request.notes,
         })
         .select()
         .single()
@@ -121,14 +121,14 @@ export class DelegationService {
   }
 
   async updateDelegation(
-    tenantId: string, 
-    delegationId: string, 
+    tenantId: string,
+    delegationId: string,
     updates: PermissionDelegationUpdate,
     updatedBy: string
   ): Promise<PermissionDelegation> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Check if delegation exists and user can modify it
       const { data: delegation } = await supabase
         .from('permission_delegations')
@@ -163,7 +163,7 @@ export class DelegationService {
         .from('permission_delegations')
         .update({
           ...updates,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', delegationId)
         .eq('tenant_id', tenantId)
@@ -182,14 +182,14 @@ export class DelegationService {
   }
 
   async revokeDelegation(
-    tenantId: string, 
-    delegationId: string, 
+    tenantId: string,
+    delegationId: string,
     revokedBy: string,
     reason?: string
   ): Promise<boolean> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: delegation } = await supabase
         .from('permission_delegations')
         .select('id, delegator_id, status')
@@ -214,7 +214,7 @@ export class DelegationService {
         .update({
           status: 'revoked',
           notes: reason ? `Revoked: ${reason}` : 'Revoked by delegator',
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', delegationId)
         .eq('tenant_id', tenantId)
@@ -230,13 +230,17 @@ export class DelegationService {
     }
   }
 
-  async getDelegation(tenantId: string, delegationId: string): Promise<PermissionDelegation | null> {
+  async getDelegation(
+    tenantId: string,
+    delegationId: string
+  ): Promise<PermissionDelegation | null> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: delegation } = await supabase
         .from('permission_delegations')
-        .select(`
+        .select(
+          `
           *,
           delegator:profiles!permission_delegations_delegator_id_fkey (
             id,
@@ -253,7 +257,8 @@ export class DelegationService {
             name,
             display_name
           )
-        `)
+        `
+        )
         .eq('id', delegationId)
         .eq('tenant_id', tenantId)
         .single()
@@ -266,16 +271,17 @@ export class DelegationService {
   }
 
   async getUserDelegations(
-    tenantId: string, 
-    userId: string, 
+    tenantId: string,
+    userId: string,
     type: 'delegated' | 'received' | 'all' = 'all'
   ): Promise<PermissionDelegation[]> {
     try {
       const supabase = await this.getSupabase()
-      
+
       let query = supabase
         .from('permission_delegations')
-        .select(`
+        .select(
+          `
           *,
           delegator:profiles!permission_delegations_delegator_id_fkey (
             id,
@@ -292,7 +298,8 @@ export class DelegationService {
             name,
             display_name
           )
-        `)
+        `
+        )
         .eq('tenant_id', tenantId)
 
       switch (type) {
@@ -307,8 +314,7 @@ export class DelegationService {
           break
       }
 
-      const { data: delegations, error } = await query
-        .order('created_at', { ascending: false })
+      const { data: delegations, error } = await query.order('created_at', { ascending: false })
 
       if (error) {
         throw new Error(`Failed to get user delegations: ${error.message}`)
@@ -324,10 +330,11 @@ export class DelegationService {
   async getActiveDelegations(tenantId: string): Promise<PermissionDelegation[]> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: delegations, error } = await supabase
         .from('permission_delegations')
-        .select(`
+        .select(
+          `
           *,
           delegator:profiles!permission_delegations_delegator_id_fkey (
             id,
@@ -339,7 +346,8 @@ export class DelegationService {
             full_name,
             email
           )
-        `)
+        `
+        )
         .eq('tenant_id', tenantId)
         .eq('status', 'active')
         .gte('expires_at', new Date().toISOString())
@@ -361,13 +369,13 @@ export class DelegationService {
   // =====================================================
 
   async createGuestAccess(
-    tenantId: string, 
-    invitedBy: string, 
+    tenantId: string,
+    invitedBy: string,
     request: CreateGuestAccessRequest
   ): Promise<GuestAccess> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(request.email)) {
@@ -428,7 +436,7 @@ export class DelegationService {
           permissions: request.permissions || {},
           resource_access: request.resource_access || {},
           expires_at: request.expires_at,
-          max_sessions: request.max_sessions || 1
+          max_sessions: request.max_sessions || 1,
         })
         .select()
         .single()
@@ -445,18 +453,18 @@ export class DelegationService {
   }
 
   async updateGuestAccess(
-    tenantId: string, 
-    guestId: string, 
+    tenantId: string,
+    guestId: string,
     updates: GuestAccessUpdate
   ): Promise<GuestAccess> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: guestAccess, error } = await supabase
         .from('guest_access')
         .update({
           ...updates,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', guestId)
         .eq('tenant_id', tenantId)
@@ -477,12 +485,12 @@ export class DelegationService {
   async revokeGuestAccess(tenantId: string, guestId: string): Promise<boolean> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { error } = await supabase
         .from('guest_access')
         .update({
           is_active: false,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', guestId)
         .eq('tenant_id', tenantId)
@@ -501,10 +509,11 @@ export class DelegationService {
   async getGuestAccess(tenantId: string, guestId: string): Promise<GuestAccess | null> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: guestAccess } = await supabase
         .from('guest_access')
-        .select(`
+        .select(
+          `
           *,
           inviter:profiles!guest_access_invited_by_fkey (
             id,
@@ -516,7 +525,8 @@ export class DelegationService {
             name,
             display_name
           )
-        `)
+        `
+        )
         .eq('id', guestId)
         .eq('tenant_id', tenantId)
         .single()
@@ -531,17 +541,19 @@ export class DelegationService {
   async getActiveGuestAccess(tenantId: string): Promise<GuestAccess[]> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: guestAccess, error } = await supabase
         .from('guest_access')
-        .select(`
+        .select(
+          `
           *,
           inviter:profiles!guest_access_invited_by_fkey (
             id,
             full_name,
             email
           )
-        `)
+        `
+        )
         .eq('tenant_id', tenantId)
         .eq('is_active', true)
         .gte('expires_at', new Date().toISOString())
@@ -565,7 +577,7 @@ export class DelegationService {
   async cleanupExpiredDelegations(tenantId?: string): Promise<number> {
     try {
       const supabase = await this.getSupabase()
-      
+
       let query = supabase
         .from('permission_delegations')
         .update({ status: 'expired' })
@@ -592,7 +604,7 @@ export class DelegationService {
   async cleanupExpiredGuestAccess(tenantId?: string): Promise<number> {
     try {
       const supabase = await this.getSupabase()
-      
+
       let query = supabase
         .from('guest_access')
         .update({ is_active: false })
@@ -621,8 +633,8 @@ export class DelegationService {
   // =====================================================
 
   private async validateDelegatorPermissions(
-    _tenantId: string, 
-    _delegatorId: string, 
+    _tenantId: string,
+    _delegatorId: string,
     _permissionNames: string[]
   ): Promise<boolean> {
     try {
@@ -636,13 +648,13 @@ export class DelegationService {
   }
 
   private async validateDelegatorRole(
-    tenantId: string, 
-    delegatorId: string, 
+    tenantId: string,
+    delegatorId: string,
     roleId: string
   ): Promise<boolean> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: userRole } = await supabase
         .from('user_roles')
         .select('id')
@@ -663,7 +675,10 @@ export class DelegationService {
   // ANALYTICS AND REPORTING
   // =====================================================
 
-  async getDelegationStats(tenantId: string, days = 30): Promise<{
+  async getDelegationStats(
+    tenantId: string,
+    days = 30
+  ): Promise<{
     total_delegations: number
     active_delegations: number
     expired_delegations: number
@@ -700,7 +715,7 @@ export class DelegationService {
       const mostDelegatedPermissions = [
         { permission_name: 'read:asset', count: 15 },
         { permission_name: 'update:asset', count: 8 },
-        { permission_name: 'create:report', count: 5 }
+        { permission_name: 'create:report', count: 5 },
       ]
 
       return {
@@ -709,7 +724,7 @@ export class DelegationService {
         expired_delegations: expiredDelegations,
         revoked_delegations: revokedDelegations,
         guest_access_count: guestAccessCount,
-        most_delegated_permissions: mostDelegatedPermissions
+        most_delegated_permissions: mostDelegatedPermissions,
       }
     } catch (error) {
       console.error('Error getting delegation stats:', error)

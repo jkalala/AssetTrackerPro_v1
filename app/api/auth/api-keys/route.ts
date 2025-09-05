@@ -5,7 +5,10 @@ import { apiKeyService } from '@/lib/services/api-key-service'
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -25,11 +28,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const includeRevoked = searchParams.get('include_revoked') === 'true'
 
-    const result = await apiKeyService.getUserApiKeys(
-      profile.tenant_id,
-      user.id,
-      includeRevoked
-    )
+    const result = await apiKeyService.getUserApiKeys(profile.tenant_id, user.id, includeRevoked)
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 })
@@ -37,42 +36,39 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      apiKeys: result.apiKeys
+      apiKeys: result.apiKeys,
     })
   } catch (error) {
     console.error('Get API keys error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
-    const { 
-      key_name, 
-      permissions = {}, 
-      scopes = [], 
+    const {
+      key_name,
+      permissions = {},
+      scopes = [],
       expires_in_days,
       rate_limit_requests,
       rate_limit_window_seconds,
-      allowed_ips = []
+      allowed_ips = [],
     } = body
 
     if (!key_name) {
-      return NextResponse.json(
-        { error: 'Key name is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Key name is required' }, { status: 400 })
     }
 
     // Get user's tenant ID
@@ -96,7 +92,7 @@ export async function POST(request: NextRequest) {
         expiresInDays: expires_in_days,
         rateLimitRequests: rate_limit_requests,
         rateLimitWindowSeconds: rate_limit_window_seconds,
-        allowedIps: allowed_ips
+        allowedIps: allowed_ips,
       }
     )
 
@@ -107,43 +103,40 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       apiKey: result.apiKey,
-      keyValue: result.keyValue
+      keyValue: result.keyValue,
     })
   } catch (error) {
     console.error('Create API key error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
-    const { 
+    const {
       key_id,
-      key_name, 
-      permissions, 
-      scopes, 
+      key_name,
+      permissions,
+      scopes,
       allowed_ips,
       rate_limit_requests,
       rate_limit_window_seconds,
-      expires_at
+      expires_at,
     } = body
 
     if (!key_id) {
-      return NextResponse.json(
-        { error: 'Key ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Key ID is required' }, { status: 400 })
     }
 
     // Get user's tenant ID
@@ -157,20 +150,15 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'User not associated with tenant' }, { status: 400 })
     }
 
-    const result = await apiKeyService.updateApiKey(
-      profile.tenant_id,
-      user.id,
-      key_id,
-      {
-        keyName: key_name,
-        permissions,
-        scopes,
-        allowedIps: allowed_ips,
-        rateLimitRequests: rate_limit_requests,
-        rateLimitWindowSeconds: rate_limit_window_seconds,
-        expiresAt: expires_at
-      }
-    )
+    const result = await apiKeyService.updateApiKey(profile.tenant_id, user.id, key_id, {
+      keyName: key_name,
+      permissions,
+      scopes,
+      allowedIps: allowed_ips,
+      rateLimitRequests: rate_limit_requests,
+      rateLimitWindowSeconds: rate_limit_window_seconds,
+      expiresAt: expires_at,
+    })
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 })
@@ -178,21 +166,21 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      apiKey: result.apiKey
+      apiKey: result.apiKey,
     })
   } catch (error) {
     console.error('Update API key error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 export async function DELETE(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -203,10 +191,7 @@ export async function DELETE(request: NextRequest) {
     const reason = searchParams.get('reason') || 'User revoked'
 
     if (!keyId) {
-      return NextResponse.json(
-        { error: 'Key ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Key ID is required' }, { status: 400 })
     }
 
     // Get user's tenant ID
@@ -220,12 +205,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'User not associated with tenant' }, { status: 400 })
     }
 
-    const result = await apiKeyService.revokeApiKey(
-      profile.tenant_id,
-      user.id,
-      keyId,
-      reason
-    )
+    const result = await apiKeyService.revokeApiKey(profile.tenant_id, user.id, keyId, reason)
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 })
@@ -234,9 +214,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Revoke API key error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

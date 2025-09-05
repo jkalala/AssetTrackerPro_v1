@@ -2,35 +2,22 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isAuthorized } from '@/lib/rbac/utils'
-import { Ratelimit } from "@upstash/ratelimit"
-import { redis, hasRedis } from "@/lib/config/redis"
+import { Ratelimit } from '@upstash/ratelimit'
+import { redis, hasRedis } from '@/lib/config/redis'
 
-const PUBLIC_ROUTES = [
-  '/login',
-  '/signup',
-  '/auth',
-  '/privacy',
-  '/terms',
-  '/docs',
-  '/',
-]
+const PUBLIC_ROUTES = ['/login', '/signup', '/auth', '/privacy', '/terms', '/docs', '/']
 
-const ADMIN_ROUTES = [
-  '/admin',
-  '/settings/billing',
-  '/settings/users',
-  '/settings/roles',
-]
+const ADMIN_ROUTES = ['/admin', '/settings/billing', '/settings/users', '/settings/roles']
 
 const ratelimit = hasRedis
   ? new Ratelimit({
       redis: redis!,
-      limiter: Ratelimit.fixedWindow(60, "1m"), // 60 requests per minute
+      limiter: Ratelimit.fixedWindow(60, '1m'), // 60 requests per minute
       analytics: true,
     })
   : {
       limit: async () => ({ success: true, limit: 60, remaining: 60, reset: Date.now() + 60000 }),
-    };
+    }
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
@@ -76,7 +63,11 @@ export async function middleware(req: NextRequest) {
 
   // Handle admin routes
   if (ADMIN_ROUTES.some(route => req.nextUrl.pathname.startsWith(route))) {
-    const hasAccess = await isAuthorized(session.user.id, ['manage:users', 'manage:roles', 'manage:billing'])
+    const hasAccess = await isAuthorized(session.user.id, [
+      'manage:users',
+      'manage:roles',
+      'manage:billing',
+    ])
     if (!hasAccess) {
       return NextResponse.redirect(new URL('/unauthorized', req.url))
     }
@@ -89,10 +80,10 @@ export async function middleware(req: NextRequest) {
 
   // Optionally apply rate limiting (only if Redis is configured)
   if (hasRedis) {
-    const ip = req.headers.get("x-forwarded-for") || "anonymous";
-    const { success } = await ratelimit.limit(ip);
+    const ip = req.headers.get('x-forwarded-for') || 'anonymous'
+    const { success } = await ratelimit.limit(ip)
     if (!success) {
-      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }
   }
 

@@ -25,16 +25,18 @@ const server = setupServer(
   rest.get('/api/health', (req, res, ctx) => {
     return res(ctx.json({ status: 'ok', timestamp: new Date().toISOString() }))
   }),
-  
+
   rest.get('/api/auth/user', (req, res, ctx) => {
-    return res(ctx.json({ 
-      user: { 
-        id: 'test-user-id', 
-        email: 'test@enterprise.com',
-        role: 'admin',
-        tenant_id: 'test-tenant-id'
-      } 
-    }))
+    return res(
+      ctx.json({
+        user: {
+          id: 'test-user-id',
+          email: 'test@enterprise.com',
+          role: 'admin',
+          tenant_id: 'test-tenant-id',
+        },
+      })
+    )
   })
 )
 
@@ -63,7 +65,7 @@ global.testUtils = {
     role: 'user',
     tenant_id: 'test-tenant-id',
     created_at: new Date().toISOString(),
-    ...overrides
+    ...overrides,
   }),
 
   createTestAsset: (overrides = {}) => ({
@@ -75,7 +77,7 @@ global.testUtils = {
     tenant_id: 'test-tenant-id',
     created_by: 'test-user-id',
     created_at: new Date().toISOString(),
-    ...overrides
+    ...overrides,
   }),
 
   createTestTenant: (overrides = {}) => ({
@@ -86,9 +88,9 @@ global.testUtils = {
     settings: {
       compliance_mode: 'strict',
       audit_retention_days: 2555, // 7 years
-      data_residency: 'US'
+      data_residency: 'US',
     },
-    ...overrides
+    ...overrides,
   }),
 
   // Compliance Test Helpers
@@ -104,7 +106,7 @@ global.testUtils = {
     const createdAt = new Date(data.created_at)
     const retentionDate = new Date()
     retentionDate.setDate(retentionDate.getDate() - retentionDays)
-    
+
     if (createdAt < retentionDate) {
       throw new Error(`Data retention policy violated: ${data.id}`)
     }
@@ -120,33 +122,33 @@ global.testUtils = {
   },
 
   // Performance Test Helpers
-  measureExecutionTime: async (fn) => {
+  measureExecutionTime: async fn => {
     const start = performance.now()
     const result = await fn()
     const end = performance.now()
     return { result, executionTime: end - start }
-  }
+  },
 }
 
 // Mock Enterprise Services
 jest.mock('@/lib/services/audit-service', () => ({
   logAuditEvent: jest.fn().mockResolvedValue({ success: true }),
   getAuditTrail: jest.fn().mockResolvedValue([]),
-  validateAuditIntegrity: jest.fn().mockResolvedValue(true)
+  validateAuditIntegrity: jest.fn().mockResolvedValue(true),
 }))
 
 jest.mock('@/lib/services/compliance-service', () => ({
   validateDataRetention: jest.fn().mockResolvedValue(true),
   generateComplianceReport: jest.fn().mockResolvedValue({}),
   checkGDPRCompliance: jest.fn().mockResolvedValue(true),
-  checkSOC2Compliance: jest.fn().mockResolvedValue(true)
+  checkSOC2Compliance: jest.fn().mockResolvedValue(true),
 }))
 
 jest.mock('@/lib/services/security-service', () => ({
   validateTenantAccess: jest.fn().mockResolvedValue(true),
   checkPermissions: jest.fn().mockResolvedValue(true),
   logSecurityEvent: jest.fn().mockResolvedValue({ success: true }),
-  detectAnomalies: jest.fn().mockResolvedValue([])
+  detectAnomalies: jest.fn().mockResolvedValue([]),
 }))
 
 // Mock Supabase with Enterprise Features
@@ -155,17 +157,17 @@ jest.mock('@supabase/supabase-js', () => ({
     auth: {
       getUser: jest.fn().mockResolvedValue({
         data: { user: global.testUtils.createTestUser() },
-        error: null
+        error: null,
       }),
       getSession: jest.fn().mockResolvedValue({
         data: { session: { user: global.testUtils.createTestUser() } },
-        error: null
+        error: null,
       }),
       signInWithPassword: jest.fn().mockResolvedValue({
         data: { user: global.testUtils.createTestUser() },
-        error: null
+        error: null,
       }),
-      signOut: jest.fn().mockResolvedValue({ error: null })
+      signOut: jest.fn().mockResolvedValue({ error: null }),
     },
     from: jest.fn(() => ({
       select: jest.fn().mockReturnThis(),
@@ -186,7 +188,7 @@ jest.mock('@supabase/supabase-js', () => ({
       limit: jest.fn().mockReturnThis(),
       range: jest.fn().mockReturnThis(),
       single: jest.fn().mockResolvedValue({ data: null, error: null }),
-      maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null })
+      maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
     })),
     rpc: jest.fn().mockResolvedValue({ data: null, error: null }),
     storage: {
@@ -194,10 +196,10 @@ jest.mock('@supabase/supabase-js', () => ({
         upload: jest.fn().mockResolvedValue({ data: null, error: null }),
         download: jest.fn().mockResolvedValue({ data: null, error: null }),
         remove: jest.fn().mockResolvedValue({ data: null, error: null }),
-        list: jest.fn().mockResolvedValue({ data: [], error: null })
-      }))
-    }
-  }))
+        list: jest.fn().mockResolvedValue({ data: [], error: null }),
+      })),
+    },
+  })),
 }))
 
 // Mock Next.js with Enterprise Features
@@ -216,9 +218,9 @@ jest.mock('next/router', () => ({
     events: {
       on: jest.fn(),
       off: jest.fn(),
-      emit: jest.fn()
-    }
-  }))
+      emit: jest.fn(),
+    },
+  })),
 }))
 
 jest.mock('next/navigation', () => ({
@@ -228,11 +230,11 @@ jest.mock('next/navigation', () => ({
     prefetch: jest.fn(),
     back: jest.fn(),
     forward: jest.fn(),
-    refresh: jest.fn()
+    refresh: jest.fn(),
   })),
   useSearchParams: jest.fn(() => new URLSearchParams()),
   usePathname: jest.fn(() => '/'),
-  useParams: jest.fn(() => ({}))
+  useParams: jest.fn(() => ({})),
 }))
 
 // Console override for test environment
@@ -243,7 +245,7 @@ global.console = {
   warn: jest.fn(),
   error: jest.fn(),
   info: jest.fn(),
-  debug: jest.fn()
+  debug: jest.fn(),
 }
 
 // Cleanup function

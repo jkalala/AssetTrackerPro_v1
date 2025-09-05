@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import { useState, useEffect, useRef } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { createClient } from "@/lib/supabase/client"
-import { useAuth } from "@/components/auth/auth-provider"
-import { Tenant } from "@/lib/rbac/types"
-import { 
+import { useState, useEffect, useRef } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/components/auth/auth-provider'
+import { Tenant } from '@/lib/rbac/types'
+import {
   Building2,
   Users,
   Settings,
@@ -20,10 +20,10 @@ import {
   Briefcase,
   Shield,
   Loader2,
-  AlertTriangle
-} from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
-import { HexColorPicker } from "react-colorful"
+  AlertTriangle,
+} from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import { HexColorPicker } from 'react-colorful'
 
 export default function TenantPage() {
   const { user } = useAuth()
@@ -32,28 +32,28 @@ export default function TenantPage() {
   const [tenant, setTenant] = useState<Tenant | null>(null)
   const [profile, setProfile] = useState<any>(null)
   const [formData, setFormData] = useState({
-    name: "",
-    industry: "",
-    website: "",
-    contact_email: "",
-    contact_phone: "",
-    address: "",
-    city: "",
-    state: "",
-    country: "",
-    postal_code: "",
+    name: '',
+    industry: '',
+    website: '',
+    contact_email: '',
+    contact_phone: '',
+    address: '',
+    city: '',
+    state: '',
+    country: '',
+    postal_code: '',
     settings: {
       allowMultipleLocations: false,
       requireAssetPhotos: false,
       enableGeofencing: false,
-      enableAnalytics: false
-    }
+      enableAnalytics: false,
+    },
   })
   const [branding, setBranding] = useState({
-    logoUrl: tenant?.branding_logo_url || "",
-    primaryColor: tenant?.branding_primary_color || "#2563eb",
-    secondaryColor: tenant?.branding_secondary_color || "#f1f5f9",
-    companyName: tenant?.branding_company_name || formData.name || ""
+    logoUrl: tenant?.branding_logo_url || '',
+    primaryColor: tenant?.branding_primary_color || '#2563eb',
+    secondaryColor: tenant?.branding_secondary_color || '#f1f5f9',
+    companyName: tenant?.branding_company_name || formData.name || '',
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
@@ -67,7 +67,7 @@ export default function TenantPage() {
   const loadTenantInfo = async () => {
     try {
       const supabase = createClient()
-      
+
       // Get profile with tenant info
       const { data: profile } = await supabase
         .from('profiles')
@@ -80,37 +80,37 @@ export default function TenantPage() {
         if (profile.tenants) {
           setTenant(profile.tenants)
           setFormData({
-            name: profile.tenants.name || "",
-            industry: profile.tenants.industry || "",
-            website: profile.tenants.website || "",
-            contact_email: profile.tenants.contact_email || "",
-            contact_phone: profile.tenants.contact_phone || "",
-            address: profile.tenants.address || "",
-            city: profile.tenants.city || "",
-            state: profile.tenants.state || "",
-            country: profile.tenants.country || "",
-            postal_code: profile.tenants.postal_code || "",
+            name: profile.tenants.name || '',
+            industry: profile.tenants.industry || '',
+            website: profile.tenants.website || '',
+            contact_email: profile.tenants.contact_email || '',
+            contact_phone: profile.tenants.contact_phone || '',
+            address: profile.tenants.address || '',
+            city: profile.tenants.city || '',
+            state: profile.tenants.state || '',
+            country: profile.tenants.country || '',
+            postal_code: profile.tenants.postal_code || '',
             settings: profile.tenants.settings || {
               allowMultipleLocations: false,
               requireAssetPhotos: false,
               enableGeofencing: false,
-              enableAnalytics: false
-            }
+              enableAnalytics: false,
+            },
           })
           setBranding({
-            logoUrl: profile.tenants.branding_logo_url || "",
-            primaryColor: profile.tenants.branding_primary_color || "#2563eb",
-            secondaryColor: profile.tenants.branding_secondary_color || "#f1f5f9",
-            companyName: profile.tenants.branding_company_name || profile.tenants.name || ""
+            logoUrl: profile.tenants.branding_logo_url || '',
+            primaryColor: profile.tenants.branding_primary_color || '#2563eb',
+            secondaryColor: profile.tenants.branding_secondary_color || '#f1f5f9',
+            companyName: profile.tenants.branding_company_name || profile.tenants.name || '',
           })
         }
       }
     } catch (error) {
       console.error('Error loading tenant info:', error)
       toast({
-        title: "Error",
-        description: "Failed to load tenant information",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to load tenant information',
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
@@ -121,7 +121,7 @@ export default function TenantPage() {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
   }
 
@@ -130,8 +130,8 @@ export default function TenantPage() {
       ...prev,
       settings: {
         ...prev.settings,
-        [setting]: !prev.settings[setting as keyof typeof prev.settings]
-      }
+        [setting]: !prev.settings[setting as keyof typeof prev.settings],
+      },
     }))
   }
 
@@ -144,13 +144,14 @@ export default function TenantPage() {
     if (!file || !tenant) return
     const supabase = createClient()
     const { data, error } = await supabase.storage
-      .from("branding-logos")
+      .from('branding-logos')
       .upload(`${tenant.id}/${file.name}`, file, { upsert: true })
     if (error) {
-      toast({ title: "Error", description: "Logo upload failed", variant: "destructive" })
+      toast({ title: 'Error', description: 'Logo upload failed', variant: 'destructive' })
       return
     }
-    const url = supabase.storage.from("branding-logos").getPublicUrl(`${tenant.id}/${file.name}`).data.publicUrl
+    const url = supabase.storage.from('branding-logos').getPublicUrl(`${tenant.id}/${file.name}`)
+      .data.publicUrl
     setBranding(prev => ({ ...prev, logoUrl: url }))
   }
 
@@ -179,26 +180,26 @@ export default function TenantPage() {
             state: formData.state,
             country: formData.country,
             postal_code: formData.postal_code,
-            settings: formData.settings
+            settings: formData.settings,
           },
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', tenant.id)
 
       if (error) throw error
 
       toast({
-        title: "Success",
-        description: "Tenant information updated successfully"
+        title: 'Success',
+        description: 'Tenant information updated successfully',
       })
 
       await loadTenantInfo()
     } catch (error) {
       console.error('Error updating tenant:', error)
       toast({
-        title: "Error",
-        description: "Failed to update tenant information",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to update tenant information',
+        variant: 'destructive',
       })
     } finally {
       setSaving(false)
@@ -222,9 +223,7 @@ export default function TenantPage() {
               <AlertTriangle className="h-6 w-6 mr-2" />
               No Tenant Found
             </CardTitle>
-            <CardDescription>
-              You are not associated with any tenant organization
-            </CardDescription>
+            <CardDescription>You are not associated with any tenant organization</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-gray-600 mb-4">
@@ -247,18 +246,20 @@ export default function TenantPage() {
               <Building2 className="h-6 w-6 mr-2" />
               Tenant Organization
             </CardTitle>
-            <CardDescription>
-              Manage your organization settings and information
-            </CardDescription>
+            <CardDescription>Manage your organization settings and information</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
-                <Badge variant="outline" className="mb-2">Tenant ID</Badge>
+                <Badge variant="outline" className="mb-2">
+                  Tenant ID
+                </Badge>
                 <p className="font-mono text-sm">{tenant.id}</p>
               </div>
               <div>
-                <Badge variant="outline" className="mb-2">Plan</Badge>
+                <Badge variant="outline" className="mb-2">
+                  Plan
+                </Badge>
                 <p className="font-medium capitalize">{tenant.plan}</p>
               </div>
             </div>
@@ -272,9 +273,15 @@ export default function TenantPage() {
                     <Label htmlFor="branding_logo">Logo</Label>
                     <div className="flex items-center space-x-4">
                       {branding.logoUrl && (
-                        <img src={branding.logoUrl} alt="Logo Preview" className="h-12 w-12 rounded bg-white border" />
+                        <img
+                          src={branding.logoUrl}
+                          alt="Logo Preview"
+                          className="h-12 w-12 rounded bg-white border"
+                        />
                       )}
-                      <Button type="button" onClick={() => fileInputRef.current?.click()}>Upload Logo</Button>
+                      <Button type="button" onClick={() => fileInputRef.current?.click()}>
+                        Upload Logo
+                      </Button>
                       <input
                         ref={fileInputRef}
                         id="branding_logo"
@@ -291,26 +298,32 @@ export default function TenantPage() {
                       id="branding_company_name"
                       name="branding_company_name"
                       value={branding.companyName}
-                      onChange={e => handleBrandingChange("companyName", e.target.value)}
+                      onChange={e => handleBrandingChange('companyName', e.target.value)}
                       placeholder="Enter company name"
                     />
                   </div>
                   <div>
                     <Label>Primary Color</Label>
-                    <HexColorPicker color={branding.primaryColor} onChange={color => handleBrandingChange("primaryColor", color)} />
+                    <HexColorPicker
+                      color={branding.primaryColor}
+                      onChange={color => handleBrandingChange('primaryColor', color)}
+                    />
                     <Input
                       className="mt-2"
                       value={branding.primaryColor}
-                      onChange={e => handleBrandingChange("primaryColor", e.target.value)}
+                      onChange={e => handleBrandingChange('primaryColor', e.target.value)}
                     />
                   </div>
                   <div>
                     <Label>Secondary Color</Label>
-                    <HexColorPicker color={branding.secondaryColor} onChange={color => handleBrandingChange("secondaryColor", color)} />
+                    <HexColorPicker
+                      color={branding.secondaryColor}
+                      onChange={color => handleBrandingChange('secondaryColor', color)}
+                    />
                     <Input
                       className="mt-2"
                       value={branding.secondaryColor}
-                      onChange={e => handleBrandingChange("secondaryColor", e.target.value)}
+                      onChange={e => handleBrandingChange('secondaryColor', e.target.value)}
                     />
                   </div>
                 </div>
@@ -319,7 +332,7 @@ export default function TenantPage() {
               {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Basic Information</h3>
-                
+
                 <div className="grid gap-4">
                   <div>
                     <Label htmlFor="name">Organization Name</Label>
@@ -359,7 +372,7 @@ export default function TenantPage() {
               {/* Contact Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Contact Information</h3>
-                
+
                 <div className="grid gap-4">
                   <div>
                     <Label htmlFor="contact_email">Contact Email</Label>
@@ -388,7 +401,7 @@ export default function TenantPage() {
               {/* Address */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Address</h3>
-                
+
                 <div className="grid gap-4">
                   <div>
                     <Label htmlFor="address">Street Address</Label>
@@ -454,16 +467,18 @@ export default function TenantPage() {
               {/* Feature Settings */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Feature Settings</h3>
-                
+
                 <div className="grid gap-4">
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5">
                       <Label>Multiple Locations</Label>
-                      <p className="text-sm text-gray-500">Allow tracking assets across multiple locations</p>
+                      <p className="text-sm text-gray-500">
+                        Allow tracking assets across multiple locations
+                      </p>
                     </div>
                     <Button
                       type="button"
-                      variant={formData.settings.allowMultipleLocations ? "default" : "outline"}
+                      variant={formData.settings.allowMultipleLocations ? 'default' : 'outline'}
                       onClick={() => handleSettingChange('allowMultipleLocations')}
                     >
                       {formData.settings.allowMultipleLocations ? 'Enabled' : 'Disabled'}
@@ -477,7 +492,7 @@ export default function TenantPage() {
                     </div>
                     <Button
                       type="button"
-                      variant={formData.settings.requireAssetPhotos ? "default" : "outline"}
+                      variant={formData.settings.requireAssetPhotos ? 'default' : 'outline'}
                       onClick={() => handleSettingChange('requireAssetPhotos')}
                     >
                       {formData.settings.requireAssetPhotos ? 'Required' : 'Optional'}
@@ -491,7 +506,7 @@ export default function TenantPage() {
                     </div>
                     <Button
                       type="button"
-                      variant={formData.settings.enableGeofencing ? "default" : "outline"}
+                      variant={formData.settings.enableGeofencing ? 'default' : 'outline'}
                       onClick={() => handleSettingChange('enableGeofencing')}
                     >
                       {formData.settings.enableGeofencing ? 'Enabled' : 'Disabled'}
@@ -505,7 +520,7 @@ export default function TenantPage() {
                     </div>
                     <Button
                       type="button"
-                      variant={formData.settings.enableAnalytics ? "default" : "outline"}
+                      variant={formData.settings.enableAnalytics ? 'default' : 'outline'}
                       onClick={() => handleSettingChange('enableAnalytics')}
                     >
                       {formData.settings.enableAnalytics ? 'Enabled' : 'Disabled'}
@@ -515,17 +530,14 @@ export default function TenantPage() {
               </div>
 
               <div className="flex justify-end space-x-4">
-                <Button
-                  type="submit"
-                  disabled={saving}
-                >
+                <Button type="submit" disabled={saving}>
                   {saving ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       Saving Changes...
                     </>
                   ) : (
-                    "Save Changes"
+                    'Save Changes'
                   )}
                 </Button>
               </div>
@@ -540,9 +552,7 @@ export default function TenantPage() {
               <AlertTriangle className="h-6 w-6 mr-2" />
               Danger Zone
             </CardTitle>
-            <CardDescription>
-              Irreversible and destructive actions
-            </CardDescription>
+            <CardDescription>Irreversible and destructive actions</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -553,9 +563,7 @@ export default function TenantPage() {
                     Permanently delete this organization and all its data
                   </p>
                 </div>
-                <Button variant="destructive">
-                  Delete Organization
-                </Button>
+                <Button variant="destructive">Delete Organization</Button>
               </div>
             </div>
           </CardContent>
@@ -563,4 +571,4 @@ export default function TenantPage() {
       </div>
     </div>
   )
-} 
+}

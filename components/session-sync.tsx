@@ -1,12 +1,14 @@
-"use client"
-import { useEffect } from "react"
-import { createClient } from "@/lib/supabase/client"
+'use client'
+import { useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 export function SessionSync() {
   useEffect(() => {
     const syncSession = async () => {
       const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       if (session) {
         await fetch('/api/auth/set-session', {
           method: 'POST',
@@ -22,4 +24,4 @@ export function SessionSync() {
     syncSession()
   }, [])
   return null
-} 
+}

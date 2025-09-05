@@ -1,12 +1,12 @@
-import { createServerClient } from "@supabase/ssr"
-import { NextResponse, type NextRequest } from "next/server"
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error("Missing Supabase environment variables")
+    console.error('Missing Supabase environment variables')
     return NextResponse.next()
   }
 
@@ -24,7 +24,9 @@ export async function updateSession(request: NextRequest) {
         supabaseResponse = NextResponse.next({
           request,
         })
-        cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
+        cookiesToSet.forEach(({ name, value, options }) =>
+          supabaseResponse.cookies.set(name, value, options)
+        )
       },
     },
   })
@@ -39,16 +41,16 @@ export async function updateSession(request: NextRequest) {
 
   // Allow access to auth-related pages without restrictions
   const isAuthPage =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/signup") ||
-    request.nextUrl.pathname.startsWith("/auth/")
+    request.nextUrl.pathname.startsWith('/login') ||
+    request.nextUrl.pathname.startsWith('/signup') ||
+    request.nextUrl.pathname.startsWith('/auth/')
 
   // Only redirect to login if user is not authenticated and trying to access protected pages
   // Don't redirect if they're already on an auth page
-  if (!user && !isAuthPage && request.nextUrl.pathname !== "/") {
+  if (!user && !isAuthPage && request.nextUrl.pathname !== '/') {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
-    url.pathname = "/login"
+    url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 

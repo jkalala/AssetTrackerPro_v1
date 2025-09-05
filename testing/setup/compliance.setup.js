@@ -16,14 +16,12 @@ global.complianceTestUtils = {
   gdpr: {
     validateDataMinimization: (collectedData, requiredFields) => {
       const collectedFields = Object.keys(collectedData)
-      const unnecessaryFields = collectedFields.filter(field => 
-        !requiredFields.includes(field)
-      )
-      
+      const unnecessaryFields = collectedFields.filter(field => !requiredFields.includes(field))
+
       expect(unnecessaryFields).toHaveLength(0)
     },
 
-    validateConsentTracking: (consentRecord) => {
+    validateConsentTracking: consentRecord => {
       expect(consentRecord).toHaveProperty('user_id')
       expect(consentRecord).toHaveProperty('consent_type')
       expect(consentRecord).toHaveProperty('granted_at')
@@ -40,7 +38,7 @@ global.complianceTestUtils = {
       expect(exportedData.format).toBe('JSON')
     },
 
-    validateRightToErasure: (deletionRecord) => {
+    validateRightToErasure: deletionRecord => {
       expect(deletionRecord).toHaveProperty('user_id')
       expect(deletionRecord).toHaveProperty('deletion_requested_at')
       expect(deletionRecord).toHaveProperty('deletion_completed_at')
@@ -51,11 +49,11 @@ global.complianceTestUtils = {
     validateDataRetention: (data, retentionPolicy) => {
       const dataAge = Date.now() - new Date(data.created_at).getTime()
       const retentionPeriod = retentionPolicy.retention_days * 24 * 60 * 60 * 1000
-      
+
       if (dataAge > retentionPeriod && !retentionPolicy.legal_hold) {
         throw new Error(`Data retention policy violated for ${data.id}`)
       }
-    }
+    },
   },
 
   // SOC 2 Compliance Testing
@@ -69,7 +67,7 @@ global.complianceTestUtils = {
       expect(userAccess.resource_id).toBe(resourceId)
     },
 
-    validateAuditLogging: (auditLog) => {
+    validateAuditLogging: auditLog => {
       expect(auditLog).toHaveProperty('event_id')
       expect(auditLog).toHaveProperty('user_id')
       expect(auditLog).toHaveProperty('action')
@@ -81,10 +79,10 @@ global.complianceTestUtils = {
       expect(auditLog.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
     },
 
-    validateDataEncryption: (sensitiveData) => {
+    validateDataEncryption: sensitiveData => {
       // Check that sensitive fields are encrypted
       const sensitiveFields = ['ssn', 'credit_card', 'password', 'api_key']
-      
+
       sensitiveFields.forEach(field => {
         if (sensitiveData[field]) {
           expect(sensitiveData[field]).not.toMatch(/^\d{3}-\d{2}-\d{4}$/) // SSN pattern
@@ -94,7 +92,7 @@ global.complianceTestUtils = {
       })
     },
 
-    validateChangeManagement: (changeRecord) => {
+    validateChangeManagement: changeRecord => {
       expect(changeRecord).toHaveProperty('change_id')
       expect(changeRecord).toHaveProperty('requested_by')
       expect(changeRecord).toHaveProperty('approved_by')
@@ -104,7 +102,7 @@ global.complianceTestUtils = {
       expect(changeRecord).toHaveProperty('rollback_plan')
     },
 
-    validateIncidentResponse: (incidentRecord) => {
+    validateIncidentResponse: incidentRecord => {
       expect(incidentRecord).toHaveProperty('incident_id')
       expect(incidentRecord).toHaveProperty('severity')
       expect(incidentRecord).toHaveProperty('detected_at')
@@ -112,12 +110,12 @@ global.complianceTestUtils = {
       expect(incidentRecord).toHaveProperty('assigned_to')
       expect(incidentRecord).toHaveProperty('status')
       expect(incidentRecord.severity).toMatch(/^(low|medium|high|critical)$/)
-    }
+    },
   },
 
   // FERPA Compliance Testing (for Educational Institutions)
   ferpa: {
-    validateEducationalRecords: (record) => {
+    validateEducationalRecords: record => {
       expect(record).toHaveProperty('student_id')
       expect(record).toHaveProperty('record_type')
       expect(record).toHaveProperty('access_level')
@@ -132,28 +130,28 @@ global.complianceTestUtils = {
       }
     },
 
-    validateDirectoryInformation: (directoryInfo) => {
+    validateDirectoryInformation: directoryInfo => {
       const allowedFields = ['name', 'address', 'phone', 'email', 'enrollment_status']
       const providedFields = Object.keys(directoryInfo)
-      
+
       providedFields.forEach(field => {
         expect(allowedFields).toContain(field)
       })
-    }
+    },
   },
 
   // General Compliance Utilities
-  validateDataClassification: (data) => {
+  validateDataClassification: data => {
     expect(data).toHaveProperty('classification')
     expect(data.classification).toMatch(/^(public|internal|confidential|restricted)$/)
-    
+
     if (data.classification === 'restricted') {
       expect(data).toHaveProperty('encryption_status')
       expect(data.encryption_status).toBe('encrypted')
     }
   },
 
-  validateDataLineage: (dataLineage) => {
+  validateDataLineage: dataLineage => {
     expect(dataLineage).toHaveProperty('source_system')
     expect(dataLineage).toHaveProperty('transformations')
     expect(dataLineage).toHaveProperty('destination_system')
@@ -161,7 +159,7 @@ global.complianceTestUtils = {
     expect(Array.isArray(dataLineage.transformations)).toBe(true)
   },
 
-  validateBackupCompliance: (backupRecord) => {
+  validateBackupCompliance: backupRecord => {
     expect(backupRecord).toHaveProperty('backup_id')
     expect(backupRecord).toHaveProperty('backup_type')
     expect(backupRecord).toHaveProperty('created_at')
@@ -170,7 +168,7 @@ global.complianceTestUtils = {
     expect(backupRecord.encryption_status).toBe('encrypted')
   },
 
-  validateDisasterRecovery: (drTest) => {
+  validateDisasterRecovery: drTest => {
     expect(drTest).toHaveProperty('test_id')
     expect(drTest).toHaveProperty('test_type')
     expect(drTest).toHaveProperty('rto_target') // Recovery Time Objective
@@ -182,7 +180,7 @@ global.complianceTestUtils = {
   },
 
   // Compliance Reporting
-  generateComplianceReport: (complianceData) => {
+  generateComplianceReport: complianceData => {
     return {
       report_id: `compliance_${Date.now()}`,
       generated_at: new Date().toISOString(),
@@ -190,9 +188,9 @@ global.complianceTestUtils = {
       overall_status: 'compliant',
       findings: complianceData.findings || [],
       recommendations: complianceData.recommendations || [],
-      next_review_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+      next_review_date: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
     }
-  }
+  },
 }
 
 // Mock Compliance Services
@@ -200,20 +198,20 @@ jest.mock('@/lib/services/gdpr-service', () => ({
   trackConsent: jest.fn().mockResolvedValue({ success: true }),
   exportUserData: jest.fn().mockResolvedValue({ data: {}, format: 'JSON' }),
   deleteUserData: jest.fn().mockResolvedValue({ success: true }),
-  validateDataMinimization: jest.fn().mockResolvedValue(true)
+  validateDataMinimization: jest.fn().mockResolvedValue(true),
 }))
 
 jest.mock('@/lib/services/audit-service', () => ({
   createAuditLog: jest.fn().mockResolvedValue({ success: true }),
   getAuditTrail: jest.fn().mockResolvedValue([]),
   validateAuditIntegrity: jest.fn().mockResolvedValue(true),
-  generateAuditReport: jest.fn().mockResolvedValue({})
+  generateAuditReport: jest.fn().mockResolvedValue({}),
 }))
 
 jest.mock('@/lib/services/data-retention-service', () => ({
   applyRetentionPolicy: jest.fn().mockResolvedValue({ success: true }),
   scheduleDataDeletion: jest.fn().mockResolvedValue({ success: true }),
-  validateRetentionCompliance: jest.fn().mockResolvedValue(true)
+  validateRetentionCompliance: jest.fn().mockResolvedValue(true),
 }))
 
 // Compliance Test Matchers
@@ -221,38 +219,34 @@ expect.extend({
   toBeGDPRCompliant(received) {
     const requiredFields = ['consent_tracking', 'data_minimization', 'right_to_erasure']
     const hasAllFields = requiredFields.every(field => received[field])
-    
+
     return {
       message: () => `expected ${received} to be GDPR compliant`,
-      pass: hasAllFields
+      pass: hasAllFields,
     }
   },
 
   toBeSOC2Compliant(received) {
     const requiredControls = ['access_control', 'audit_logging', 'encryption', 'change_management']
     const hasAllControls = requiredControls.every(control => received[control])
-    
+
     return {
       message: () => `expected ${received} to be SOC 2 compliant`,
-      pass: hasAllControls
+      pass: hasAllControls,
     }
   },
 
   toHaveValidAuditTrail(received) {
-    const pass = received && 
-                 Array.isArray(received) &&
-                 received.every(log => 
-                   log.timestamp && 
-                   log.user_id && 
-                   log.action && 
-                   log.resource_type
-                 )
-    
+    const pass =
+      received &&
+      Array.isArray(received) &&
+      received.every(log => log.timestamp && log.user_id && log.action && log.resource_type)
+
     return {
       message: () => `expected ${received} to have a valid audit trail`,
-      pass
+      pass,
     }
-  }
+  },
 })
 
 export default global.complianceTestUtils

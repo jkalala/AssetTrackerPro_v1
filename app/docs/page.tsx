@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 import {
   BookOpen,
   Search,
@@ -26,130 +26,251 @@ import {
   Sparkles,
   Target,
   Shield,
-} from "lucide-react"
+} from 'lucide-react'
 
 const documentationSections = [
   {
-    id: "getting-started",
-    title: "Getting Started",
-    description: "Quick start guide and basic setup to get you running in minutes",
+    id: 'getting-started',
+    title: 'Getting Started',
+    description: 'Quick start guide and basic setup to get you running in minutes',
     icon: Zap,
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-50",
-    borderColor: "border-emerald-200",
-    hoverColor: "hover:bg-emerald-100",
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50',
+    borderColor: 'border-emerald-200',
+    hoverColor: 'hover:bg-emerald-100',
     articles: [
-      { title: "System Overview", time: "5 min read", difficulty: "Beginner", completed: 0 },
-      { title: "First Login & Setup", time: "3 min read", difficulty: "Beginner", completed: 0 },
-      { title: "Dashboard Navigation", time: "4 min read", difficulty: "Beginner", completed: 0 },
-      { title: "Creating Your First Asset", time: "6 min read", difficulty: "Beginner", completed: 0 },
+      { title: 'System Overview', time: '5 min read', difficulty: 'Beginner', completed: 0 },
+      { title: 'First Login & Setup', time: '3 min read', difficulty: 'Beginner', completed: 0 },
+      { title: 'Dashboard Navigation', time: '4 min read', difficulty: 'Beginner', completed: 0 },
+      {
+        title: 'Creating Your First Asset',
+        time: '6 min read',
+        difficulty: 'Beginner',
+        completed: 0,
+      },
     ],
   },
   {
-    id: "asset-management",
-    title: "Asset Management",
-    description: "Complete guide to managing your assets efficiently and effectively",
+    id: 'asset-management',
+    title: 'Asset Management',
+    description: 'Complete guide to managing your assets efficiently and effectively',
     icon: Package,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-    borderColor: "border-blue-200",
-    hoverColor: "hover:bg-blue-100",
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200',
+    hoverColor: 'hover:bg-blue-100',
     articles: [
-      { title: "Adding New Assets", time: "8 min read", difficulty: "Beginner", completed: 0 },
-      { title: "Asset Categories & Classification", time: "10 min read", difficulty: "Intermediate", completed: 0 },
-      { title: "Asset Lifecycle Management", time: "12 min read", difficulty: "Intermediate", completed: 0 },
-      { title: "Bulk Asset Operations", time: "15 min read", difficulty: "Advanced", completed: 0 },
-      { title: "Asset Maintenance Scheduling", time: "10 min read", difficulty: "Intermediate", completed: 0 },
-      { title: "Asset Depreciation Tracking", time: "8 min read", difficulty: "Advanced", completed: 0 },
+      { title: 'Adding New Assets', time: '8 min read', difficulty: 'Beginner', completed: 0 },
+      {
+        title: 'Asset Categories & Classification',
+        time: '10 min read',
+        difficulty: 'Intermediate',
+        completed: 0,
+      },
+      {
+        title: 'Asset Lifecycle Management',
+        time: '12 min read',
+        difficulty: 'Intermediate',
+        completed: 0,
+      },
+      { title: 'Bulk Asset Operations', time: '15 min read', difficulty: 'Advanced', completed: 0 },
+      {
+        title: 'Asset Maintenance Scheduling',
+        time: '10 min read',
+        difficulty: 'Intermediate',
+        completed: 0,
+      },
+      {
+        title: 'Asset Depreciation Tracking',
+        time: '8 min read',
+        difficulty: 'Advanced',
+        completed: 0,
+      },
     ],
   },
   {
-    id: "qr-codes",
-    title: "QR Code System",
-    description: "Master QR code generation, scanning, and management for seamless tracking",
+    id: 'qr-codes',
+    title: 'QR Code System',
+    description: 'Master QR code generation, scanning, and management for seamless tracking',
     icon: QrCode,
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
-    borderColor: "border-purple-200",
-    hoverColor: "hover:bg-purple-100",
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    borderColor: 'border-purple-200',
+    hoverColor: 'hover:bg-purple-100',
     articles: [
-      { title: "QR Code Basics & Benefits", time: "5 min read", difficulty: "Beginner", completed: 0 },
-      { title: "Generating QR Codes", time: "7 min read", difficulty: "Beginner", completed: 0 },
-      { title: "Scanning QR Codes", time: "6 min read", difficulty: "Beginner", completed: 0 },
-      { title: "Bulk QR Operations", time: "12 min read", difficulty: "Advanced", completed: 0 },
-      { title: "Custom QR Code Templates", time: "8 min read", difficulty: "Intermediate", completed: 0 },
-      { title: "QR Code Analytics", time: "10 min read", difficulty: "Intermediate", completed: 0 },
+      {
+        title: 'QR Code Basics & Benefits',
+        time: '5 min read',
+        difficulty: 'Beginner',
+        completed: 0,
+      },
+      { title: 'Generating QR Codes', time: '7 min read', difficulty: 'Beginner', completed: 0 },
+      { title: 'Scanning QR Codes', time: '6 min read', difficulty: 'Beginner', completed: 0 },
+      { title: 'Bulk QR Operations', time: '12 min read', difficulty: 'Advanced', completed: 0 },
+      {
+        title: 'Custom QR Code Templates',
+        time: '8 min read',
+        difficulty: 'Intermediate',
+        completed: 0,
+      },
+      { title: 'QR Code Analytics', time: '10 min read', difficulty: 'Intermediate', completed: 0 },
     ],
   },
   {
-    id: "analytics",
-    title: "Analytics & Reporting",
-    description: "Harness real-time analytics and comprehensive reporting for data-driven decisions",
+    id: 'analytics',
+    title: 'Analytics & Reporting',
+    description:
+      'Harness real-time analytics and comprehensive reporting for data-driven decisions',
     icon: BarChart3,
-    color: "text-orange-600",
-    bgColor: "bg-orange-50",
-    borderColor: "border-orange-200",
-    hoverColor: "hover:bg-orange-100",
+    color: 'text-orange-600',
+    bgColor: 'bg-orange-50',
+    borderColor: 'border-orange-200',
+    hoverColor: 'hover:bg-orange-100',
     articles: [
-      { title: "Dashboard Analytics Overview", time: "8 min read", difficulty: "Beginner", completed: 0 },
-      { title: "Real-time Monitoring Setup", time: "10 min read", difficulty: "Intermediate", completed: 0 },
-      { title: "Custom Reports Creation", time: "15 min read", difficulty: "Advanced", completed: 0 },
-      { title: "Data Export & Integration", time: "6 min read", difficulty: "Intermediate", completed: 0 },
-      { title: "Performance Metrics & KPIs", time: "12 min read", difficulty: "Advanced", completed: 0 },
-      { title: "Automated Report Scheduling", time: "8 min read", difficulty: "Intermediate", completed: 0 },
+      {
+        title: 'Dashboard Analytics Overview',
+        time: '8 min read',
+        difficulty: 'Beginner',
+        completed: 0,
+      },
+      {
+        title: 'Real-time Monitoring Setup',
+        time: '10 min read',
+        difficulty: 'Intermediate',
+        completed: 0,
+      },
+      {
+        title: 'Custom Reports Creation',
+        time: '15 min read',
+        difficulty: 'Advanced',
+        completed: 0,
+      },
+      {
+        title: 'Data Export & Integration',
+        time: '6 min read',
+        difficulty: 'Intermediate',
+        completed: 0,
+      },
+      {
+        title: 'Performance Metrics & KPIs',
+        time: '12 min read',
+        difficulty: 'Advanced',
+        completed: 0,
+      },
+      {
+        title: 'Automated Report Scheduling',
+        time: '8 min read',
+        difficulty: 'Intermediate',
+        completed: 0,
+      },
     ],
   },
   {
-    id: "user-management",
-    title: "User Management",
-    description: "Manage user accounts, permissions, and team collaboration effectively",
+    id: 'user-management',
+    title: 'User Management',
+    description: 'Manage user accounts, permissions, and team collaboration effectively',
     icon: Users,
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-50",
-    borderColor: "border-indigo-200",
-    hoverColor: "hover:bg-indigo-100",
+    color: 'text-indigo-600',
+    bgColor: 'bg-indigo-50',
+    borderColor: 'border-indigo-200',
+    hoverColor: 'hover:bg-indigo-100',
     articles: [
-      { title: "User Roles & Permissions", time: "10 min read", difficulty: "Intermediate", completed: 0 },
-      { title: "Team Collaboration Features", time: "8 min read", difficulty: "Beginner", completed: 0 },
-      { title: "Account Settings & Preferences", time: "5 min read", difficulty: "Beginner", completed: 0 },
-      { title: "Security Best Practices", time: "12 min read", difficulty: "Advanced", completed: 0 },
-      { title: "Multi-tenant Organization Setup", time: "15 min read", difficulty: "Advanced", completed: 0 },
-      { title: "Audit Logs & Compliance", time: "10 min read", difficulty: "Intermediate", completed: 0 },
+      {
+        title: 'User Roles & Permissions',
+        time: '10 min read',
+        difficulty: 'Intermediate',
+        completed: 0,
+      },
+      {
+        title: 'Team Collaboration Features',
+        time: '8 min read',
+        difficulty: 'Beginner',
+        completed: 0,
+      },
+      {
+        title: 'Account Settings & Preferences',
+        time: '5 min read',
+        difficulty: 'Beginner',
+        completed: 0,
+      },
+      {
+        title: 'Security Best Practices',
+        time: '12 min read',
+        difficulty: 'Advanced',
+        completed: 0,
+      },
+      {
+        title: 'Multi-tenant Organization Setup',
+        time: '15 min read',
+        difficulty: 'Advanced',
+        completed: 0,
+      },
+      {
+        title: 'Audit Logs & Compliance',
+        time: '10 min read',
+        difficulty: 'Intermediate',
+        completed: 0,
+      },
     ],
   },
   {
-    id: "technical",
-    title: "Technical Documentation",
-    description: "API reference, integrations, and development guides for developers",
+    id: 'technical',
+    title: 'Technical Documentation',
+    description: 'API reference, integrations, and development guides for developers',
     icon: Code,
-    color: "text-red-600",
-    bgColor: "bg-red-50",
-    borderColor: "border-red-200",
-    hoverColor: "hover:bg-red-100",
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    borderColor: 'border-red-200',
+    hoverColor: 'hover:bg-red-100',
     articles: [
-      { title: "API Reference & Authentication", time: "20 min read", difficulty: "Advanced", completed: 0 },
-      { title: "Database Schema & Models", time: "15 min read", difficulty: "Advanced", completed: 0 },
-      { title: "Third-party Integration Guide", time: "25 min read", difficulty: "Advanced", completed: 0 },
-      { title: "Deployment & Infrastructure", time: "30 min read", difficulty: "Expert", completed: 0 },
-      { title: "Webhook Configuration", time: "12 min read", difficulty: "Advanced", completed: 0 },
-      { title: "Custom Development Guide", time: "35 min read", difficulty: "Expert", completed: 0 },
+      {
+        title: 'API Reference & Authentication',
+        time: '20 min read',
+        difficulty: 'Advanced',
+        completed: 0,
+      },
+      {
+        title: 'Database Schema & Models',
+        time: '15 min read',
+        difficulty: 'Advanced',
+        completed: 0,
+      },
+      {
+        title: 'Third-party Integration Guide',
+        time: '25 min read',
+        difficulty: 'Advanced',
+        completed: 0,
+      },
+      {
+        title: 'Deployment & Infrastructure',
+        time: '30 min read',
+        difficulty: 'Expert',
+        completed: 0,
+      },
+      { title: 'Webhook Configuration', time: '12 min read', difficulty: 'Advanced', completed: 0 },
+      {
+        title: 'Custom Development Guide',
+        time: '35 min read',
+        difficulty: 'Expert',
+        completed: 0,
+      },
     ],
   },
 ]
 
 const popularArticles = [
-  { title: "Creating Your First Asset", views: "2.1k", category: "Getting Started", trend: "+12%" },
-  { title: "QR Code Generation Guide", views: "1.8k", category: "QR Codes", trend: "+8%" },
-  { title: "Dashboard Analytics Overview", views: "1.5k", category: "Analytics", trend: "+15%" },
-  { title: "User Roles & Permissions", views: "1.2k", category: "User Management", trend: "+5%" },
-  { title: "API Authentication", views: "980", category: "Technical", trend: "+22%" },
+  { title: 'Creating Your First Asset', views: '2.1k', category: 'Getting Started', trend: '+12%' },
+  { title: 'QR Code Generation Guide', views: '1.8k', category: 'QR Codes', trend: '+8%' },
+  { title: 'Dashboard Analytics Overview', views: '1.5k', category: 'Analytics', trend: '+15%' },
+  { title: 'User Roles & Permissions', views: '1.2k', category: 'User Management', trend: '+5%' },
+  { title: 'API Authentication', views: '980', category: 'Technical', trend: '+22%' },
 ]
 
 const recentUpdates = [
-  { title: "Real-time Analytics Documentation", date: "2 days ago", type: "New", icon: Sparkles },
-  { title: "QR Code Bulk Operations Guide", date: "1 week ago", type: "Updated", icon: Target },
-  { title: "API v2.0 Reference", date: "2 weeks ago", type: "New", icon: Code },
-  { title: "Security Best Practices", date: "3 weeks ago", type: "Updated", icon: Shield },
+  { title: 'Real-time Analytics Documentation', date: '2 days ago', type: 'New', icon: Sparkles },
+  { title: 'QR Code Bulk Operations Guide', date: '1 week ago', type: 'Updated', icon: Target },
+  { title: 'API v2.0 Reference', date: '2 weeks ago', type: 'New', icon: Code },
+  { title: 'Security Best Practices', date: '3 weeks ago', type: 'Updated', icon: Shield },
 ]
 
 const containerVariants = {
@@ -174,14 +295,16 @@ const itemVariants = {
 }
 
 export default function DocumentationPage() {
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
   const [selectedSection, setSelectedSection] = useState<string | null>(null)
 
   const filteredSections = documentationSections.filter(
-    (section) =>
+    section =>
       section.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       section.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      section.articles.some((article) => article.title.toLowerCase().includes(searchQuery.toLowerCase())),
+      section.articles.some(article =>
+        article.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
   )
 
   return (
@@ -221,8 +344,8 @@ export default function DocumentationPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              Comprehensive guides, tutorials, and reference materials to help you master your asset management system
-              and unlock its full potential for your organization.
+              Comprehensive guides, tutorials, and reference materials to help you master your asset
+              management system and unlock its full potential for your organization.
             </motion.p>
 
             {/* Search Bar */}
@@ -237,7 +360,7 @@ export default function DocumentationPage() {
                 type="text"
                 placeholder="Search documentation..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="pl-12 pr-4 py-4 text-lg border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl shadow-sm"
               />
             </motion.div>
@@ -268,12 +391,36 @@ export default function DocumentationPage() {
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
-                          { step: "1", title: "System Overview", desc: "Learn the basics", time: "5 min" },
-                          { step: "2", title: "Create First Asset", desc: "Add your first item", time: "3 min" },
-                          { step: "3", title: "Generate QR Code", desc: "Create tracking codes", time: "4 min" },
-                          { step: "4", title: "View Analytics", desc: "Monitor your assets", time: "2 min" },
+                          {
+                            step: '1',
+                            title: 'System Overview',
+                            desc: 'Learn the basics',
+                            time: '5 min',
+                          },
+                          {
+                            step: '2',
+                            title: 'Create First Asset',
+                            desc: 'Add your first item',
+                            time: '3 min',
+                          },
+                          {
+                            step: '3',
+                            title: 'Generate QR Code',
+                            desc: 'Create tracking codes',
+                            time: '4 min',
+                          },
+                          {
+                            step: '4',
+                            title: 'View Analytics',
+                            desc: 'Monitor your assets',
+                            time: '2 min',
+                          },
                         ].map((item, index) => (
-                          <motion.div key={index} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                          <motion.div
+                            key={index}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
                             <Button
                               variant="outline"
                               className="justify-start h-auto p-4 border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400 transition-all duration-200 w-full"
@@ -286,7 +433,9 @@ export default function DocumentationPage() {
                                   <div className="font-semibold text-slate-900">{item.title}</div>
                                   <div className="text-sm text-slate-600">{item.desc}</div>
                                 </div>
-                                <div className="text-xs text-emerald-600 font-medium mr-2">{item.time}</div>
+                                <div className="text-xs text-emerald-600 font-medium mr-2">
+                                  {item.time}
+                                </div>
                                 <ChevronRight className="h-4 w-4 text-emerald-600" />
                               </div>
                             </Button>
@@ -298,7 +447,10 @@ export default function DocumentationPage() {
                 </motion.div>
 
                 {/* Documentation Sections */}
-                <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" variants={containerVariants}>
+                <motion.div
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
+                  variants={containerVariants}
+                >
                   {filteredSections.map((section, index) => {
                     const IconComponent = section.icon
                     return (
@@ -320,7 +472,9 @@ export default function DocumentationPage() {
                                 <IconComponent className={`h-6 w-6 ${section.color}`} />
                               </div>
                               <div>
-                                <div className="text-slate-900 group-hover:text-slate-700">{section.title}</div>
+                                <div className="text-slate-900 group-hover:text-slate-700">
+                                  {section.title}
+                                </div>
                                 <div className="text-sm text-slate-500 font-normal mt-1">
                                   {section.articles.length} articles
                                 </div>
@@ -333,19 +487,24 @@ export default function DocumentationPage() {
                           <CardContent>
                             <div className="space-y-3">
                               {section.articles.slice(0, 3).map((article, articleIndex) => (
-                                <div key={articleIndex} className="flex items-center justify-between text-sm">
-                                  <span className="text-slate-700 font-medium">{article.title}</span>
+                                <div
+                                  key={articleIndex}
+                                  className="flex items-center justify-between text-sm"
+                                >
+                                  <span className="text-slate-700 font-medium">
+                                    {article.title}
+                                  </span>
                                   <div className="flex items-center space-x-2">
                                     <Badge
                                       variant="outline"
                                       className={`text-xs ${
-                                        article.difficulty === "Beginner"
-                                          ? "border-green-300 text-green-700"
-                                          : article.difficulty === "Intermediate"
-                                            ? "border-yellow-300 text-yellow-700"
-                                            : article.difficulty === "Advanced"
-                                              ? "border-orange-300 text-orange-700"
-                                              : "border-red-300 text-red-700"
+                                        article.difficulty === 'Beginner'
+                                          ? 'border-green-300 text-green-700'
+                                          : article.difficulty === 'Intermediate'
+                                            ? 'border-yellow-300 text-yellow-700'
+                                            : article.difficulty === 'Advanced'
+                                              ? 'border-orange-300 text-orange-700'
+                                              : 'border-red-300 text-red-700'
                                       }`}
                                     >
                                       {article.difficulty}
@@ -355,7 +514,9 @@ export default function DocumentationPage() {
                                 </div>
                               ))}
                               {section.articles.length > 3 && (
-                                <div className={`text-sm font-medium ${section.color} flex items-center`}>
+                                <div
+                                  className={`text-sm font-medium ${section.color} flex items-center`}
+                                >
                                   +{section.articles.length - 3} more articles
                                   <ArrowRight className="h-3 w-3 ml-1" />
                                 </div>
@@ -402,7 +563,9 @@ export default function DocumentationPage() {
                                 <Badge variant="outline" className="text-xs">
                                   {article.views} views
                                 </Badge>
-                                <div className="text-xs text-green-600 font-medium mt-1">{article.trend}</div>
+                                <div className="text-xs text-green-600 font-medium mt-1">
+                                  {article.trend}
+                                </div>
                               </div>
                               <ChevronRight className="h-4 w-4 text-slate-400" />
                             </div>
@@ -415,7 +578,7 @@ export default function DocumentationPage() {
               </motion.div>
             ) : (
               <DocumentationSection
-                section={documentationSections.find((s) => s.id === selectedSection)!}
+                section={documentationSections.find(s => s.id === selectedSection)!}
                 onBack={() => setSelectedSection(null)}
               />
             )}
@@ -452,7 +615,10 @@ export default function DocumentationPage() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-slate-600">{update.date}</span>
-                        <Badge variant={update.type === "New" ? "default" : "secondary"} className="text-xs">
+                        <Badge
+                          variant={update.type === 'New' ? 'default' : 'secondary'}
+                          className="text-xs"
+                        >
                           {update.type}
                         </Badge>
                       </div>
@@ -470,13 +636,17 @@ export default function DocumentationPage() {
               <CardContent>
                 <div className="space-y-2">
                   {[
-                    { icon: Download, label: "Download PDF Guide", color: "text-blue-600" },
-                    { icon: ExternalLink, label: "Video Tutorials", color: "text-purple-600" },
-                    { icon: HelpCircle, label: "Contact Support", color: "text-green-600" },
-                    { icon: FileText, label: "Release Notes", color: "text-orange-600" },
+                    { icon: Download, label: 'Download PDF Guide', color: 'text-blue-600' },
+                    { icon: ExternalLink, label: 'Video Tutorials', color: 'text-purple-600' },
+                    { icon: HelpCircle, label: 'Contact Support', color: 'text-green-600' },
+                    { icon: FileText, label: 'Release Notes', color: 'text-orange-600' },
                   ].map((link, index) => (
                     <motion.div key={index} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button variant="ghost" size="sm" className="w-full justify-start hover:bg-slate-100">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start hover:bg-slate-100"
+                      >
                         <link.icon className={`h-4 w-4 mr-2 ${link.color}`} />
                         {link.label}
                       </Button>
@@ -517,7 +687,11 @@ export default function DocumentationPage() {
 
 function DocumentationSection({ section, onBack }: { section: any; onBack: () => void }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <Button variant="ghost" onClick={onBack} className="mb-6 hover:bg-slate-100">
         ← Back to Documentation
       </Button>
@@ -548,13 +722,13 @@ function DocumentationSection({ section, onBack }: { section: any; onBack: () =>
                       <Badge
                         variant="outline"
                         className={`text-xs ${
-                          article.difficulty === "Beginner"
-                            ? "border-green-300 text-green-700"
-                            : article.difficulty === "Intermediate"
-                              ? "border-yellow-300 text-yellow-700"
-                              : article.difficulty === "Advanced"
-                                ? "border-orange-300 text-orange-700"
-                                : "border-red-300 text-red-700"
+                          article.difficulty === 'Beginner'
+                            ? 'border-green-300 text-green-700'
+                            : article.difficulty === 'Intermediate'
+                              ? 'border-yellow-300 text-yellow-700'
+                              : article.difficulty === 'Advanced'
+                                ? 'border-orange-300 text-orange-700'
+                                : 'border-red-300 text-red-700'
                         }`}
                       >
                         {article.difficulty}

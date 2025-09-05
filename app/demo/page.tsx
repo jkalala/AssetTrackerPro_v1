@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Package,
   QrCode,
@@ -15,37 +15,37 @@ import {
   TrendingUp,
   Eye,
   Settings,
-} from "lucide-react"
-import Link from "next/link"
+} from 'lucide-react'
+import Link from 'next/link'
 
 export default function DemoPage() {
   const demoAssets = [
     {
-      id: "DEMO-001",
+      id: 'DEMO-001',
       name: 'MacBook Pro 16"',
-      category: "Electronics",
-      status: "Active",
-      location: "Office Floor 2",
-      lastSeen: "2 hours ago",
-      value: "$2,499",
+      category: 'Electronics',
+      status: 'Active',
+      location: 'Office Floor 2',
+      lastSeen: '2 hours ago',
+      value: '$2,499',
     },
     {
-      id: "DEMO-002",
-      name: "Office Chair",
-      category: "Furniture",
-      status: "Maintenance",
-      location: "Storage Room",
-      lastSeen: "1 day ago",
-      value: "$299",
+      id: 'DEMO-002',
+      name: 'Office Chair',
+      category: 'Furniture',
+      status: 'Maintenance',
+      location: 'Storage Room',
+      lastSeen: '1 day ago',
+      value: '$299',
     },
     {
-      id: "DEMO-003",
-      name: "Projector",
-      category: "Electronics",
-      status: "Active",
-      location: "Conference Room A",
-      lastSeen: "30 minutes ago",
-      value: "$899",
+      id: 'DEMO-003',
+      name: 'Projector',
+      category: 'Electronics',
+      status: 'Active',
+      location: 'Conference Room A',
+      lastSeen: '30 minutes ago',
+      value: '$899',
     },
   ]
 
@@ -54,7 +54,7 @@ export default function DemoPage() {
     activeAssets: 142,
     maintenanceAssets: 8,
     retiredAssets: 6,
-    totalValue: "$45,670",
+    totalValue: '$45,670',
     qrCodesGenerated: 156,
     recentScans: 23,
   }
@@ -66,12 +66,12 @@ export default function DemoPage() {
         <Alert className="mb-8 border-amber-200 bg-amber-50">
           <AlertTriangle className="h-4 w-4 text-amber-600" />
           <AlertDescription className="text-amber-800">
-            <strong>Demo Mode:</strong> This is a demonstration of the Asset Management System with sample data. To
-            access the full system with your own data, please{" "}
+            <strong>Demo Mode:</strong> This is a demonstration of the Asset Management System with
+            sample data. To access the full system with your own data, please{' '}
             <Link href="/login" className="underline font-medium hover:text-amber-900">
               sign in
-            </Link>{" "}
-            or{" "}
+            </Link>{' '}
+            or{' '}
             <Link href="/signup" className="underline font-medium hover:text-amber-900">
               create an account
             </Link>
@@ -152,7 +152,7 @@ export default function DemoPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {demoAssets.map((asset) => (
+              {demoAssets.map(asset => (
                 <div
                   key={asset.id}
                   className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-white/50"
@@ -174,9 +174,11 @@ export default function DemoPage() {
                       <p className="text-xs text-gray-600">{asset.location}</p>
                     </div>
                     <Badge
-                      variant={asset.status === "Active" ? "default" : "secondary"}
+                      variant={asset.status === 'Active' ? 'default' : 'secondary'}
                       className={
-                        asset.status === "Active" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                        asset.status === 'Active'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
                       }
                     >
                       {asset.status}
@@ -203,7 +205,8 @@ export default function DemoPage() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 mb-4">
-                Generate, scan, and manage QR codes for all your assets with bulk operations and analytics.
+                Generate, scan, and manage QR codes for all your assets with bulk operations and
+                analytics.
               </p>
               <Button variant="outline" className="w-full" disabled>
                 <Eye className="h-4 w-4 mr-2" />
@@ -239,7 +242,8 @@ export default function DemoPage() {
             </CardHeader>
             <CardContent>
               <p className="text-gray-600 mb-4">
-                Manage user roles, permissions, and track asset assignments across your organization.
+                Manage user roles, permissions, and track asset assignments across your
+                organization.
               </p>
               <Button variant="outline" className="w-full" disabled>
                 <Settings className="h-4 w-4 mr-2" />
@@ -254,14 +258,20 @@ export default function DemoPage() {
           <CardContent className="p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">Ready to Get Started?</h2>
             <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-              Create your account to start managing your assets with our comprehensive tracking system. Set up your
-              inventory, generate QR codes, and gain insights into your asset utilization.
+              Create your account to start managing your assets with our comprehensive tracking
+              system. Set up your inventory, generate QR codes, and gain insights into your asset
+              utilization.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
                 <Link href="/signup">Get Started Free</Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-white text-white hover:bg-white/10"
+              >
                 <Link href="/login">Sign In</Link>
               </Button>
             </div>

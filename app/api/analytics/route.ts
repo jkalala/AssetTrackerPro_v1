@@ -5,14 +5,14 @@ export const runtime = 'nodejs'
 
 export async function GET() {
   const supabase = await createClient()
-  
+
   try {
     // Get user for authentication
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser()
-    
+
     if (userError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -36,48 +36,56 @@ export async function GET() {
       qrCodeStats,
       userActivity,
       locationStats,
-      valueStats
+      valueStats,
     ] = await Promise.all([
       // Total assets
       supabase.from('assets').select('id', { count: 'exact' }),
-      
+
       // Active assets
       supabase.from('assets').select('id', { count: 'exact' }).eq('status', 'active'),
-      
+
       // Assets created today
-      supabase.from('assets').select('id', { count: 'exact' })
+      supabase
+        .from('assets')
+        .select('id', { count: 'exact' })
         .gte('created_at', today.toISOString()),
-      
+
       // Assets created this week
-      supabase.from('assets').select('id', { count: 'exact' })
+      supabase
+        .from('assets')
+        .select('id', { count: 'exact' })
         .gte('created_at', weekAgo.toISOString()),
-      
+
       // Assets created this month
-      supabase.from('assets').select('id', { count: 'exact' })
+      supabase
+        .from('assets')
+        .select('id', { count: 'exact' })
         .gte('created_at', monthAgo.toISOString()),
-      
+
       // Assets by category
       supabase.from('assets').select('category, id').not('category', 'is', null),
-      
+
       // Assets by status
       supabase.from('assets').select('status, id'),
-      
+
       // Recent activity (last 50 activities)
-      supabase.from('assets').select('id, name, created_at, updated_at, status')
+      supabase
+        .from('assets')
+        .select('id, name, created_at, updated_at, status')
         .order('updated_at', { ascending: false })
         .limit(50),
-      
+
       // QR code statistics
       supabase.from('assets').select('id, qr_code').not('qr_code', 'is', null),
-      
+
       // User activity (profiles)
       supabase.from('profiles').select('id, full_name, created_at, last_sign_in_at'),
-      
+
       // Location statistics
       supabase.from('assets').select('location').not('location', 'is', null),
-      
+
       // Value statistics
-      supabase.from('assets').select('purchase_value').not('purchase_value', 'is', null)
+      supabase.from('assets').select('purchase_value').not('purchase_value', 'is', null),
     ])
 
     // Process category data
@@ -111,14 +119,16 @@ export async function GET() {
     }
 
     // Calculate total value
-    const totalValue = valueStats.data?.reduce((sum, asset) => {
-      return sum + (asset.purchase_value || 0)
-    }, 0) || 0
+    const totalValue =
+      valueStats.data?.reduce((sum, asset) => {
+        return sum + (asset.purchase_value || 0)
+      }, 0) || 0
 
     // Calculate QR code coverage
-    const qrCoverage = totalAssets.count && qrCodeStats.data 
-      ? Math.round((qrCodeStats.data.length / totalAssets.count) * 100)
-      : 0
+    const qrCoverage =
+      totalAssets.count && qrCodeStats.data
+        ? Math.round((qrCodeStats.data.length / totalAssets.count) * 100)
+        : 0
 
     // Generate time series data for charts
     const timeSeriesData = generateTimeSeriesData(assetsCreatedThisWeek.count || 0)
@@ -135,22 +145,22 @@ export async function GET() {
         assetsCreatedThisMonth: assetsCreatedThisMonth.count || 0,
         totalValue: totalValue,
         qrCoverage: qrCoverage,
-        lastUpdated: now.toISOString()
+        lastUpdated: now.toISOString(),
       },
       categories: Object.entries(categoryCounts).map(([category, count]) => ({
         category,
         count,
-        percentage: totalAssets.count ? Math.round((count / totalAssets.count) * 100) : 0
+        percentage: totalAssets.count ? Math.round((count / totalAssets.count) * 100) : 0,
       })),
       status: Object.entries(statusCounts).map(([status, count]) => ({
         status,
         count,
-        percentage: totalAssets.count ? Math.round((count / totalAssets.count) * 100) : 0
+        percentage: totalAssets.count ? Math.round((count / totalAssets.count) * 100) : 0,
       })),
       locations: Object.entries(locationCounts).map(([location, count]) => ({
         location,
         count,
-        percentage: totalAssets.count ? Math.round((count / totalAssets.count) * 100) : 0
+        percentage: totalAssets.count ? Math.round((count / totalAssets.count) * 100) : 0,
       })),
       timeSeries: timeSeriesData,
       scanData: scanData,
@@ -158,10 +168,9 @@ export async function GET() {
       userActivity: {
         totalUsers: userActivity.data?.length || 0,
         activeUsers: userActivity.data?.filter(u => u.last_sign_in_at).length || 0,
-        newUsersThisMonth: userActivity.data?.filter(u => 
-          new Date(u.created_at) >= monthAgo
-        ).length || 0
-      }
+        newUsersThisMonth:
+          userActivity.data?.filter(u => new Date(u.created_at) >= monthAgo).length || 0,
+      },
     }
 
     return NextResponse.json({ analytics })
@@ -174,37 +183,37 @@ export async function GET() {
 function generateTimeSeriesData(weeklyAssets: number) {
   const data = []
   const now = new Date()
-  
+
   for (let i = 6; i >= 0; i--) {
     const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
     const dayAssets = Math.floor(Math.random() * Math.max(1, weeklyAssets / 7))
     const dayScans = Math.floor(Math.random() * 50) + 10
-    
+
     data.push({
       date: date.toISOString().split('T')[0],
       assets: dayAssets,
       scans: dayScans,
-      users: Math.floor(Math.random() * 20) + 5
+      users: Math.floor(Math.random() * 20) + 5,
     })
   }
-  
+
   return data
 }
 
 function generateMockScanData() {
   const data = []
   const now = new Date()
-  
+
   for (let i = 23; i >= 0; i--) {
     const hour = new Date(now.getTime() - i * 60 * 60 * 1000)
     const scans = Math.floor(Math.random() * 20) + 5
-    
+
     data.push({
       hour: hour.getHours(),
       scans: scans,
-      timestamp: hour.toISOString()
+      timestamp: hour.toISOString(),
     })
   }
-  
+
   return data
-} 
+}

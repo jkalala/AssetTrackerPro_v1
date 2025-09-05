@@ -1,6 +1,6 @@
-export type Role = 'super_admin' | 'admin' | 'manager' | 'user' | 'guest';
+export type Role = 'super_admin' | 'admin' | 'manager' | 'user' | 'guest'
 
-export type Permission = 
+export type Permission =
   | 'create:asset'
   | 'read:asset'
   | 'update:asset'
@@ -11,43 +11,43 @@ export type Permission =
   | 'view:analytics'
   | 'manage:billing'
   | 'manage:settings'
-  | 'read:users';
+  | 'read:users'
 
 export interface RolePermissions {
-  role: Role;
-  permissions: Permission[];
+  role: Role
+  permissions: Permission[]
 }
 
 export interface Tenant {
-  id: string;
-  name: string;
-  plan: 'free' | 'basic' | 'pro' | 'enterprise';
-  status: 'active' | 'suspended' | 'cancelled';
-  maxUsers: number;
-  maxAssets: number;
+  id: string
+  name: string
+  plan: 'free' | 'basic' | 'pro' | 'enterprise'
+  status: 'active' | 'suspended' | 'cancelled'
+  maxUsers: number
+  maxAssets: number
   features: {
-    qrCodes: boolean;
-    analytics: boolean;
-    api: boolean;
-    customBranding: boolean;
-    multipleLocations: boolean;
-    advancedReports: boolean;
-  };
-  createdAt: string;
-  updatedAt: string;
-  branding_logo_url?: string;
-  branding_primary_color?: string;
-  branding_secondary_color?: string;
-  branding_company_name?: string;
+    qrCodes: boolean
+    analytics: boolean
+    api: boolean
+    customBranding: boolean
+    multipleLocations: boolean
+    advancedReports: boolean
+  }
+  createdAt: string
+  updatedAt: string
+  branding_logo_url?: string
+  branding_primary_color?: string
+  branding_secondary_color?: string
+  branding_company_name?: string
 }
 
 export interface UserWithTenant {
-  id: string;
-  email: string;
-  role: Role;
-  tenantId: string;
-  tenant: Tenant;
-  isOwner: boolean;
+  id: string
+  email: string
+  role: Role
+  tenantId: string
+  tenant: Tenant
+  isOwner: boolean
 }
 
 // Default role permissions configuration
@@ -75,19 +75,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'manage:settings',
     'read:users',
   ],
-  manager: [
-    'create:asset',
-    'read:asset',
-    'update:asset',
-    'view:analytics',
-    'read:users',
-  ],
-  user: [
-    'read:asset',
-    'create:asset',
-    'read:users',
-  ],
-  guest: [
-    'read:asset'
-  ]
-}; 
+  manager: ['create:asset', 'read:asset', 'update:asset', 'view:analytics', 'read:users'],
+  user: ['read:asset', 'create:asset', 'read:users'],
+  guest: ['read:asset'],
+}

@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useEffect, useState } from "react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertTriangle, RefreshCw, Download } from "lucide-react"
-import ErrorBoundary from "./error-boundary"
-import NetworkStatus from "./network-status"
-import SupabaseStatus from "./supabase-status"
+import { useEffect, useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertTriangle, RefreshCw, Download } from 'lucide-react'
+import ErrorBoundary from './error-boundary'
+import NetworkStatus from './network-status'
+import SupabaseStatus from './supabase-status'
 
 interface SafeAuthWrapperProps {
   children: React.ReactNode
@@ -22,24 +22,24 @@ export default function SafeAuthWrapper({ children, fallback }: SafeAuthWrapperP
 
   useEffect(() => {
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error("Unhandled promise rejection:", event.reason)
+      console.error('Unhandled promise rejection:', event.reason)
 
       // Check if it's a network/fetch error
       if (
-        event.reason?.message?.includes("Failed to fetch") ||
-        event.reason?.message?.includes("NetworkError") ||
-        event.reason?.message?.includes("TypeError")
+        event.reason?.message?.includes('Failed to fetch') ||
+        event.reason?.message?.includes('NetworkError') ||
+        event.reason?.message?.includes('TypeError')
       ) {
         setHasNetworkError(true)
-        setErrorCount((prev) => prev + 1)
+        setErrorCount(prev => prev + 1)
         event.preventDefault() // Prevent the error from being logged to console
       }
     }
 
-    window.addEventListener("unhandledrejection", handleUnhandledRejection)
+    window.addEventListener('unhandledrejection', handleUnhandledRejection)
 
     return () => {
-      window.removeEventListener("unhandledrejection", handleUnhandledRejection)
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection)
     }
   }, [])
 
@@ -54,14 +54,16 @@ export default function SafeAuthWrapper({ children, fallback }: SafeAuthWrapperP
                 Network Connection Issues
               </CardTitle>
               <CardDescription className="text-red-700">
-                Multiple network errors detected. The v0 preview environment may have connectivity restrictions.
+                Multiple network errors detected. The v0 preview environment may have connectivity
+                restrictions.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Alert variant="destructive">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  <strong>Connection Failed:</strong> Unable to connect to the database after multiple attempts.
+                  <strong>Connection Failed:</strong> Unable to connect to the database after
+                  multiple attempts.
                 </AlertDescription>
               </Alert>
 
@@ -71,7 +73,8 @@ export default function SafeAuthWrapper({ children, fallback }: SafeAuthWrapperP
                   <div className="bg-blue-50 p-4 rounded border border-blue-200">
                     <h5 className="font-medium text-blue-800 mb-2">🏠 Run Locally</h5>
                     <p className="text-sm text-blue-700 mb-3">
-                      Download the code and run it locally for full functionality without network restrictions.
+                      Download the code and run it locally for full functionality without network
+                      restrictions.
                     </p>
                     <Button size="sm" className="w-full">
                       <Download className="h-4 w-4 mr-2" />
@@ -103,8 +106,9 @@ export default function SafeAuthWrapper({ children, fallback }: SafeAuthWrapperP
 
               <div className="bg-yellow-50 p-3 rounded border border-yellow-200">
                 <p className="text-sm text-yellow-800">
-                  <strong>v0 Preview Limitation:</strong> The v0 preview environment may have network restrictions that
-                  prevent full database connectivity. This is normal and expected in preview environments.
+                  <strong>v0 Preview Limitation:</strong> The v0 preview environment may have
+                  network restrictions that prevent full database connectivity. This is normal and
+                  expected in preview environments.
                 </p>
               </div>
             </CardContent>

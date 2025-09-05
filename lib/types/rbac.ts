@@ -4,10 +4,35 @@
 // TypeScript types for the hierarchical RBAC system
 
 export type PermissionScope = 'global' | 'tenant' | 'department' | 'personal'
-export type PermissionAction = 'create' | 'read' | 'update' | 'delete' | 'assign' | 'transfer' | 'approve' | 'export' | 'import' | 'manage'
-export type ResourceType = 'asset' | 'user' | 'role' | 'department' | 'report' | 'setting' | 'audit' | 'maintenance' | 'geofence' | 'iot_device'
+export type PermissionAction =
+  | 'create'
+  | 'read'
+  | 'update'
+  | 'delete'
+  | 'assign'
+  | 'transfer'
+  | 'approve'
+  | 'export'
+  | 'import'
+  | 'manage'
+export type ResourceType =
+  | 'asset'
+  | 'user'
+  | 'role'
+  | 'department'
+  | 'report'
+  | 'setting'
+  | 'audit'
+  | 'maintenance'
+  | 'geofence'
+  | 'iot_device'
 export type DelegationStatus = 'active' | 'expired' | 'revoked' | 'pending'
-export type DepartmentType = 'operational' | 'administrative' | 'technical' | 'financial' | 'security'
+export type DepartmentType =
+  | 'operational'
+  | 'administrative'
+  | 'technical'
+  | 'financial'
+  | 'security'
 
 // =====================================================
 // CORE RBAC INTERFACES
@@ -382,7 +407,7 @@ export interface RoleAssignmentHistoryInsert {
 // =====================================================
 
 export interface RoleWithPermissions extends Role {
-  permissions: (Permission & { 
+  permissions: (Permission & {
     conditions?: Record<string, any>
     resource_filters?: Record<string, any>
     inherited_from_role_id?: string
@@ -620,7 +645,7 @@ export interface DelegationValidationRules {
 export const VALIDATION_PATTERNS = {
   ROLE_NAME: /^[a-zA-Z0-9_-]+$/,
   DEPARTMENT_CODE: /^[A-Z0-9_-]+$/,
-  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
 } as const
 
 export const VALIDATION_LIMITS = {
@@ -628,7 +653,7 @@ export const VALIDATION_LIMITS = {
   MAX_GUEST_ACCESS_DURATION_DAYS: 90,
   MAX_ROLE_HIERARCHY_DEPTH: 10,
   MAX_PERMISSIONS_PER_ROLE: 100,
-  MAX_ROLES_PER_USER: 10
+  MAX_ROLES_PER_USER: 10,
 } as const
 
 // =====================================================
@@ -641,7 +666,7 @@ export interface RBACError {
   details?: Record<string, any>
 }
 
-export type RBACErrorCode = 
+export type RBACErrorCode =
   | 'ROLE_NOT_FOUND'
   | 'PERMISSION_DENIED'
   | 'CIRCULAR_HIERARCHY'

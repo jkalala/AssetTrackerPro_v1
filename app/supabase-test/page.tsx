@@ -1,10 +1,10 @@
-import type { Metadata } from "next"
-import { SUPABASE_CONFIG } from "@/lib/supabase/config"
-import { SupabaseConnectionTest } from "@/components/supabase-connection-test"
+import type { Metadata } from 'next'
+import { SUPABASE_CONFIG } from '@/lib/supabase/config'
+import { SupabaseConnectionTest } from '@/components/supabase-connection-test'
 
 export const metadata: Metadata = {
-  title: "Supabase Connection Test",
-  description: "Verify your Supabase connection is working correctly",
+  title: 'Supabase Connection Test',
+  description: 'Verify your Supabase connection is working correctly',
 }
 
 export default function SupabaseTestPage() {
@@ -12,7 +12,8 @@ export default function SupabaseTestPage() {
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-6">Supabase Connection Test</h1>
       <p className="text-muted-foreground mb-8">
-        This page tests your connection to the Supabase project and verifies your API keys are working correctly.
+        This page tests your connection to the Supabase project and verifies your API keys are
+        working correctly.
       </p>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -33,7 +34,7 @@ export default function SupabaseTestPage() {
           <div className="space-y-2">
             <p className="font-medium">Environment</p>
             <p className="text-sm text-muted-foreground">
-              {process.env.NODE_ENV === "production" ? "Production" : "Development"}
+              {process.env.NODE_ENV === 'production' ? 'Production' : 'Development'}
             </p>
           </div>
 

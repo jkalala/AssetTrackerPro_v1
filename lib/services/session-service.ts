@@ -4,11 +4,11 @@
 // Service for managing user sessions, concurrent limits, and security
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  UserSession, 
-  UserSessionInsert, 
+import {
+  UserSession,
+  UserSessionInsert,
   SessionActivity,
-  SecurityEventInsert
+  SecurityEventInsert,
 } from '@/lib/types/database'
 import * as crypto from 'crypto'
 import { UAParser } from 'ua-parser-js'
@@ -103,7 +103,7 @@ export class SessionService {
         country_code: locationInfo.country,
         city: locationInfo.city,
         user_agent: userAgent,
-        expires_at: expiresAt.toISOString()
+        expires_at: expiresAt.toISOString(),
       }
 
       const { data: session, error } = await supabase
@@ -132,20 +132,20 @@ export class SessionService {
         session_id: session.id,
         device_type: deviceInfo.type,
         location: `${locationInfo.city}, ${locationInfo.country}`,
-        ip_address: locationInfo.ip
+        ip_address: locationInfo.ip,
       })
 
       return {
         success: true,
         session,
         sessionToken,
-        refreshToken
+        refreshToken,
       }
     } catch (error) {
       console.error('Error creating session:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -192,13 +192,13 @@ export class SessionService {
       return {
         valid: true,
         session,
-        requiresRefresh
+        requiresRefresh,
       }
     } catch (error) {
       console.error('Error validating session:', error)
       return {
         valid: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -240,7 +240,7 @@ export class SessionService {
           session_token_hash: newSessionTokenHash,
           refresh_token_hash: newRefreshTokenHash,
           expires_at: newExpiresAt.toISOString(),
-          last_activity_at: new Date().toISOString()
+          last_activity_at: new Date().toISOString(),
         })
         .eq('id', session.id)
         .select()
@@ -265,13 +265,13 @@ export class SessionService {
         success: true,
         session: updatedSession,
         sessionToken: newSessionToken,
-        refreshToken: newRefreshToken
+        refreshToken: newRefreshToken,
       }
     } catch (error) {
       console.error('Error refreshing session:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -281,7 +281,12 @@ export class SessionService {
    */
   async terminateSession(
     sessionId: string,
-    reason: 'logout' | 'timeout' | 'admin_revoke' | 'security_revoke' | 'concurrent_limit' = 'logout'
+    reason:
+      | 'logout'
+      | 'timeout'
+      | 'admin_revoke'
+      | 'security_revoke'
+      | 'concurrent_limit' = 'logout'
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const supabase = await this.getSupabase()
@@ -291,7 +296,7 @@ export class SessionService {
         .update({
           is_active: false,
           terminated_at: new Date().toISOString(),
-          termination_reason: reason
+          termination_reason: reason,
         })
         .eq('id', sessionId)
         .select()
@@ -316,7 +321,7 @@ export class SessionService {
       if (reason !== 'logout') {
         await this.logSecurityEvent(session.tenant_id, session.user_id, 'session_terminated', {
           session_id: sessionId,
-          termination_reason: reason
+          termination_reason: reason,
         })
       }
 
@@ -325,7 +330,7 @@ export class SessionService {
       console.error('Error terminating session:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -347,7 +352,7 @@ export class SessionService {
         .update({
           is_active: false,
           terminated_at: new Date().toISOString(),
-          termination_reason: reason
+          termination_reason: reason,
         })
         .eq('tenant_id', tenantId)
         .eq('user_id', userId)
@@ -368,19 +373,19 @@ export class SessionService {
       await this.logSecurityEvent(tenantId, userId, 'session_terminated', {
         terminated_sessions: sessions?.length || 0,
         termination_reason: reason,
-        excluded_session: excludeSessionId
+        excluded_session: excludeSessionId,
       })
 
       return {
         success: true,
-        terminatedCount: sessions?.length || 0
+        terminatedCount: sessions?.length || 0,
       }
     } catch (error) {
       console.error('Error terminating user sessions:', error)
       return {
         success: false,
         terminatedCount: 0,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -416,22 +421,22 @@ export class SessionService {
       if (sessions) {
         processedSessions = sessions.map(session => {
           let isCurrent = false
-          
+
           // Primary method: match session token hash
           if (currentSessionToken) {
             const currentTokenHash = this.hashToken(currentSessionToken)
             isCurrent = session.session_token_hash === currentTokenHash
           }
-          
+
           // Fallback method: match IP and user agent for most recent session
           if (!isCurrent && currentIpAddress && currentUserAgent) {
-            isCurrent = session.ip_address === currentIpAddress && 
-                       session.user_agent === currentUserAgent
+            isCurrent =
+              session.ip_address === currentIpAddress && session.user_agent === currentUserAgent
           }
 
           return {
             ...session,
-            is_current: isCurrent
+            is_current: isCurrent,
           }
         })
       }
@@ -441,7 +446,7 @@ export class SessionService {
       console.error('Error getting user sessions:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -472,7 +477,7 @@ export class SessionService {
       console.error('Error getting current session:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -507,15 +512,17 @@ export class SessionService {
       }
 
       // Check if this is the current session
-      const isCurrentSession = currentIpAddress && currentUserAgent &&
-                              session.ip_address === currentIpAddress && 
-                              session.user_agent === currentUserAgent
+      const isCurrentSession =
+        currentIpAddress &&
+        currentUserAgent &&
+        session.ip_address === currentIpAddress &&
+        session.user_agent === currentUserAgent
 
       if (isCurrentSession) {
-        return { 
-          canTerminate: false, 
+        return {
+          canTerminate: false,
           reason: 'Cannot terminate current session. Please log out instead.',
-          isCurrentSession: true
+          isCurrentSession: true,
         }
       }
 
@@ -534,19 +541,19 @@ export class SessionService {
     userId: string,
     currentIpAddress?: string,
     currentUserAgent?: string
-  ): Promise<{ 
-    success: boolean; 
+  ): Promise<{
+    success: boolean
     sessions?: Array<{
-      id: string;
-      device_info: string;
-      ip_address: string;
-      created_at: string;
-      last_activity: string;
-      is_current: boolean;
-      user_agent?: string;
-      location?: string;
-    }>; 
-    error?: string 
+      id: string
+      device_info: string
+      ip_address: string
+      created_at: string
+      last_activity: string
+      is_current: boolean
+      user_agent?: string
+      location?: string
+    }>
+    error?: string
   }> {
     try {
       const result = await this.getUserSessions(
@@ -560,39 +567,44 @@ export class SessionService {
       if (!result.success) {
         return {
           success: false,
-          error: result.error
+          error: result.error,
         }
       }
 
       // Transform sessions for UI display
-      const transformedSessions = result.sessions?.map(session => {
-        // Determine if this is the current session based on IP and user agent
-        const isCurrent = currentIpAddress && currentUserAgent && 
-          session.ip_address === currentIpAddress && 
-          session.user_agent === currentUserAgent
+      const transformedSessions =
+        result.sessions?.map(session => {
+          // Determine if this is the current session based on IP and user agent
+          const isCurrent =
+            currentIpAddress &&
+            currentUserAgent &&
+            session.ip_address === currentIpAddress &&
+            session.user_agent === currentUserAgent
 
-        return {
-          id: session.id,
-          device_info: session.device_name || 'Unknown Device',
-          ip_address: session.ip_address,
-          created_at: session.created_at,
-          last_activity: session.last_activity_at || session.created_at,
-          is_current: isCurrent || false,
-          user_agent: session.user_agent,
-          location: session.city && session.country_code ? 
-            `${session.city}, ${session.country_code}` : undefined
-        }
-      }) || []
+          return {
+            id: session.id,
+            device_info: session.device_name || 'Unknown Device',
+            ip_address: session.ip_address,
+            created_at: session.created_at,
+            last_activity: session.last_activity_at || session.created_at,
+            is_current: isCurrent || false,
+            user_agent: session.user_agent,
+            location:
+              session.city && session.country_code
+                ? `${session.city}, ${session.country_code}`
+                : undefined,
+          }
+        }) || []
 
       return {
         success: true,
-        sessions: transformedSessions
+        sessions: transformedSessions,
       }
     } catch (error) {
       console.error('Error listing active sessions:', error)
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -621,12 +633,10 @@ export class SessionService {
         activity_type: activityType,
         activity_details: activityDetails,
         ip_address: ipAddress,
-        user_agent: userAgent
+        user_agent: userAgent,
       }
 
-      await supabase
-        .from('session_activities')
-        .insert(activityData)
+      await supabase.from('session_activities').insert(activityData)
     } catch (error) {
       console.error('Error logging session activity:', error)
     }
@@ -676,12 +686,12 @@ export class SessionService {
       if (currentCount >= tenantMaxSessions) {
         // Terminate oldest session to make room
         await this.terminateOldestSession(tenantId, userId)
-        
+
         // Log security event
         await this.logSecurityEvent(tenantId, userId, 'concurrent_session_limit', {
           active_sessions: currentCount,
           max_sessions: tenantMaxSessions,
-          action: 'terminated_oldest'
+          action: 'terminated_oldest',
         })
 
         return { allowed: true, activeCount: currentCount - 1 }
@@ -748,12 +758,12 @@ export class SessionService {
       type: deviceType,
       browser: {
         name: result.browser.name,
-        version: result.browser.version
+        version: result.browser.version,
       },
       os: {
         name: result.os.name,
-        version: result.os.version
-      }
+        version: result.os.version,
+      },
     }
   }
 
@@ -766,7 +776,7 @@ export class SessionService {
     return {
       ip: ipAddress,
       country: 'US', // Would be determined by geolocation service
-      city: 'Unknown' // Would be determined by geolocation service
+      city: 'Unknown', // Would be determined by geolocation service
     }
   }
 
@@ -777,7 +787,11 @@ export class SessionService {
   /**
    * Clean up expired sessions
    */
-  async cleanupExpiredSessions(): Promise<{ success: boolean; cleanedCount: number; error?: string }> {
+  async cleanupExpiredSessions(): Promise<{
+    success: boolean
+    cleanedCount: number
+    error?: string
+  }> {
     try {
       const supabase = await this.getSupabase()
 
@@ -786,9 +800,11 @@ export class SessionService {
         .update({
           is_active: false,
           terminated_at: new Date().toISOString(),
-          termination_reason: 'timeout'
+          termination_reason: 'timeout',
         })
-        .or(`expires_at.lt.${new Date().toISOString()},last_activity_at.lt.${new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()}`)
+        .or(
+          `expires_at.lt.${new Date().toISOString()},last_activity_at.lt.${new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()}`
+        )
         .eq('is_active', true)
         .select('id')
 
@@ -799,14 +815,14 @@ export class SessionService {
 
       return {
         success: true,
-        cleanedCount: expiredSessions?.length || 0
+        cleanedCount: expiredSessions?.length || 0,
       }
     } catch (error) {
       console.error('Error cleaning up expired sessions:', error)
       return {
         success: false,
         cleanedCount: 0,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -831,14 +847,10 @@ export class SessionService {
       parsedUA.os.version || '',
       parsedUA.device.vendor || '',
       parsedUA.device.model || '',
-      userAgent.length.toString()
+      userAgent.length.toString(),
     ]
 
-    return crypto
-      .createHash('sha256')
-      .update(components.join('|'))
-      .digest('hex')
-      .substring(0, 16)
+    return crypto.createHash('sha256').update(components.join('|')).digest('hex').substring(0, 16)
   }
 
   private generateDeviceName(parsedUA: any): string {
@@ -875,12 +887,10 @@ export class SessionService {
         event_type: eventType,
         severity: 'low',
         description: `Session ${eventType.replace('_', ' ')}`,
-        details
+        details,
       }
 
-      await supabase
-        .from('security_events')
-        .insert(eventData)
+      await supabase.from('security_events').insert(eventData)
     } catch (error) {
       console.error('Error logging security event:', error)
     }
@@ -893,14 +903,18 @@ export class SessionService {
   /**
    * Update session activity
    */
-  async updateSessionActivity(sessionId: string, userId: string, ipAddress?: string): Promise<{ success: boolean; error?: string }> {
+  async updateSessionActivity(
+    sessionId: string,
+    userId: string,
+    ipAddress?: string
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const updateData: any = {
-        last_activity_at: new Date().toISOString()
+        last_activity_at: new Date().toISOString(),
       }
-      
+
       if (ipAddress) {
         updateData.ip_address = ipAddress
       }
@@ -919,7 +933,7 @@ export class SessionService {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }
     }
   }
@@ -927,10 +941,14 @@ export class SessionService {
   /**
    * Get session by ID
    */
-  async getSessionById(sessionId: string, userId: string, tenantId?: string): Promise<UserSession | null> {
+  async getSessionById(
+    sessionId: string,
+    userId: string,
+    tenantId?: string
+  ): Promise<UserSession | null> {
     try {
       const supabase = await this.getSupabase()
-      
+
       let query = supabase
         .from('user_sessions')
         .select('*')
@@ -985,7 +1003,7 @@ export class SessionService {
     const lastActivity = new Date(lastActivityAt)
     const now = new Date()
     const hoursSinceActivity = (now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60)
-    
+
     // Session expires after 24 hours of inactivity
     return hoursSinceActivity > 24
   }

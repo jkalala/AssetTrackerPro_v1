@@ -7,6 +7,7 @@ Your AssetPro application is now ready for deployment to AWS Amplify!
 ## 📋 Deployment Checklist
 
 ### ✅ Completed Tasks:
+
 - [x] **Build Configuration**: `amplify.yml` created
 - [x] **Next.js Config**: Updated for Amplify compatibility
 - [x] **Dependencies**: All required packages installed
@@ -16,6 +17,7 @@ Your AssetPro application is now ready for deployment to AWS Amplify!
 - [x] **Documentation**: Comprehensive deployment guide created
 
 ### 📁 Required Files (All Present):
+
 - ✅ `amplify.yml` - Build configuration
 - ✅ `next.config.mjs` - Next.js configuration
 - ✅ `package.json` - Dependencies
@@ -25,6 +27,7 @@ Your AssetPro application is now ready for deployment to AWS Amplify!
 ## 🚀 Quick Deployment Steps
 
 ### 1. Push to GitHub
+
 ```bash
 git add .
 git commit -m "Prepare for AWS Amplify deployment"
@@ -32,6 +35,7 @@ git push origin main
 ```
 
 ### 2. Deploy to AWS Amplify
+
 1. Go to [AWS Amplify Console](https://console.aws.amazon.com/amplify/)
 2. Click "New app" → "Host web app"
 3. Connect your GitHub repository
@@ -39,6 +43,7 @@ git push origin main
 5. Amplify will auto-detect the `amplify.yml` configuration
 
 ### 3. Environment Variables
+
 Add these in Amplify Console → App settings → Environment variables:
 
 ```bash
@@ -60,6 +65,7 @@ NODE_ENV=production
 ## 🔧 Technical Configuration
 
 ### Build Configuration (`amplify.yml`):
+
 ```yaml
 version: 1
 frontend:
@@ -82,6 +88,7 @@ frontend:
 ```
 
 ### Next.js Configuration:
+
 - ✅ Output: Standard (no standalone)
 - ✅ Images: Unoptimized for Amplify
 - ✅ TypeScript: Build errors ignored
@@ -91,11 +98,13 @@ frontend:
 ## 🌐 Post-Deployment
 
 ### Custom Domain (Optional):
+
 1. Amplify Console → Domain management
 2. Add your custom domain
 3. Configure DNS settings
 
 ### Monitoring:
+
 - Build logs in Amplify Console
 - Application logs for debugging
 - Performance monitoring via CloudWatch
@@ -103,12 +112,14 @@ frontend:
 ## 🛠️ Troubleshooting
 
 ### Common Issues:
+
 1. **Build Failures**: Check Amplify build logs
 2. **Environment Variables**: Verify all required vars are set
 3. **Styling Issues**: Ensure Tailwind CSS is properly configured
 4. **API Errors**: Check Supabase connection and CORS settings
 
 ### Support Resources:
+
 - [AWS Amplify Documentation](https://docs.aws.amazon.com/amplify/)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Supabase Documentation](https://supabase.com/docs)

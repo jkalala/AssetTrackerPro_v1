@@ -1,29 +1,29 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { createClient } from "@/lib/supabase/client"
-import Link from "next/link"
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { createClient } from '@/lib/supabase/client'
+import Link from 'next/link'
 
 export default function ResetPasswordPage() {
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState("")
-  const [error, setError] = useState("")
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
   const [mounted, setMounted] = useState(false)
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const accessToken = searchParams.get("access_token")
-  const refreshToken = searchParams.get("refresh_token")
+  const accessToken = searchParams.get('access_token')
+  const refreshToken = searchParams.get('refresh_token')
 
   useEffect(() => {
     setMounted(true)
@@ -35,18 +35,18 @@ export default function ResetPasswordPage() {
     if (!mounted) return
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
+      setError('Passwords do not match')
       return
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long")
+      setError('Password must be at least 6 characters long')
       return
     }
 
     setLoading(true)
-    setError("")
-    setMessage("")
+    setError('')
+    setMessage('')
 
     try {
       const supabase = createClient()
@@ -72,14 +72,14 @@ export default function ResetPasswordPage() {
         throw updateError
       }
 
-      setMessage("Password updated successfully! Redirecting to login...")
+      setMessage('Password updated successfully! Redirecting to login...')
 
       setTimeout(() => {
-        router.push("/login")
+        router.push('/login')
       }, 2000)
     } catch (error: any) {
-      console.error("Password reset error:", error)
-      setError(error.message || "An error occurred while resetting your password")
+      console.error('Password reset error:', error)
+      setError(error.message || 'An error occurred while resetting your password')
     } finally {
       setLoading(false)
     }
@@ -120,7 +120,7 @@ export default function ResetPasswordPage() {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 required
                 minLength={6}
                 placeholder="Enter your new password"
@@ -134,7 +134,7 @@ export default function ResetPasswordPage() {
                 id="confirmPassword"
                 type="password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={e => setConfirmPassword(e.target.value)}
                 required
                 minLength={6}
                 placeholder="Confirm your new password"
@@ -142,14 +142,18 @@ export default function ResetPasswordPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading || !password || !confirmPassword}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading || !password || !confirmPassword}
+            >
               {loading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Updating Password...
                 </>
               ) : (
-                "Update Password"
+                'Update Password'
               )}
             </Button>
           </form>

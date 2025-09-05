@@ -1,19 +1,19 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/components/auth/auth-provider"
-import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
-import dynamic from "next/dynamic"
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/components/auth/auth-provider'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import Link from 'next/link'
+import dynamic from 'next/dynamic'
 
 // Force dynamic rendering and disable SSR completely
-export const runtime = "edge"
+export const runtime = 'edge'
 
 // Dynamically import the dashboard component with no SSR
-const DashboardContent = dynamic(() => import("@/components/dashboard-content"), {
+const DashboardContent = dynamic(() => import('@/components/dashboard-content'), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -41,7 +41,7 @@ export default function DashboardPage() {
     if (!mounted) return
 
     if (!loading && !user) {
-      router.push("/login")
+      router.push('/login')
       return
     }
 
@@ -53,22 +53,26 @@ export default function DashboardPage() {
   const checkProfile = async () => {
     try {
       const supabase = createClient()
-      const { data: profileData, error } = await supabase.from("profiles").select("*").eq("id", user?.id).single()
+      const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .single()
 
-      if (error && error.code === "PGRST116") {
+      if (error && error.code === 'PGRST116') {
         // No profile found, redirect to profile setup
-        router.push("/profile-setup")
+        router.push('/profile-setup')
         return
       }
 
       if (error) {
-        console.error("Error fetching profile:", error)
+        console.error('Error fetching profile:', error)
         return
       }
 
       setProfile(profileData)
     } catch (error) {
-      console.error("Error checking profile:", error)
+      console.error('Error checking profile:', error)
     } finally {
       setProfileLoading(false)
     }

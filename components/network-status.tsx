@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Wifi, WifiOff, RefreshCw } from "lucide-react"
-import { firebaseConfig, vapidKey } from "@/lib/firebase"
+import { useEffect, useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Wifi, WifiOff, RefreshCw } from 'lucide-react'
+import { firebaseConfig, vapidKey } from '@/lib/firebase'
 
 export default function NetworkStatus() {
   const [isOnline, setIsOnline] = useState(true)
@@ -27,16 +27,16 @@ export default function NetworkStatus() {
     // Check initial status
     setIsOnline(navigator.onLine)
 
-    window.addEventListener("online", handleOnline)
-    window.addEventListener("offline", handleOffline)
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
 
-    if (typeof window !== "undefined" && "Notification" in window) {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
       setPermission(Notification.permission)
     }
 
     return () => {
-      window.removeEventListener("online", handleOnline)
-      window.removeEventListener("offline", handleOffline)
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
     }
   }, [])
 
@@ -44,8 +44,8 @@ export default function NetworkStatus() {
     try {
       setError(null)
       // Modular Firebase imports
-      const { initializeApp, getApps } = await import("firebase/app")
-      const { getMessaging, getToken } = await import("firebase/messaging")
+      const { initializeApp, getApps } = await import('firebase/app')
+      const { getMessaging, getToken } = await import('firebase/messaging')
       let app
       if (!getApps().length) {
         app = initializeApp(firebaseConfig)
@@ -57,13 +57,13 @@ export default function NetworkStatus() {
       setToken(currentToken)
       setPermission(Notification.permission)
       // Send currentToken to your backend to associate with the user
-      await fetch("/api/notifications/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: currentToken })
+      await fetch('/api/notifications/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: currentToken }),
       })
     } catch (err: any) {
-      setError(err.message || "Failed to subscribe to notifications")
+      setError(err.message || 'Failed to subscribe to notifications')
     }
   }
 
@@ -73,13 +73,13 @@ export default function NetworkStatus() {
 
   return (
     <div>
-      <Alert variant={isOnline ? "default" : "destructive"} className="mb-4">
+      <Alert variant={isOnline ? 'default' : 'destructive'} className="mb-4">
         {isOnline ? <Wifi className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
         <AlertDescription className="flex items-center justify-between">
           <span>
             {isOnline
-              ? "Connection restored! You may need to refresh the page."
-              : "You appear to be offline. Some features may not work properly."}
+              ? 'Connection restored! You may need to refresh the page.'
+              : 'You appear to be offline. Some features may not work properly.'}
           </span>
           {isOnline && (
             <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
@@ -90,9 +90,11 @@ export default function NetworkStatus() {
         </AlertDescription>
       </Alert>
       <div className="my-4">
-        <div className="mb-2">Push Notifications: <b>{permission}</b></div>
-        <Button onClick={subscribe} disabled={permission === "granted"}>
-          {permission === "granted" ? "Subscribed" : "Enable Notifications"}
+        <div className="mb-2">
+          Push Notifications: <b>{permission}</b>
+        </div>
+        <Button onClick={subscribe} disabled={permission === 'granted'}>
+          {permission === 'granted' ? 'Subscribed' : 'Enable Notifications'}
         </Button>
         {token && <div className="text-xs mt-2 break-all">Token: {token}</div>}
         {error && <div className="text-xs text-red-600 mt-2">{error}</div>}

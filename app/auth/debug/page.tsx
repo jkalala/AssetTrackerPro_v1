@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import AuthDebug from "@/components/auth-debug"
+import AuthDebug from '@/components/auth-debug'
 
 export default function DebugPage() {
   return (

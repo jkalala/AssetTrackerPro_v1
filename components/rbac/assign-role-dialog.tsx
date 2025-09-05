@@ -1,12 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,12 +15,12 @@ interface AssignRoleDialogProps {
   onAssignComplete: () => void
 }
 
-export function AssignRoleDialog({ 
-  open, 
-  onOpenChange, 
-  role, 
-  tenantId, 
-  onAssignComplete 
+export function AssignRoleDialog({
+  open,
+  onOpenChange,
+  role,
+  tenantId,
+  onAssignComplete,
 }: AssignRoleDialogProps) {
   const [userId, setUserId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -37,10 +32,10 @@ export function AssignRoleDialog({
     try {
       // Here you would call your role assignment API
       console.log('Assigning role', role.id, 'to user', userId, 'in tenant', tenantId)
-      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       onAssignComplete()
       setUserId('')
     } catch (error) {
@@ -56,14 +51,14 @@ export function AssignRoleDialog({
         <DialogHeader>
           <DialogTitle>Assign Role: {role.display_name || role.name}</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="userId">User ID or Email</Label>
             <Input
               id="userId"
               value={userId}
-              onChange={(e) => setUserId(e.target.value)}
+              onChange={e => setUserId(e.target.value)}
               placeholder="Enter user ID or email"
               required
             />

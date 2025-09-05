@@ -1,26 +1,42 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Separator } from "@/components/ui/separator"
-import { Package, AlertCircle, Loader2, Github, Mail, ArrowRight, CheckCircle, Building2 } from "lucide-react"
-import { motion } from "framer-motion"
-import { useBranding } from "@/components/branding-provider"
+import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Separator } from '@/components/ui/separator'
+import {
+  Package,
+  AlertCircle,
+  Loader2,
+  Github,
+  Mail,
+  ArrowRight,
+  CheckCircle,
+  Building2,
+} from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useBranding } from '@/components/branding-provider'
 
 export default function SignupForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [name, setName] = useState("")
-  const [orgName, setOrgName] = useState("")
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  const [orgName, setOrgName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [githubLoading, setGithubLoading] = useState(false)
@@ -34,14 +50,14 @@ export default function SignupForm() {
     setError(null)
 
     if (!orgName.trim()) {
-      setError("Organization name is required")
+      setError('Organization name is required')
       setLoading(false)
       return
     }
 
     try {
       // Dynamically import to prevent SSR issues
-      const { createClient } = await import("@/lib/supabase/client")
+      const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
 
       const { error } = await supabase.auth.signUp({
@@ -62,8 +78,8 @@ export default function SignupForm() {
         setSuccess(true)
       }
     } catch (err) {
-      console.error("Signup error:", err)
-      setError("An unexpected error occurred. Please try again.")
+      console.error('Signup error:', err)
+      setError('An unexpected error occurred. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -71,31 +87,31 @@ export default function SignupForm() {
 
   const handleGithubSignup = async () => {
     if (!orgName.trim()) {
-      setError("Organization name is required")
+      setError('Organization name is required')
       return
     }
     setGithubLoading(true)
     setError(null)
 
     try {
-      const { createClient } = await import("@/lib/supabase/client")
+      const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
       // Store org name in a cookie before GitHub OAuth
       document.cookie = `signup_org_name=${encodeURIComponent(orgName)}; path=/; max-age=300`
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: "github",
+        provider: 'github',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       })
       if (error) {
         setError(error.message)
-        document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+        document.cookie = 'signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
       }
     } catch (err) {
-      console.error("GitHub signup error:", err)
-      setError("Failed to authenticate with GitHub. Please try again.")
-      document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+      console.error('GitHub signup error:', err)
+      setError('Failed to authenticate with GitHub. Please try again.')
+      document.cookie = 'signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
     } finally {
       setGithubLoading(false)
     }
@@ -110,7 +126,7 @@ export default function SignupForm() {
             <img src={branding.logoUrl} alt="Logo" className="h-12 w-12 rounded bg-white border" />
           )}
           <span className="text-2xl font-bold text-gray-900">
-            {branding?.companyName || "AssetTracker Pro"}
+            {branding?.companyName || 'AssetTracker Pro'}
           </span>
         </Link>
       </header>
@@ -129,21 +145,23 @@ export default function SignupForm() {
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
                   className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4"
                 >
                   <CheckCircle className="h-8 w-8 text-green-600" />
                 </motion.div>
                 <CardTitle className="text-2xl font-bold text-center">Check your email</CardTitle>
-                <CardDescription className="text-center">We've sent a confirmation link to your email</CardDescription>
+                <CardDescription className="text-center">
+                  We've sent a confirmation link to your email
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Alert className="bg-blue-50 border-blue-200">
                   <div className="flex items-start">
                     <Mail className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
                     <AlertDescription className="text-blue-800">
-                      Please check <span className="font-medium">{email}</span> and click the confirmation link to
-                      complete your registration.
+                      Please check <span className="font-medium">{email}</span> and click the
+                      confirmation link to complete your registration.
                     </AlertDescription>
                   </div>
                 </Alert>
@@ -151,8 +169,11 @@ export default function SignupForm() {
                 <div className="text-sm text-gray-600 space-y-2">
                   <p>After confirming your email, you'll be able to sign in to your account.</p>
                   <p className="text-xs text-gray-500">
-                    If you don't see the email, check your spam folder or{" "}
-                    <Link href="/auth/resend" className="text-blue-600 hover:text-blue-800 font-medium">
+                    If you don't see the email, check your spam folder or{' '}
+                    <Link
+                      href="/auth/resend"
+                      className="text-blue-600 hover:text-blue-800 font-medium"
+                    >
                       request a new link
                     </Link>
                     .
@@ -175,7 +196,9 @@ export default function SignupForm() {
                     <Package className="h-8 w-8 text-blue-600" />
                   </div>
                 </div>
-                <CardTitle className="text-2xl font-bold text-center">Create your account</CardTitle>
+                <CardTitle className="text-2xl font-bold text-center">
+                  Create your account
+                </CardTitle>
                 <CardDescription className="text-center">
                   Join AssetTracker Pro to start managing your assets efficiently
                 </CardDescription>
@@ -197,7 +220,7 @@ export default function SignupForm() {
                       type="text"
                       placeholder="Enter your organization name"
                       value={orgName}
-                      onChange={(e) => setOrgName(e.target.value)}
+                      onChange={e => setOrgName(e.target.value)}
                       className="pl-10"
                       required
                     />
@@ -237,7 +260,7 @@ export default function SignupForm() {
                           id="name"
                           placeholder="Enter your name"
                           value={name}
-                          onChange={(e) => setName(e.target.value)}
+                          onChange={e => setName(e.target.value)}
                           required
                         />
                       </div>
@@ -248,7 +271,7 @@ export default function SignupForm() {
                           type="email"
                           placeholder="you@example.com"
                           value={email}
-                          onChange={(e) => setEmail(e.target.value)}
+                          onChange={e => setEmail(e.target.value)}
                           required
                         />
                       </div>
@@ -267,7 +290,7 @@ export default function SignupForm() {
                           type="password"
                           placeholder="Create a secure password"
                           value={password}
-                          onChange={(e) => setPassword(e.target.value)}
+                          onChange={e => setPassword(e.target.value)}
                           required
                           minLength={8}
                         />
@@ -279,7 +302,7 @@ export default function SignupForm() {
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating account...
                           </>
                         ) : (
-                          "Create account"
+                          'Create account'
                         )}
                       </Button>
                     </form>
@@ -288,11 +311,11 @@ export default function SignupForm() {
 
                 <div className="mt-4 text-center text-sm">
                   <p className="text-gray-600">
-                    By signing up, you agree to our{" "}
+                    By signing up, you agree to our{' '}
                     <Link href="/terms" className="text-blue-600 hover:text-blue-800 font-medium">
                       Terms of Service
-                    </Link>{" "}
-                    and{" "}
+                    </Link>{' '}
+                    and{' '}
                     <Link href="/privacy" className="text-blue-600 hover:text-blue-800 font-medium">
                       Privacy Policy
                     </Link>
@@ -302,7 +325,7 @@ export default function SignupForm() {
               <CardFooter className="flex flex-col space-y-4">
                 <Separator />
                 <div className="text-center text-sm w-full">
-                  Already have an account?{" "}
+                  Already have an account?{' '}
                   <Link href="/login" className="text-blue-600 hover:text-blue-800 font-medium">
                     Sign in
                   </Link>

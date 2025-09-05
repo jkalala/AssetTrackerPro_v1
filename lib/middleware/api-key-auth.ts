@@ -33,10 +33,7 @@ export async function withApiKeyAuth(
     if (!apiKey) {
       return {
         success: false,
-        response: NextResponse.json(
-          { error: 'API key required' },
-          { status: 401 }
-        )
+        response: NextResponse.json({ error: 'API key required' }, { status: 401 }),
       }
     }
 
@@ -55,10 +52,7 @@ export async function withApiKeyAuth(
       const status = validation.rateLimitExceeded ? 429 : 401
       return {
         success: false,
-        response: NextResponse.json(
-          { error: validation.error },
-          { status }
-        )
+        response: NextResponse.json({ error: validation.error }, { status }),
       }
     }
 
@@ -72,7 +66,7 @@ export async function withApiKeyAuth(
         200, // Will be updated with actual status code later
         {
           ipAddress,
-          userAgent: request.headers.get('user-agent') || undefined
+          userAgent: request.headers.get('user-agent') || undefined,
         }
       )
     }
@@ -82,17 +76,14 @@ export async function withApiKeyAuth(
       context: {
         apiKey: validation.apiKey!,
         tenantId: validation.apiKey!.tenant_id,
-        userId: validation.apiKey!.user_id
-      }
+        userId: validation.apiKey!.user_id,
+      },
     }
   } catch (error) {
     console.error('API key authentication error:', error)
     return {
       success: false,
-      response: NextResponse.json(
-        { error: 'Authentication failed' },
-        { status: 500 }
-      )
+      response: NextResponse.json({ error: 'Authentication failed' }, { status: 500 }),
     }
   }
 }
@@ -106,14 +97,14 @@ export function requireApiKey(
 ) {
   return async (request: NextRequest): Promise<NextResponse> => {
     const auth = await withApiKeyAuth(request, options)
-    
+
     if (!auth.success) {
       return auth.response!
     }
 
     try {
       const response = await handler(request, auth.context!)
-      
+
       // Update usage log with actual response status
       if (!options.skipRateLimit) {
         const url = new URL(request.url)
@@ -124,7 +115,7 @@ export function requireApiKey(
           response.status,
           {
             ipAddress: getClientIpAddress(request),
-            userAgent: request.headers.get('user-agent') || undefined
+            userAgent: request.headers.get('user-agent') || undefined,
           }
         )
       }
@@ -132,7 +123,7 @@ export function requireApiKey(
       return response
     } catch (error) {
       console.error('API route error:', error)
-      
+
       // Log error in usage
       if (!options.skipRateLimit) {
         const url = new URL(request.url)
@@ -143,15 +134,12 @@ export function requireApiKey(
           500,
           {
             ipAddress: getClientIpAddress(request),
-            userAgent: request.headers.get('user-agent') || undefined
+            userAgent: request.headers.get('user-agent') || undefined,
           }
         )
       }
 
-      return NextResponse.json(
-        { error: 'Internal server error' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
   }
 }
@@ -213,10 +201,16 @@ export function addRateLimitHeaders(
 ): NextResponse {
   response.headers.set('X-RateLimit-Limit', rateLimitStatus.limit.toString())
   response.headers.set('X-RateLimit-Remaining', rateLimitStatus.remaining.toString())
-  response.headers.set('X-RateLimit-Reset', Math.ceil(rateLimitStatus.resetTime.getTime() / 1000).toString())
+  response.headers.set(
+    'X-RateLimit-Reset',
+    Math.ceil(rateLimitStatus.resetTime.getTime() / 1000).toString()
+  )
 
   if (!rateLimitStatus.allowed) {
-    response.headers.set('Retry-After', Math.ceil((rateLimitStatus.resetTime.getTime() - Date.now()) / 1000).toString())
+    response.headers.set(
+      'Retry-After',
+      Math.ceil((rateLimitStatus.resetTime.getTime() - Date.now()) / 1000).toString()
+    )
   }
 
   return response
@@ -231,7 +225,7 @@ export function createApiErrorResponse(
   details?: Record<string, any>
 ): NextResponse {
   const body: any = { error }
-  
+
   if (details) {
     body.details = details
   }
@@ -242,12 +236,12 @@ export function createApiErrorResponse(
 /**
  * Create a standardized API success response
  */
-export function createApiSuccessResponse(
-  data: any,
-  status: number = 200
-): NextResponse {
-  return NextResponse.json({
-    success: true,
-    data
-  }, { status })
+export function createApiSuccessResponse(data: any, status: number = 200): NextResponse {
+  return NextResponse.json(
+    {
+      success: true,
+      data,
+    },
+    { status }
+  )
 }

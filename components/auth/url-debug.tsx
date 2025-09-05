@@ -1,21 +1,21 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useEffect, useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 export function UrlDebug() {
   const [urls, setUrls] = useState({
-    current: "",
-    appUrl: "",
-    origin: "",
-    host: "",
+    current: '',
+    appUrl: '',
+    origin: '',
+    host: '',
   })
 
   useEffect(() => {
     setUrls({
       current: window.location.href,
-      appUrl: process.env.NEXT_PUBLIC_APP_URL || "Not set",
+      appUrl: process.env.NEXT_PUBLIC_APP_URL || 'Not set',
       origin: window.location.origin,
       host: window.location.host,
     })
@@ -34,7 +34,9 @@ export function UrlDebug() {
           </div>
           <div className="flex justify-between items-center">
             <span className="font-medium">NEXT_PUBLIC_APP_URL:</span>
-            <Badge variant={urls.appUrl === "Not set" ? "destructive" : "default"}>{urls.appUrl}</Badge>
+            <Badge variant={urls.appUrl === 'Not set' ? 'destructive' : 'default'}>
+              {urls.appUrl}
+            </Badge>
           </div>
           <div className="flex justify-between items-center">
             <span className="font-medium">Window Origin:</span>

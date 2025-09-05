@@ -32,7 +32,10 @@ export async function POST(request: Request) {
       })
       .eq('id', assetId)
     if (updateError) {
-      return NextResponse.json({ error: 'Failed to check in asset: ' + updateError.message }, { status: 500 })
+      return NextResponse.json(
+        { error: 'Failed to check in asset: ' + updateError.message },
+        { status: 500 }
+      )
     }
     // Update latest assignment record for this asset (set checked_in_at)
     const { data: assignment, error: assignmentError } = await supabase
@@ -53,4 +56,4 @@ export async function POST(request: Request) {
   } catch (err) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-} 
+}

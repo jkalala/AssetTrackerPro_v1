@@ -1,12 +1,19 @@
-"use client"
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+'use client'
+import { useEffect, useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 export default function ActivityFeedPage() {
   const [logs, setLogs] = useState<any[]>([])
   useEffect(() => {
-    fetch("/api/audit-logs")
+    fetch('/api/audit-logs')
       .then(res => res.json())
       .then(res => setLogs(res.data || []))
   }, [])
@@ -47,4 +54,4 @@ export default function ActivityFeedPage() {
       </Card>
     </div>
   )
-} 
+}

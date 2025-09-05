@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import {
   Package,
   QrCode,
@@ -20,8 +20,8 @@ import {
   MapPin,
   Layers,
   Settings,
-} from "lucide-react"
-import Link from "next/link"
+} from 'lucide-react'
+import Link from 'next/link'
 
 export default function HomePage() {
   const router = useRouter()
@@ -38,11 +38,11 @@ export default function HomePage() {
 
     const checkAuth = async () => {
       try {
-        const { useAuth } = await import("@/components/auth/auth-provider")
+        const { useAuth } = await import('@/components/auth/auth-provider')
         // We'll handle auth checking in a safer way
         setLoading(false)
       } catch (error) {
-        console.error("Auth check error:", error)
+        console.error('Auth check error:', error)
         setLoading(false)
       }
     }
@@ -78,7 +78,12 @@ export default function HomePage() {
               <Link href="/qr-management" className="text-blue-600 hover:text-blue-800">
                 QR Features
               </Link>
-              <a href="/login" className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">Sign In</a>
+              <a
+                href="/login"
+                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Sign In
+              </a>
             </div>
           </div>
         </div>
@@ -95,8 +100,8 @@ export default function HomePage() {
             <span className="text-blue-600"> Management</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Streamline your asset tracking with QR codes, real-time monitoring, and powerful analytics. Built for
-            businesses that demand excellence.
+            Streamline your asset tracking with QR codes, real-time monitoring, and powerful
+            analytics. Built for businesses that demand excellence.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild className="text-lg px-8 py-3">
@@ -124,8 +129,8 @@ export default function HomePage() {
               Everything You Need for Asset Management
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              AssetPro comes with a complete suite of features for professional asset tracking, 
-              from QR codes to geofencing and real-time analytics.
+              AssetPro comes with a complete suite of features for professional asset tracking, from
+              QR codes to geofencing and real-time analytics.
             </p>
           </div>
 
@@ -133,54 +138,92 @@ export default function HomePage() {
             {[
               {
                 icon: Package,
-                title: "Asset Management",
-                description: "Complete lifecycle management with advanced tracking, search, and filtering capabilities.",
-                color: "text-blue-600",
-                bgColor: "bg-blue-50",
-                features: ["Asset CRUD Operations", "Advanced Search", "Asset History", "File Attachments", "Depreciation Tracking"]
+                title: 'Asset Management',
+                description:
+                  'Complete lifecycle management with advanced tracking, search, and filtering capabilities.',
+                color: 'text-blue-600',
+                bgColor: 'bg-blue-50',
+                features: [
+                  'Asset CRUD Operations',
+                  'Advanced Search',
+                  'Asset History',
+                  'File Attachments',
+                  'Depreciation Tracking',
+                ],
               },
               {
                 icon: QrCode,
-                title: "QR Code System",
-                description: "Generate, scan, and manage QR codes with bulk operations and analytics.",
-                color: "text-purple-600",
-                bgColor: "bg-purple-50",
-                features: ["QR Generation", "Camera Scanning", "Bulk Operations", "Usage Analytics"]
+                title: 'QR Code System',
+                description:
+                  'Generate, scan, and manage QR codes with bulk operations and analytics.',
+                color: 'text-purple-600',
+                bgColor: 'bg-purple-50',
+                features: [
+                  'QR Generation',
+                  'Camera Scanning',
+                  'Bulk Operations',
+                  'Usage Analytics',
+                ],
               },
               {
                 icon: MapPin,
-                title: "Geofencing & Location",
-                description: "GPS tracking, geofence zones, and location-based alerts and monitoring.",
-                color: "text-green-600",
-                bgColor: "bg-green-50",
-                features: ["Interactive Maps", "Geofence Zones", "Location History", "Real-time Alerts"]
+                title: 'Geofencing & Location',
+                description:
+                  'GPS tracking, geofence zones, and location-based alerts and monitoring.',
+                color: 'text-green-600',
+                bgColor: 'bg-green-50',
+                features: [
+                  'Interactive Maps',
+                  'Geofence Zones',
+                  'Location History',
+                  'Real-time Alerts',
+                ],
               },
               {
                 icon: BarChart3,
-                title: "Analytics & Reporting",
-                description: "Comprehensive analytics, real-time dashboards, and custom reporting tools.",
-                color: "text-orange-600",
-                bgColor: "bg-orange-50",
-                features: ["Real-time Charts", "Activity Feeds", "Custom Reports", "Performance Metrics"]
+                title: 'Analytics & Reporting',
+                description:
+                  'Comprehensive analytics, real-time dashboards, and custom reporting tools.',
+                color: 'text-orange-600',
+                bgColor: 'bg-orange-50',
+                features: [
+                  'Real-time Charts',
+                  'Activity Feeds',
+                  'Custom Reports',
+                  'Performance Metrics',
+                ],
               },
               {
                 icon: Layers,
-                title: "Bulk Operations",
-                description: "Efficient bulk processing for import, export, and mass operations.",
-                color: "text-indigo-600",
-                bgColor: "bg-indigo-50",
-                features: ["CSV Import/Export", "Bulk QR Generation", "Mass Assignment", "Data Validation"]
+                title: 'Bulk Operations',
+                description: 'Efficient bulk processing for import, export, and mass operations.',
+                color: 'text-indigo-600',
+                bgColor: 'bg-indigo-50',
+                features: [
+                  'CSV Import/Export',
+                  'Bulk QR Generation',
+                  'Mass Assignment',
+                  'Data Validation',
+                ],
               },
               {
                 icon: Settings,
-                title: "System Administration",
-                description: "Advanced administration tools, debugging, and system monitoring.",
-                color: "text-red-600",
-                bgColor: "bg-red-50",
-                features: ["Database Management", "Auth Debug", "System Status", "Environment Tools"]
-              }
+                title: 'System Administration',
+                description: 'Advanced administration tools, debugging, and system monitoring.',
+                color: 'text-red-600',
+                bgColor: 'bg-red-50',
+                features: [
+                  'Database Management',
+                  'Auth Debug',
+                  'System Status',
+                  'Environment Tools',
+                ],
+              },
             ].map((feature, index) => (
-              <Card key={index} className={`${feature.bgColor} border-0 hover:shadow-lg transition-shadow`}>
+              <Card
+                key={index}
+                className={`${feature.bgColor} border-0 hover:shadow-lg transition-shadow`}
+              >
                 <CardHeader>
                   <feature.icon className={`h-12 w-12 ${feature.color} mb-4`} />
                   <CardTitle className="text-xl">{feature.title}</CardTitle>
@@ -216,7 +259,9 @@ export default function HomePage() {
       {/* CTA Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Transform Your Asset Management?</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Ready to Transform Your Asset Management?
+          </h2>
           <p className="text-xl text-gray-600 mb-8">
             Join organizations using AssetTracker Pro to streamline their operations.
           </p>

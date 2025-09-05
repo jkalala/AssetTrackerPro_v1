@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Copy, ExternalLink, CheckCircle, Settings, Github } from "lucide-react"
-import Link from "next/link"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Copy, ExternalLink, CheckCircle, Settings, Github } from 'lucide-react'
+import Link from 'next/link'
 
 export default function GitHubOAuthSetupPage() {
   const copyToClipboard = (text: string) => {
@@ -35,8 +35,14 @@ export default function GitHubOAuthSetupPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Client ID</label>
               <div className="flex items-center gap-2">
-                <code className="bg-gray-100 px-2 py-1 rounded text-sm flex-1">Ov23lipMb8831rUNvsJR</code>
-                <Button size="sm" variant="outline" onClick={() => copyToClipboard("Ov23lipMb8831rUNvsJR")}>
+                <code className="bg-gray-100 px-2 py-1 rounded text-sm flex-1">
+                  Ov23lipMb8831rUNvsJR
+                </code>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard('Ov23lipMb8831rUNvsJR')}
+                >
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
@@ -50,7 +56,7 @@ export default function GitHubOAuthSetupPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => copyToClipboard("97c8805c06fa9b6589b8d33848a0835873fd2f98")}
+                  onClick={() => copyToClipboard('97c8805c06fa9b6589b8d33848a0835873fd2f98')}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -61,8 +67,14 @@ export default function GitHubOAuthSetupPage() {
           <div className="space-y-2">
             <label className="text-sm font-medium">Production URL</label>
             <div className="flex items-center gap-2">
-              <code className="bg-gray-100 px-2 py-1 rounded text-sm flex-1">https://cloudeleavepro.vercel.app</code>
-              <Button size="sm" variant="outline" onClick={() => copyToClipboard("https://cloudeleavepro.vercel.app")}>
+              <code className="bg-gray-100 px-2 py-1 rounded text-sm flex-1">
+                https://cloudeleavepro.vercel.app
+              </code>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => copyToClipboard('https://cloudeleavepro.vercel.app')}
+              >
                 <Copy className="h-4 w-4" />
               </Button>
             </div>
@@ -85,7 +97,7 @@ export default function GitHubOAuthSetupPage() {
           <CardContent className="space-y-4">
             <ol className="list-decimal list-inside space-y-3 text-sm">
               <li>
-                Go to your{" "}
+                Go to your{' '}
                 <a
                   href="https://supabase.com/dashboard"
                   target="_blank"
@@ -106,7 +118,11 @@ export default function GitHubOAuthSetupPage() {
                 Enter the Client ID:
                 <div className="mt-1 flex items-center gap-2">
                   <code className="bg-gray-100 px-2 py-1 rounded">Ov23lipMb8831rUNvsJR</code>
-                  <Button size="sm" variant="outline" onClick={() => copyToClipboard("Ov23lipMb8831rUNvsJR")}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => copyToClipboard('Ov23lipMb8831rUNvsJR')}
+                  >
                     <Copy className="h-4 w-4" />
                   </Button>
                 </div>
@@ -114,11 +130,13 @@ export default function GitHubOAuthSetupPage() {
               <li>
                 Enter the Client Secret:
                 <div className="mt-1 flex items-center gap-2">
-                  <code className="bg-gray-100 px-2 py-1 rounded">97c8805c06fa9b6589b8d33848a0835873fd2f98</code>
+                  <code className="bg-gray-100 px-2 py-1 rounded">
+                    97c8805c06fa9b6589b8d33848a0835873fd2f98
+                  </code>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => copyToClipboard("97c8805c06fa9b6589b8d33848a0835873fd2f98")}
+                    onClick={() => copyToClipboard('97c8805c06fa9b6589b8d33848a0835873fd2f98')}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -127,11 +145,15 @@ export default function GitHubOAuthSetupPage() {
               <li>
                 Set the Redirect URL to:
                 <div className="mt-1 flex items-center gap-2">
-                  <code className="bg-gray-100 px-2 py-1 rounded">https://cloudeleavepro.vercel.app/auth/callback</code>
+                  <code className="bg-gray-100 px-2 py-1 rounded">
+                    https://cloudeleavepro.vercel.app/auth/callback
+                  </code>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => copyToClipboard("https://cloudeleavepro.vercel.app/auth/callback")}
+                    onClick={() =>
+                      copyToClipboard('https://cloudeleavepro.vercel.app/auth/callback')
+                    }
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -155,7 +177,7 @@ export default function GitHubOAuthSetupPage() {
           <CardContent className="space-y-4">
             <ol className="list-decimal list-inside space-y-3 text-sm">
               <li>
-                Go to{" "}
+                Go to{' '}
                 <a
                   href="https://github.com/settings/developers"
                   target="_blank"
@@ -172,11 +194,13 @@ export default function GitHubOAuthSetupPage() {
               <li>
                 Set the <strong>Homepage URL</strong> to:
                 <div className="mt-1 flex items-center gap-2">
-                  <code className="bg-gray-100 px-2 py-1 rounded">https://cloudeleavepro.vercel.app</code>
+                  <code className="bg-gray-100 px-2 py-1 rounded">
+                    https://cloudeleavepro.vercel.app
+                  </code>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => copyToClipboard("https://cloudeleavepro.vercel.app")}
+                    onClick={() => copyToClipboard('https://cloudeleavepro.vercel.app')}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -185,11 +209,15 @@ export default function GitHubOAuthSetupPage() {
               <li>
                 Set the <strong>Authorization callback URL</strong> to:
                 <div className="mt-1 flex items-center gap-2">
-                  <code className="bg-gray-100 px-2 py-1 rounded">https://cloudeleavepro.vercel.app/auth/callback</code>
+                  <code className="bg-gray-100 px-2 py-1 rounded">
+                    https://cloudeleavepro.vercel.app/auth/callback
+                  </code>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => copyToClipboard("https://cloudeleavepro.vercel.app/auth/callback")}
+                    onClick={() =>
+                      copyToClipboard('https://cloudeleavepro.vercel.app/auth/callback')
+                    }
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -283,7 +311,11 @@ export default function GitHubOAuthSetupPage() {
               </a>
             </Button>
             <Button asChild variant="outline">
-              <a href="https://github.com/settings/developers" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://github.com/settings/developers"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Github className="h-4 w-4 mr-2" />
                 GitHub OAuth Apps
               </a>

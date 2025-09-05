@@ -1,24 +1,24 @@
-"use client"
+'use client'
 
-import { useEffect, useState, useRef } from "react"
-import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { LogOut, Upload, User, Mail, Building2, Loader2 } from "lucide-react"
-import SignOutButton from "@/components/auth/sign-out-button"
+import { useEffect, useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { LogOut, Upload, User, Mail, Building2, Loader2 } from 'lucide-react'
+import SignOutButton from '@/components/auth/sign-out-button'
 
 export default function ProfileSettings() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
-  const [fullName, setFullName] = useState("")
-  const [avatarUrl, setAvatarUrl] = useState("")
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState('')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
@@ -30,19 +30,25 @@ export default function ProfileSettings() {
 
   const fetchProfile = async () => {
     setLoading(true)
-    setError("")
-    const { data: { user } } = await supabase.auth.getUser()
+    setError('')
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
     if (!user) {
-      router.push("/login")
+      router.push('/login')
       return
     }
-    const { data, error } = await supabase.from("profiles").select("*", { count: "exact" }).eq("id", user.id).single()
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact' })
+      .eq('id', user.id)
+      .single()
     if (error) {
-      setError("Failed to load profile.")
+      setError('Failed to load profile.')
     } else {
       setProfile(data)
-      setFullName(data.full_name || "")
-      setAvatarUrl(data.avatar_url || "")
+      setFullName(data.full_name || '')
+      setAvatarUrl(data.avatar_url || '')
     }
     setLoading(false)
   }
@@ -53,50 +59,59 @@ export default function ProfileSettings() {
     setAvatarFile(file)
     // Optionally preview
     const reader = new FileReader()
-    reader.onload = (ev) => {
+    reader.onload = ev => {
       if (ev.target?.result) setAvatarUrl(ev.target.result as string)
     }
     reader.readAsDataURL(file)
   }
 
   const uploadAvatar = async (file: File) => {
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
     if (!user) return null
     const fileExt = file.name.split('.').pop()
     const filePath = `avatars/${user.id}.${fileExt}`
-    const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, file, { upsert: true })
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, { upsert: true })
     if (uploadError) {
-      setError("Failed to upload avatar.")
+      setError('Failed to upload avatar.')
       return null
     }
-    const { data } = supabase.storage.from("avatars").getPublicUrl(filePath)
+    const { data } = supabase.storage.from('avatars').getPublicUrl(filePath)
     return data.publicUrl
   }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
-    setError("")
-    setSuccess("")
+    setError('')
+    setSuccess('')
     let newAvatarUrl = avatarUrl
     if (avatarFile) {
       const url = await uploadAvatar(avatarFile)
       if (url) newAvatarUrl = url
     }
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
     if (!user) {
-      setError("Not authenticated.")
+      setError('Not authenticated.')
       setSaving(false)
       return
     }
-    const { error: updateError } = await supabase.from("profiles").update({
-      full_name: fullName,
-      avatar_url: newAvatarUrl
-    }).eq("id", user.id)
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        full_name: fullName,
+        avatar_url: newAvatarUrl,
+      })
+      .eq('id', user.id)
     if (updateError) {
-      setError("Failed to update profile.")
+      setError('Failed to update profile.')
     } else {
-      setSuccess("Profile updated successfully.")
+      setSuccess('Profile updated successfully.')
       setAvatarFile(null)
     }
     setSaving(false)
@@ -159,7 +174,7 @@ export default function ProfileSettings() {
                   id="fullName"
                   type="text"
                   value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  onChange={e => setFullName(e.target.value)}
                   className="mt-1"
                   required
                 />
@@ -167,11 +182,21 @@ export default function ProfileSettings() {
             </div>
             <div>
               <Label>Email</Label>
-              <Input type="email" value={profile?.email || ""} readOnly className="mt-1 bg-gray-100" />
+              <Input
+                type="email"
+                value={profile?.email || ''}
+                readOnly
+                className="mt-1 bg-gray-100"
+              />
             </div>
             <div>
               <Label>Organization</Label>
-              <Input type="text" value={profile?.tenant_id || ""} readOnly className="mt-1 bg-gray-100" />
+              <Input
+                type="text"
+                value={profile?.tenant_id || ''}
+                readOnly
+                className="mt-1 bg-gray-100"
+              />
             </div>
             {/* Password change could be added here */}
             <div className="flex justify-between items-center pt-4">
@@ -186,4 +211,4 @@ export default function ProfileSettings() {
       </Card>
     </div>
   )
-} 
+}

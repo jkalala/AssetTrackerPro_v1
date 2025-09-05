@@ -9,10 +9,11 @@ function pointInPolygon(point: [number, number], polygon: [number, number][][]):
   let inside = false
   for (const ring of polygon) {
     for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-      const xi = ring[i][0], yi = ring[i][1]
-      const xj = ring[j][0], yj = ring[j][1]
-      const intersect = ((yi > y) !== (yj > y)) &&
-        (x < (xj - xi) * (y - yi) / (yj - yi + 0.0000001) + xi)
+      const xi = ring[i][0],
+        yi = ring[i][1]
+      const xj = ring[j][0],
+        yj = ring[j][1]
+      const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi + 0.0000001) + xi
       if (intersect) inside = !inside
     }
   }
@@ -72,13 +73,16 @@ async function main() {
     })
     // For each geofence, check if an entry/exit event needs to be logged
     for (const zone of geofences) {
-      const wasInside = recentEvents?.some(ev => ev.asset_id === asset.id && ev.geofence_id === zone.id && ev.event_type === 'entry')
+      const wasInside = recentEvents?.some(
+        ev => ev.asset_id === asset.id && ev.geofence_id === zone.id && ev.event_type === 'entry'
+      )
       const isInside = insideZones.some(z => z.id === zone.id)
       // Find matching rules for this asset/zone
-      const matchingRules = rules.filter(rule =>
-        rule.geofence_id === zone.id &&
-        (rule.asset_id ? rule.asset_id === asset.id : true) &&
-        (rule.category ? rule.category === asset.category : true)
+      const matchingRules = rules.filter(
+        rule =>
+          rule.geofence_id === zone.id &&
+          (rule.asset_id ? rule.asset_id === asset.id : true) &&
+          (rule.category ? rule.category === asset.category : true)
       )
       if (isInside && !wasInside) {
         // Log entry event
@@ -91,8 +95,14 @@ async function main() {
         // Check for entry rules
         for (const rule of matchingRules.filter(r => r.trigger_event === 'entry')) {
           // Trigger notification (replace with real notification util if available)
-          if (rule.notify_in_app) console.log(`[IN-APP] Geofence rule triggered: Asset ${asset.asset_id} entered ${zone.name} (Escalation: ${rule.escalation_level})`)
-          if (rule.notify_email) console.log(`[EMAIL] Geofence rule triggered: Asset ${asset.asset_id} entered ${zone.name} (Escalation: ${rule.escalation_level})`)
+          if (rule.notify_in_app)
+            console.log(
+              `[IN-APP] Geofence rule triggered: Asset ${asset.asset_id} entered ${zone.name} (Escalation: ${rule.escalation_level})`
+            )
+          if (rule.notify_email)
+            console.log(
+              `[EMAIL] Geofence rule triggered: Asset ${asset.asset_id} entered ${zone.name} (Escalation: ${rule.escalation_level})`
+            )
         }
       } else if (!isInside && wasInside) {
         // Log exit event
@@ -106,12 +116,18 @@ async function main() {
         for (const rule of matchingRules.filter(r => r.trigger_event === 'exit')) {
           // For min_duration, you would check the last entry event timestamp and compare
           // For now, just trigger notification
-          if (rule.notify_in_app) console.log(`[IN-APP] Geofence rule triggered: Asset ${asset.asset_id} exited ${zone.name} (Escalation: ${rule.escalation_level})`)
-          if (rule.notify_email) console.log(`[EMAIL] Geofence rule triggered: Asset ${asset.asset_id} exited ${zone.name} (Escalation: ${rule.escalation_level})`)
+          if (rule.notify_in_app)
+            console.log(
+              `[IN-APP] Geofence rule triggered: Asset ${asset.asset_id} exited ${zone.name} (Escalation: ${rule.escalation_level})`
+            )
+          if (rule.notify_email)
+            console.log(
+              `[EMAIL] Geofence rule triggered: Asset ${asset.asset_id} exited ${zone.name} (Escalation: ${rule.escalation_level})`
+            )
         }
       }
     }
   }
 }
 
-main().catch(console.error) 
+main().catch(console.error)

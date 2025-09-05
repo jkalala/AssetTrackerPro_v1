@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Progress } from "@/components/ui/progress"
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Progress } from '@/components/ui/progress'
 import {
   CheckCircle,
   ArrowRight,
@@ -30,42 +30,42 @@ import {
   Smartphone,
   Monitor,
   Wifi,
-} from "lucide-react"
+} from 'lucide-react'
 
 const quickStartSteps = [
   {
     id: 1,
-    title: "Complete Profile Setup",
-    description: "Set up your account with organization details",
-    time: "2 minutes",
+    title: 'Complete Profile Setup',
+    description: 'Set up your account with organization details',
+    time: '2 minutes',
     completed: false,
   },
   {
     id: 2,
-    title: "Add Your First Asset",
-    description: "Create your first asset entry in the system",
-    time: "3 minutes",
+    title: 'Add Your First Asset',
+    description: 'Create your first asset entry in the system',
+    time: '3 minutes',
     completed: false,
   },
   {
     id: 3,
-    title: "Generate QR Code",
-    description: "Create a QR code for easy asset tracking",
-    time: "1 minute",
+    title: 'Generate QR Code',
+    description: 'Create a QR code for easy asset tracking',
+    time: '1 minute',
     completed: false,
   },
   {
     id: 4,
-    title: "Scan QR Code",
-    description: "Test the scanning functionality",
-    time: "1 minute",
+    title: 'Scan QR Code',
+    description: 'Test the scanning functionality',
+    time: '1 minute',
     completed: false,
   },
   {
     id: 5,
-    title: "View Dashboard Analytics",
-    description: "Explore your asset management dashboard",
-    time: "2 minutes",
+    title: 'View Dashboard Analytics',
+    description: 'Explore your asset management dashboard',
+    time: '2 minutes',
     completed: false,
   },
 ]
@@ -73,82 +73,86 @@ const quickStartSteps = [
 const systemFeatures = [
   {
     icon: Package,
-    title: "Asset Management",
+    title: 'Asset Management',
     description:
-      "Create, organize, and track all your physical and digital assets with detailed information and lifecycle management.",
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
+      'Create, organize, and track all your physical and digital assets with detailed information and lifecycle management.',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50',
   },
   {
     icon: QrCode,
-    title: "QR Code System",
+    title: 'QR Code System',
     description:
-      "Generate unique QR codes for instant asset identification, bulk operations, and mobile scanning capabilities.",
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
+      'Generate unique QR codes for instant asset identification, bulk operations, and mobile scanning capabilities.',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
   },
   {
     icon: BarChart3,
-    title: "Real-time Analytics",
+    title: 'Real-time Analytics',
     description:
-      "Monitor performance with live dashboards, custom reports, and comprehensive data visualization tools.",
-    color: "text-orange-600",
-    bgColor: "bg-orange-50",
+      'Monitor performance with live dashboards, custom reports, and comprehensive data visualization tools.',
+    color: 'text-orange-600',
+    bgColor: 'bg-orange-50',
   },
   {
     icon: Users,
-    title: "Team Collaboration",
-    description: "Work together with role-based access, permission controls, activity tracking, and team workflows.",
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-50",
+    title: 'Team Collaboration',
+    description:
+      'Work together with role-based access, permission controls, activity tracking, and team workflows.',
+    color: 'text-indigo-600',
+    bgColor: 'bg-indigo-50',
   },
   {
     icon: Shield,
-    title: "Security & Compliance",
-    description: "Enterprise-grade security with audit logs, compliance reporting, and data protection features.",
-    color: "text-green-600",
-    bgColor: "bg-green-50",
+    title: 'Security & Compliance',
+    description:
+      'Enterprise-grade security with audit logs, compliance reporting, and data protection features.',
+    color: 'text-green-600',
+    bgColor: 'bg-green-50',
   },
   {
     icon: Globe,
-    title: "Cloud-Based Platform",
+    title: 'Cloud-Based Platform',
     description:
-      "Access your assets from anywhere with our secure, scalable cloud infrastructure and offline capabilities.",
-    color: "text-cyan-600",
-    bgColor: "bg-cyan-50",
+      'Access your assets from anywhere with our secure, scalable cloud infrastructure and offline capabilities.',
+    color: 'text-cyan-600',
+    bgColor: 'bg-cyan-50',
   },
 ]
 
 const benefits = [
   {
     icon: Zap,
-    title: "Improved Efficiency",
+    title: 'Improved Efficiency',
     description:
-      "Reduce time spent searching for assets and streamline operations with automated workflows and smart notifications.",
-    stats: "75% faster asset location",
+      'Reduce time spent searching for assets and streamline operations with automated workflows and smart notifications.',
+    stats: '75% faster asset location',
   },
   {
     icon: Shield,
-    title: "Better Security",
+    title: 'Better Security',
     description:
-      "Track asset movement, prevent loss or theft with real-time alerts, and maintain comprehensive audit trails.",
-    stats: "90% reduction in asset loss",
+      'Track asset movement, prevent loss or theft with real-time alerts, and maintain comprehensive audit trails.',
+    stats: '90% reduction in asset loss',
   },
   {
     icon: BarChart3,
-    title: "Data-Driven Decisions",
+    title: 'Data-Driven Decisions',
     description:
-      "Make informed decisions with comprehensive analytics, predictive insights, and customizable reporting.",
-    stats: "3x better asset utilization",
+      'Make informed decisions with comprehensive analytics, predictive insights, and customizable reporting.',
+    stats: '3x better asset utilization',
   },
 ]
 
 export default function GettingStartedPage() {
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
-  const [activeTab, setActiveTab] = useState("overview")
+  const [activeTab, setActiveTab] = useState('overview')
 
   const toggleStep = (stepId: number) => {
-    setCompletedSteps((prev) => (prev.includes(stepId) ? prev.filter((id) => id !== stepId) : [...prev, stepId]))
+    setCompletedSteps(prev =>
+      prev.includes(stepId) ? prev.filter(id => id !== stepId) : [...prev, stepId]
+    )
   }
 
   const progress = (completedSteps.length / quickStartSteps.length) * 100
@@ -189,8 +193,9 @@ export default function GettingStartedPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Welcome to your Asset Management System! This comprehensive guide will help you get up and running quickly
-            and efficiently with all the tools you need to manage your assets professionally.
+            Welcome to your Asset Management System! This comprehensive guide will help you get up
+            and running quickly and efficiently with all the tools you need to manage your assets
+            professionally.
           </motion.p>
         </div>
       </motion.div>
@@ -228,8 +233,8 @@ export default function GettingStartedPage() {
                     key={step.id}
                     className={`flex items-center space-x-4 p-4 rounded-lg border transition-all duration-200 cursor-pointer ${
                       completedSteps.includes(step.id)
-                        ? "bg-green-100 border-green-300"
-                        : "bg-white border-green-200 hover:bg-green-50"
+                        ? 'bg-green-100 border-green-300'
+                        : 'bg-white border-green-200 hover:bg-green-50'
                     }`}
                     onClick={() => toggleStep(step.id)}
                     whileHover={{ scale: 1.01 }}
@@ -240,10 +245,16 @@ export default function GettingStartedPage() {
                   >
                     <div
                       className={`rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm ${
-                        completedSteps.includes(step.id) ? "bg-green-600 text-white" : "bg-green-200 text-green-800"
+                        completedSteps.includes(step.id)
+                          ? 'bg-green-600 text-white'
+                          : 'bg-green-200 text-green-800'
                       }`}
                     >
-                      {completedSteps.includes(step.id) ? <CheckCircle className="h-5 w-5" /> : step.id}
+                      {completedSteps.includes(step.id) ? (
+                        <CheckCircle className="h-5 w-5" />
+                      ) : (
+                        step.id
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="font-semibold text-slate-900">{step.title}</div>
@@ -259,19 +270,34 @@ export default function GettingStartedPage() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-5 bg-white shadow-sm">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger
+              value="overview"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            >
               Overview
             </TabsTrigger>
-            <TabsTrigger value="setup" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger
+              value="setup"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            >
               Setup
             </TabsTrigger>
-            <TabsTrigger value="first-asset" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger
+              value="first-asset"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            >
               First Asset
             </TabsTrigger>
-            <TabsTrigger value="qr-codes" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger
+              value="qr-codes"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            >
               QR Codes
             </TabsTrigger>
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsTrigger
+              value="dashboard"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            >
               Dashboard
             </TabsTrigger>
           </TabsList>
@@ -293,11 +319,14 @@ export default function GettingStartedPage() {
                 </CardHeader>
                 <CardContent className="space-y-8">
                   <div>
-                    <h3 className="text-xl font-semibold mb-4 text-slate-900">What is Asset Management?</h3>
+                    <h3 className="text-xl font-semibold mb-4 text-slate-900">
+                      What is Asset Management?
+                    </h3>
                     <p className="text-slate-600 mb-6 leading-relaxed text-lg">
-                      Asset management is the systematic approach to tracking, maintaining, and optimizing your
-                      organization's physical and digital assets throughout their lifecycle. Our comprehensive system
-                      provides you with powerful tools to streamline operations, reduce costs, and improve efficiency.
+                      Asset management is the systematic approach to tracking, maintaining, and
+                      optimizing your organization's physical and digital assets throughout their
+                      lifecycle. Our comprehensive system provides you with powerful tools to
+                      streamline operations, reduce costs, and improve efficiency.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -359,7 +388,9 @@ export default function GettingStartedPage() {
                       >
                         <feature.icon className={`h-10 w-10 ${feature.color} mb-4`} />
                         <h4 className="font-semibold text-slate-900 mb-2">{feature.title}</h4>
-                        <p className="text-sm text-slate-600 leading-relaxed">{feature.description}</p>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          {feature.description}
+                        </p>
                       </motion.div>
                     ))}
                   </div>
@@ -387,9 +418,14 @@ export default function GettingStartedPage() {
                         <div className="bg-gradient-to-br from-blue-100 to-purple-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                           <benefit.icon className="h-10 w-10 text-blue-600" />
                         </div>
-                        <h4 className="font-semibold mb-3 text-slate-900 text-lg">{benefit.title}</h4>
+                        <h4 className="font-semibold mb-3 text-slate-900 text-lg">
+                          {benefit.title}
+                        </h4>
                         <p className="text-slate-600 mb-3 leading-relaxed">{benefit.description}</p>
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
+                        <Badge
+                          variant="outline"
+                          className="bg-green-50 text-green-700 border-green-300"
+                        >
                           {benefit.stats}
                         </Badge>
                       </motion.div>
@@ -418,8 +454,8 @@ export default function GettingStartedPage() {
                   <Alert className="border-blue-200 bg-blue-50">
                     <Lightbulb className="h-4 w-4 text-blue-600" />
                     <AlertDescription className="text-blue-800">
-                      <strong>Pro Tip:</strong> Complete your profile setup first to ensure all features work correctly
-                      and to personalize your experience.
+                      <strong>Pro Tip:</strong> Complete your profile setup first to ensure all
+                      features work correctly and to personalize your experience.
                     </AlertDescription>
                   </Alert>
 
@@ -428,10 +464,13 @@ export default function GettingStartedPage() {
                       className="border-l-4 border-blue-500 pl-6 py-4 bg-blue-50 rounded-r-lg"
                       whileHover={{ x: 4 }}
                     >
-                      <h4 className="font-semibold text-blue-900 text-lg mb-2">Step 1: Complete Your Profile</h4>
+                      <h4 className="font-semibold text-blue-900 text-lg mb-2">
+                        Step 1: Complete Your Profile
+                      </h4>
                       <p className="text-blue-800 mb-4 leading-relaxed">
-                        Add your name, organization details, contact information, and preferences. This helps
-                        personalize your experience and enables team collaboration features.
+                        Add your name, organization details, contact information, and preferences.
+                        This helps personalize your experience and enables team collaboration
+                        features.
                       </p>
                       <div className="space-y-2 mb-4">
                         <div className="text-sm text-blue-700">
@@ -444,7 +483,11 @@ export default function GettingStartedPage() {
                           <li>• Timezone and language preferences</li>
                         </ul>
                       </div>
-                      <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                      >
                         <Settings className="h-4 w-4 mr-2" />
                         Go to Profile Settings
                       </Button>
@@ -458,12 +501,14 @@ export default function GettingStartedPage() {
                         Step 2: Configure System Preferences
                       </h4>
                       <p className="text-green-800 mb-4 leading-relaxed">
-                        Set your timezone, notification preferences, default asset categories, and security settings to
-                        match your organization's needs.
+                        Set your timezone, notification preferences, default asset categories, and
+                        security settings to match your organization's needs.
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
-                          <div className="text-sm font-medium text-green-800">General Settings:</div>
+                          <div className="text-sm font-medium text-green-800">
+                            General Settings:
+                          </div>
                           <ul className="text-sm text-green-700 space-y-1 mt-1">
                             <li>• Timezone configuration</li>
                             <li>• Date and time formats</li>
@@ -491,8 +536,8 @@ export default function GettingStartedPage() {
                         Step 3: Invite Team Members (Optional)
                       </h4>
                       <p className="text-purple-800 mb-4 leading-relaxed">
-                        Add team members and assign appropriate roles and permissions. Set up departments and access
-                        levels for better organization.
+                        Add team members and assign appropriate roles and permissions. Set up
+                        departments and access levels for better organization.
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div className="text-center p-3 bg-white rounded-lg">
@@ -619,17 +664,20 @@ export default function GettingStartedPage() {
               {/* First Asset Content */}
               <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-slate-900 text-2xl">Creating Your First Asset</CardTitle>
+                  <CardTitle className="text-slate-900 text-2xl">
+                    Creating Your First Asset
+                  </CardTitle>
                   <CardDescription className="text-slate-600 text-lg">
-                    Learn how to add and configure your first asset in the system with best practices
+                    Learn how to add and configure your first asset in the system with best
+                    practices
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-8">
                   <Alert className="border-green-200 bg-green-50">
                     <Package className="h-4 w-4 text-green-600" />
                     <AlertDescription className="text-green-800">
-                      <strong>Getting Started:</strong> Start with a simple asset like a laptop, office chair, or piece
-                      of equipment to get familiar with the process.
+                      <strong>Getting Started:</strong> Start with a simple asset like a laptop,
+                      office chair, or piece of equipment to get familiar with the process.
                     </AlertDescription>
                   </Alert>
 
@@ -637,27 +685,29 @@ export default function GettingStartedPage() {
                     {[
                       {
                         step: 1,
-                        title: "Navigate to Add Asset",
-                        description: "Access the asset creation form from your dashboard or navigation menu.",
+                        title: 'Navigate to Add Asset',
+                        description:
+                          'Access the asset creation form from your dashboard or navigation menu.',
                         details:
                           "Click the prominent 'Add Asset' button in your dashboard, or use the main navigation menu to access the asset creation form. The form is designed to be intuitive and guide you through each step.",
-                        color: "blue",
+                        color: 'blue',
                       },
                       {
                         step: 2,
-                        title: "Fill in Asset Details",
-                        description: "Provide essential and optional information about your asset.",
+                        title: 'Fill in Asset Details',
+                        description: 'Provide essential and optional information about your asset.',
                         details:
-                          "Complete the required fields and add any additional information that will help you track and manage the asset effectively.",
-                        color: "green",
+                          'Complete the required fields and add any additional information that will help you track and manage the asset effectively.',
+                        color: 'green',
                       },
                       {
                         step: 3,
-                        title: "Save and Generate QR Code",
-                        description: "Complete the asset creation and optionally generate a QR code.",
+                        title: 'Save and Generate QR Code',
+                        description:
+                          'Complete the asset creation and optionally generate a QR code.',
                         details:
                           "After saving, you can immediately generate a QR code for easy tracking and access the asset's detailed information page.",
-                        color: "purple",
+                        color: 'purple',
                       },
                     ].map((step, index) => (
                       <motion.div
@@ -673,7 +723,9 @@ export default function GettingStartedPage() {
                           {step.step}
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-semibold text-slate-900 text-lg mb-2">{step.title}</h4>
+                          <h4 className="font-semibold text-slate-900 text-lg mb-2">
+                            {step.title}
+                          </h4>
                           <p className="text-slate-600 mb-3 leading-relaxed">{step.description}</p>
                           <p className="text-sm text-slate-500 leading-relaxed">{step.details}</p>
                           {step.step === 1 && (
@@ -694,13 +746,25 @@ export default function GettingStartedPage() {
                       <div className="space-y-3">
                         {[
                           {
-                            field: "Asset Name",
-                            desc: "Descriptive and unique identifier",
-                            example: "MacBook Pro 16-inch #001",
+                            field: 'Asset Name',
+                            desc: 'Descriptive and unique identifier',
+                            example: 'MacBook Pro 16-inch #001',
                           },
-                          { field: "Category", desc: "Choose from predefined categories", example: "IT Equipment" },
-                          { field: "Location", desc: "Current physical location", example: "Office A - Desk 12" },
-                          { field: "Status", desc: "Current operational status", example: "Active, In Use" },
+                          {
+                            field: 'Category',
+                            desc: 'Choose from predefined categories',
+                            example: 'IT Equipment',
+                          },
+                          {
+                            field: 'Location',
+                            desc: 'Current physical location',
+                            example: 'Office A - Desk 12',
+                          },
+                          {
+                            field: 'Status',
+                            desc: 'Current operational status',
+                            example: 'Active, In Use',
+                          },
                         ].map((item, index) => (
                           <motion.div
                             key={index}
@@ -709,7 +773,9 @@ export default function GettingStartedPage() {
                           >
                             <div className="font-medium text-slate-900">{item.field}</div>
                             <div className="text-sm text-slate-600 mt-1">{item.desc}</div>
-                            <div className="text-xs text-blue-600 mt-2 font-medium">Example: {item.example}</div>
+                            <div className="text-xs text-blue-600 mt-2 font-medium">
+                              Example: {item.example}
+                            </div>
                           </motion.div>
                         ))}
                       </div>
@@ -719,15 +785,35 @@ export default function GettingStartedPage() {
                       <div className="space-y-3">
                         {[
                           {
-                            field: "Description",
-                            desc: "Detailed asset information",
-                            example: "Company laptop for development team",
+                            field: 'Description',
+                            desc: 'Detailed asset information',
+                            example: 'Company laptop for development team',
                           },
-                          { field: "Purchase Value", desc: "Original purchase price", example: "$2,500.00" },
-                          { field: "Purchase Date", desc: "Date of acquisition", example: "2024-01-15" },
-                          { field: "Serial Number", desc: "Manufacturer serial number", example: "ABC123XYZ789" },
-                          { field: "Warranty Info", desc: "Warranty expiration date", example: "2027-01-15" },
-                          { field: "Supplier", desc: "Vendor or supplier name", example: "Tech Solutions Inc." },
+                          {
+                            field: 'Purchase Value',
+                            desc: 'Original purchase price',
+                            example: '$2,500.00',
+                          },
+                          {
+                            field: 'Purchase Date',
+                            desc: 'Date of acquisition',
+                            example: '2024-01-15',
+                          },
+                          {
+                            field: 'Serial Number',
+                            desc: 'Manufacturer serial number',
+                            example: 'ABC123XYZ789',
+                          },
+                          {
+                            field: 'Warranty Info',
+                            desc: 'Warranty expiration date',
+                            example: '2027-01-15',
+                          },
+                          {
+                            field: 'Supplier',
+                            desc: 'Vendor or supplier name',
+                            example: 'Tech Solutions Inc.',
+                          },
                         ].map((item, index) => (
                           <motion.div
                             key={index}
@@ -736,7 +822,9 @@ export default function GettingStartedPage() {
                           >
                             <div className="font-medium text-slate-900">{item.field}</div>
                             <div className="text-sm text-slate-600 mt-1">{item.desc}</div>
-                            <div className="text-xs text-purple-600 mt-2 font-medium">Example: {item.example}</div>
+                            <div className="text-xs text-purple-600 mt-2 font-medium">
+                              Example: {item.example}
+                            </div>
                           </motion.div>
                         ))}
                       </div>
@@ -745,23 +833,29 @@ export default function GettingStartedPage() {
 
                   {/* Asset Categories */}
                   <div className="bg-slate-50 p-6 rounded-xl">
-                    <h5 className="font-semibold mb-4 text-slate-900 text-lg">Available Asset Categories</h5>
+                    <h5 className="font-semibold mb-4 text-slate-900 text-lg">
+                      Available Asset Categories
+                    </h5>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {[
-                        "IT Equipment",
-                        "Furniture",
-                        "Vehicles",
-                        "Tools",
-                        "AV Equipment",
-                        "Office Supplies",
-                        "Machinery",
-                        "Medical Equipment",
-                        "Safety Equipment",
-                        "Software Licenses",
-                        "Real Estate",
-                        "Other",
+                        'IT Equipment',
+                        'Furniture',
+                        'Vehicles',
+                        'Tools',
+                        'AV Equipment',
+                        'Office Supplies',
+                        'Machinery',
+                        'Medical Equipment',
+                        'Safety Equipment',
+                        'Software Licenses',
+                        'Real Estate',
+                        'Other',
                       ].map((category, index) => (
-                        <motion.div key={index} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        <motion.div
+                          key={index}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
                           <Badge
                             variant="outline"
                             className="w-full justify-center py-2 hover:bg-blue-50 hover:border-blue-300 cursor-pointer"
@@ -778,7 +872,9 @@ export default function GettingStartedPage() {
               {/* Best Practices */}
               <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-slate-900">Best Practices for Asset Creation</CardTitle>
+                  <CardTitle className="text-slate-900">
+                    Best Practices for Asset Creation
+                  </CardTitle>
                   <CardDescription className="text-slate-600">
                     Follow these guidelines to maintain consistent and effective asset management
                   </CardDescription>
@@ -789,20 +885,20 @@ export default function GettingStartedPage() {
                       <h5 className="font-medium text-green-800 text-lg">✅ Do's</h5>
                       {[
                         {
-                          title: "Use Descriptive Names",
-                          desc: "Include model, brand, or unique identifiers in asset names for easy identification",
+                          title: 'Use Descriptive Names',
+                          desc: 'Include model, brand, or unique identifiers in asset names for easy identification',
                         },
                         {
-                          title: "Consistent Categorization",
-                          desc: "Use consistent categories to make searching and filtering easier across your organization",
+                          title: 'Consistent Categorization',
+                          desc: 'Use consistent categories to make searching and filtering easier across your organization',
                         },
                         {
-                          title: "Include Serial Numbers",
-                          desc: "Add serial numbers or unique identifiers in the description for warranty and support purposes",
+                          title: 'Include Serial Numbers',
+                          desc: 'Add serial numbers or unique identifiers in the description for warranty and support purposes',
                         },
                         {
-                          title: "Regular Updates",
-                          desc: "Keep asset information current by updating status, location, and condition regularly",
+                          title: 'Regular Updates',
+                          desc: 'Keep asset information current by updating status, location, and condition regularly',
                         },
                       ].map((item, index) => (
                         <motion.div
@@ -824,19 +920,19 @@ export default function GettingStartedPage() {
                       <h5 className="font-medium text-red-800 text-lg">❌ Don'ts</h5>
                       {[
                         {
-                          title: "Avoid Generic Names",
+                          title: 'Avoid Generic Names',
                           desc: "Don't use vague names like 'Laptop 1' - be specific about model and purpose",
                         },
                         {
-                          title: "Skip Important Details",
+                          title: 'Skip Important Details',
                           desc: "Don't leave critical fields empty - complete information helps with tracking and reporting",
                         },
                         {
-                          title: "Inconsistent Categories",
-                          desc: "Avoid creating new categories unnecessarily - use existing ones for better organization",
+                          title: 'Inconsistent Categories',
+                          desc: 'Avoid creating new categories unnecessarily - use existing ones for better organization',
                         },
                         {
-                          title: "Forget Location Updates",
+                          title: 'Forget Location Updates',
                           desc: "Don't forget to update asset locations when they're moved between departments or offices",
                         },
                       ].map((item, index) => (
@@ -884,9 +980,10 @@ export default function GettingStartedPage() {
                         What are QR Codes?
                       </h4>
                       <p className="text-slate-600 mb-4 leading-relaxed">
-                        QR (Quick Response) codes are two-dimensional barcodes that can store comprehensive information
-                        about your assets. When scanned with any smartphone or tablet, they instantly provide access to
-                        detailed asset information, location history, and management options.
+                        QR (Quick Response) codes are two-dimensional barcodes that can store
+                        comprehensive information about your assets. When scanned with any
+                        smartphone or tablet, they instantly provide access to detailed asset
+                        information, location history, and management options.
                       </p>
                       <div className="space-y-3">
                         <h5 className="font-medium text-slate-900">Key Benefits:</h5>
@@ -918,7 +1015,9 @@ export default function GettingStartedPage() {
                       <div className="w-40 h-40 bg-white border-2 border-dashed border-purple-300 rounded-lg flex items-center justify-center mx-auto mb-4">
                         <QrCode className="h-20 w-20 text-purple-400" />
                       </div>
-                      <p className="text-center text-sm text-purple-700 font-medium">Sample QR Code</p>
+                      <p className="text-center text-sm text-purple-700 font-medium">
+                        Sample QR Code
+                      </p>
                       <p className="text-center text-xs text-purple-600 mt-2">
                         Each asset gets a unique QR code linking to its detailed information page
                       </p>
@@ -927,17 +1026,19 @@ export default function GettingStartedPage() {
 
                   {/* QR Code Generation Process */}
                   <div className="space-y-6">
-                    <h4 className="font-semibold text-slate-900 text-lg">How to Generate QR Codes</h4>
+                    <h4 className="font-semibold text-slate-900 text-lg">
+                      How to Generate QR Codes
+                    </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-4">
                         <h5 className="font-medium text-slate-900">Individual QR Codes</h5>
                         <div className="space-y-3">
                           {[
-                            "Navigate to your asset details page",
+                            'Navigate to your asset details page',
                             "Click the 'Generate QR Code' button",
-                            "Choose size and format options (PNG, SVG, PDF)",
-                            "Download the QR code image",
-                            "Print and attach to the physical asset",
+                            'Choose size and format options (PNG, SVG, PDF)',
+                            'Download the QR code image',
+                            'Print and attach to the physical asset',
                           ].map((step, index) => (
                             <motion.div
                               key={index}
@@ -958,11 +1059,11 @@ export default function GettingStartedPage() {
                         <h5 className="font-medium text-slate-900">Bulk QR Generation</h5>
                         <div className="space-y-3">
                           {[
-                            "Go to QR Management page from the main menu",
-                            "Select multiple assets using checkboxes",
+                            'Go to QR Management page from the main menu',
+                            'Select multiple assets using checkboxes',
                             "Click 'Generate QR Codes' for bulk operation",
-                            "Choose template and formatting options",
-                            "Download as ZIP file containing all codes",
+                            'Choose template and formatting options',
+                            'Download as ZIP file containing all codes',
                           ].map((step, index) => (
                             <motion.div
                               key={index}
@@ -985,8 +1086,9 @@ export default function GettingStartedPage() {
                   <Alert className="border-purple-200 bg-purple-50">
                     <QrCode className="h-4 w-4 text-purple-600" />
                     <AlertDescription className="text-purple-800">
-                      <strong>QR Code Formats:</strong> Available in PNG (web use), SVG (high-quality printing), and PDF
-                      (professional labels). SVG format is recommended for the best print quality and scalability.
+                      <strong>QR Code Formats:</strong> Available in PNG (web use), SVG
+                      (high-quality printing), and PDF (professional labels). SVG format is
+                      recommended for the best print quality and scalability.
                     </AlertDescription>
                   </Alert>
                 </CardContent>
@@ -1006,21 +1108,24 @@ export default function GettingStartedPage() {
                       {[
                         {
                           icon: Smartphone,
-                          title: "Built-in Scanner",
-                          description: "Use the app's built-in QR scanner for best results and full feature access",
-                          color: "blue",
+                          title: 'Built-in Scanner',
+                          description:
+                            "Use the app's built-in QR scanner for best results and full feature access",
+                          color: 'blue',
                         },
                         {
                           icon: Monitor,
-                          title: "Camera App",
-                          description: "Most smartphone cameras can scan QR codes directly without additional apps",
-                          color: "green",
+                          title: 'Camera App',
+                          description:
+                            'Most smartphone cameras can scan QR codes directly without additional apps',
+                          color: 'green',
                         },
                         {
                           icon: Download,
-                          title: "Third-party Apps",
-                          description: "Compatible with popular QR scanner apps available on app stores",
-                          color: "purple",
+                          title: 'Third-party Apps',
+                          description:
+                            'Compatible with popular QR scanner apps available on app stores',
+                          color: 'purple',
                         },
                       ].map((method, index) => (
                         <motion.div
@@ -1037,13 +1142,17 @@ export default function GettingStartedPage() {
                             <method.icon className={`h-6 w-6 text-${method.color}-600`} />
                           </div>
                           <h5 className="font-medium text-slate-900 mb-2">{method.title}</h5>
-                          <p className="text-sm text-slate-600 leading-relaxed">{method.description}</p>
+                          <p className="text-sm text-slate-600 leading-relaxed">
+                            {method.description}
+                          </p>
                         </motion.div>
                       ))}
                     </div>
 
                     <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
-                      <h5 className="font-medium text-blue-900 mb-3 text-lg">What Happens When You Scan?</h5>
+                      <h5 className="font-medium text-blue-900 mb-3 text-lg">
+                        What Happens When You Scan?
+                      </h5>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <ul className="space-y-2 text-sm text-blue-800">
                           <li className="flex items-center">
@@ -1091,7 +1200,9 @@ export default function GettingStartedPage() {
               {/* Dashboard Overview */}
               <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-slate-900 text-2xl">Understanding Your Dashboard</CardTitle>
+                  <CardTitle className="text-slate-900 text-2xl">
+                    Understanding Your Dashboard
+                  </CardTitle>
                   <CardDescription className="text-slate-600 text-lg">
                     Navigate and interpret your asset management dashboard for maximum efficiency
                   </CardDescription>
@@ -1106,23 +1217,23 @@ export default function GettingStartedPage() {
                       <div className="space-y-4">
                         {[
                           {
-                            title: "Total Assets",
-                            desc: "Complete count of all assets in your system across all categories and locations",
+                            title: 'Total Assets',
+                            desc: 'Complete count of all assets in your system across all categories and locations',
                             icon: Package,
                           },
                           {
-                            title: "Active Assets",
-                            desc: "Assets currently in use, available for deployment, or in active rotation",
+                            title: 'Active Assets',
+                            desc: 'Assets currently in use, available for deployment, or in active rotation',
                             icon: CheckCircle,
                           },
                           {
-                            title: "QR Code Coverage",
-                            desc: "Percentage of assets with generated QR codes for tracking and identification",
+                            title: 'QR Code Coverage',
+                            desc: 'Percentage of assets with generated QR codes for tracking and identification',
                             icon: QrCode,
                           },
                           {
-                            title: "Recent Activity",
-                            desc: "Latest asset movements, updates, scans, and system interactions",
+                            title: 'Recent Activity',
+                            desc: 'Latest asset movements, updates, scans, and system interactions',
                             icon: Clock,
                           },
                         ].map((metric, index) => (
@@ -1138,7 +1249,9 @@ export default function GettingStartedPage() {
                               <metric.icon className="h-5 w-5 text-orange-600 mr-2" />
                               <div className="font-medium text-slate-900">{metric.title}</div>
                             </div>
-                            <div className="text-xs text-slate-600 leading-relaxed">{metric.desc}</div>
+                            <div className="text-xs text-slate-600 leading-relaxed">
+                              {metric.desc}
+                            </div>
                           </motion.div>
                         ))}
                       </div>
@@ -1147,21 +1260,36 @@ export default function GettingStartedPage() {
                       <h4 className="font-semibold mb-4 text-slate-900 text-lg">Quick Actions</h4>
                       <div className="space-y-3">
                         {[
-                          { icon: Package, label: "Add New Asset", desc: "Create a new asset entry", color: "blue" },
-                          { icon: QrCode, label: "Scan QR Code", desc: "Scan asset QR codes", color: "purple" },
+                          {
+                            icon: Package,
+                            label: 'Add New Asset',
+                            desc: 'Create a new asset entry',
+                            color: 'blue',
+                          },
+                          {
+                            icon: QrCode,
+                            label: 'Scan QR Code',
+                            desc: 'Scan asset QR codes',
+                            color: 'purple',
+                          },
                           {
                             icon: BarChart3,
-                            label: "View Analytics",
-                            desc: "Access detailed reports",
-                            color: "orange",
+                            label: 'View Analytics',
+                            desc: 'Access detailed reports',
+                            color: 'orange',
                           },
                           {
                             icon: Users,
-                            label: "Manage Team",
-                            desc: "User and permission management",
-                            color: "indigo",
+                            label: 'Manage Team',
+                            desc: 'User and permission management',
+                            color: 'indigo',
                           },
-                          { icon: Download, label: "Export Data", desc: "Download reports and data", color: "green" },
+                          {
+                            icon: Download,
+                            label: 'Export Data',
+                            desc: 'Download reports and data',
+                            color: 'green',
+                          },
                         ].map((action, index) => (
                           <motion.div
                             key={index}
@@ -1191,31 +1319,43 @@ export default function GettingStartedPage() {
 
                   {/* Dashboard Sections */}
                   <div>
-                    <h4 className="font-semibold mb-6 text-slate-900 text-lg">Dashboard Sections</h4>
+                    <h4 className="font-semibold mb-6 text-slate-900 text-lg">
+                      Dashboard Sections
+                    </h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       {[
                         {
-                          title: "Asset Overview",
+                          title: 'Asset Overview',
                           description:
-                            "Summary cards showing key metrics, statistics, and performance indicators about your assets",
+                            'Summary cards showing key metrics, statistics, and performance indicators about your assets',
                           features: [
-                            "Total asset count",
-                            "Category breakdown",
-                            "Status distribution",
-                            "Value summaries",
+                            'Total asset count',
+                            'Category breakdown',
+                            'Status distribution',
+                            'Value summaries',
                           ],
                         },
                         {
-                          title: "Recent Activity",
+                          title: 'Recent Activity',
                           description:
-                            "Live feed of recent asset additions, updates, QR code scans, and system interactions",
-                          features: ["Asset movements", "Status changes", "QR code scans", "User activities"],
+                            'Live feed of recent asset additions, updates, QR code scans, and system interactions',
+                          features: [
+                            'Asset movements',
+                            'Status changes',
+                            'QR code scans',
+                            'User activities',
+                          ],
                         },
                         {
-                          title: "Analytics & Reports",
+                          title: 'Analytics & Reports',
                           description:
-                            "Interactive charts, graphs, and data visualizations for asset performance analysis",
-                          features: ["Usage trends", "Location analytics", "Performance metrics", "Custom reports"],
+                            'Interactive charts, graphs, and data visualizations for asset performance analysis',
+                          features: [
+                            'Usage trends',
+                            'Location analytics',
+                            'Performance metrics',
+                            'Custom reports',
+                          ],
                         },
                       ].map((section, index) => (
                         <motion.div
@@ -1227,10 +1367,15 @@ export default function GettingStartedPage() {
                           transition={{ delay: index * 0.1 }}
                         >
                           <h5 className="font-semibold text-slate-900 mb-3">{section.title}</h5>
-                          <p className="text-sm text-slate-600 mb-4 leading-relaxed">{section.description}</p>
+                          <p className="text-sm text-slate-600 mb-4 leading-relaxed">
+                            {section.description}
+                          </p>
                           <ul className="space-y-1">
                             {section.features.map((feature, featureIndex) => (
-                              <li key={featureIndex} className="text-xs text-slate-500 flex items-center">
+                              <li
+                                key={featureIndex}
+                                className="text-xs text-slate-500 flex items-center"
+                              >
                                 <CheckCircle className="h-3 w-3 text-green-600 mr-2" />
                                 {feature}
                               </li>
@@ -1254,8 +1399,9 @@ export default function GettingStartedPage() {
                 <CardContent>
                   <div className="space-y-6">
                     <p className="text-slate-600 leading-relaxed">
-                      Your dashboard provides real-time insights into your asset management operations, updating
-                      automatically as your team uses the system throughout the day.
+                      Your dashboard provides real-time insights into your asset management
+                      operations, updating automatically as your team uses the system throughout the
+                      day.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -1306,8 +1452,9 @@ export default function GettingStartedPage() {
                     <Alert className="border-blue-200 bg-blue-50">
                       <BarChart3 className="h-4 w-4 text-blue-600" />
                       <AlertDescription className="text-blue-800">
-                        <strong>Real-time Updates:</strong> Analytics update automatically as you use the system. No
-                        need to refresh the page - data flows seamlessly to provide current insights!
+                        <strong>Real-time Updates:</strong> Analytics update automatically as you
+                        use the system. No need to refresh the page - data flows seamlessly to
+                        provide current insights!
                       </AlertDescription>
                     </Alert>
                   </div>
@@ -1327,35 +1474,36 @@ export default function GettingStartedPage() {
             <CardHeader>
               <CardTitle className="text-slate-900 text-2xl">Next Steps</CardTitle>
               <CardDescription className="text-slate-600 text-lg">
-                Now that you understand the basics, here's what to do next to maximize your system's potential
+                Now that you understand the basics, here's what to do next to maximize your system's
+                potential
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
                   {
-                    title: "Explore Advanced Features",
-                    desc: "Learn about bulk operations, integrations, and automation",
+                    title: 'Explore Advanced Features',
+                    desc: 'Learn about bulk operations, integrations, and automation',
                     icon: Rocket,
-                    color: "blue",
+                    color: 'blue',
                   },
                   {
-                    title: "Set Up Team Access",
-                    desc: "Invite team members and configure permissions",
+                    title: 'Set Up Team Access',
+                    desc: 'Invite team members and configure permissions',
                     icon: Users,
-                    color: "green",
+                    color: 'green',
                   },
                   {
-                    title: "Configure Notifications",
-                    desc: "Set up alerts for important events and maintenance",
+                    title: 'Configure Notifications',
+                    desc: 'Set up alerts for important events and maintenance',
                     icon: Settings,
-                    color: "purple",
+                    color: 'purple',
                   },
                   {
-                    title: "View Video Tutorials",
-                    desc: "Watch step-by-step video guides and best practices",
+                    title: 'View Video Tutorials',
+                    desc: 'Watch step-by-step video guides and best practices',
                     icon: Video,
-                    color: "orange",
+                    color: 'orange',
                   },
                 ].map((step, index) => (
                   <motion.div
@@ -1366,7 +1514,10 @@ export default function GettingStartedPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <Button variant="outline" className="h-auto p-4 justify-start w-full hover:bg-white/80">
+                    <Button
+                      variant="outline"
+                      className="h-auto p-4 justify-start w-full hover:bg-white/80"
+                    >
                       <step.icon className={`h-5 w-5 mr-3 text-${step.color}-600`} />
                       <div className="text-left flex-1">
                         <div className="font-semibold text-slate-900">{step.title}</div>

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server'
 
 const assetSchema = {
   type: 'object',
@@ -13,8 +13,8 @@ const assetSchema = {
     created_at: { type: 'string', format: 'date-time' },
     updated_at: { type: 'string', format: 'date-time' },
     // ...add more fields as needed
-  }
-};
+  },
+}
 
 const userSchema = {
   type: 'object',
@@ -25,8 +25,8 @@ const userSchema = {
     avatar_url: { type: 'string' },
     role: { type: 'string' },
     created_at: { type: 'string', format: 'date-time' },
-  }
-};
+  },
+}
 
 const analyticsResponseSchema = {
   type: 'object',
@@ -41,11 +41,11 @@ const analyticsResponseSchema = {
           asset_id: { type: 'string' },
           name: { type: 'string' },
           created_at: { type: 'string', format: 'date-time' },
-        }
-      }
-    }
-  }
-};
+        },
+      },
+    },
+  },
+}
 
 const webhookRequestSchema = {
   type: 'object',
@@ -54,12 +54,12 @@ const webhookRequestSchema = {
     events: {
       type: 'array',
       items: { type: 'string' },
-      description: 'List of event types to subscribe to.'
+      description: 'List of event types to subscribe to.',
     },
-    secret: { type: 'string', description: 'Secret for signing payloads.' }
+    secret: { type: 'string', description: 'Secret for signing payloads.' },
   },
-  required: ['url', 'events']
-};
+  required: ['url', 'events'],
+}
 
 const webhookResponseSchema = {
   type: 'object',
@@ -67,16 +67,16 @@ const webhookResponseSchema = {
     webhook_id: { type: 'string' },
     url: { type: 'string', format: 'uri' },
     events: { type: 'array', items: { type: 'string' } },
-    created_at: { type: 'string', format: 'date-time' }
-  }
-};
+    created_at: { type: 'string', format: 'date-time' },
+  },
+}
 
 const errorResponse = {
   type: 'object',
   properties: {
-    error: { type: 'string' }
-  }
-};
+    error: { type: 'string' },
+  },
+}
 
 // Minimal OpenAPI spec for the external assets endpoint
 const openApiSpec = {
@@ -84,11 +84,9 @@ const openApiSpec = {
   info: {
     title: 'AssetPro External API',
     version: '1.0.0',
-    description: 'API for accessing assets and users by tenant using API keys.'
+    description: 'API for accessing assets and users by tenant using API keys.',
   },
-  servers: [
-    { url: '/api/external' }
-  ],
+  servers: [{ url: '/api/external' }],
   paths: {
     '/assets': {
       get: {
@@ -102,16 +100,25 @@ const openApiSpec = {
                 schema: {
                   type: 'object',
                   properties: {
-                    data: { type: 'array', items: assetSchema }
-                  }
-                }
-              }
-            }
+                    data: { type: 'array', items: assetSchema },
+                  },
+                },
+              },
+            },
           },
-          401: { description: 'Unauthorized', content: { 'application/json': { schema: errorResponse } } },
-          429: { description: 'Rate limit exceeded', content: { 'application/json': { schema: errorResponse } } },
-          500: { description: 'Server error', content: { 'application/json': { schema: errorResponse } } }
-        }
+          401: {
+            description: 'Unauthorized',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          429: {
+            description: 'Rate limit exceeded',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          500: {
+            description: 'Server error',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+        },
       },
       post: {
         summary: 'Create a new asset',
@@ -120,9 +127,9 @@ const openApiSpec = {
           required: true,
           content: {
             'application/json': {
-              schema: assetSchema
-            }
-          }
+              schema: assetSchema,
+            },
+          },
         },
         responses: {
           200: {
@@ -131,18 +138,33 @@ const openApiSpec = {
               'application/json': {
                 schema: {
                   type: 'object',
-                  properties: { data: assetSchema }
-                }
-              }
-            }
+                  properties: { data: assetSchema },
+                },
+              },
+            },
           },
-          400: { description: 'Invalid input', content: { 'application/json': { schema: errorResponse } } },
-          401: { description: 'Unauthorized', content: { 'application/json': { schema: errorResponse } } },
-          403: { description: 'Forbidden', content: { 'application/json': { schema: errorResponse } } },
-          429: { description: 'Rate limit exceeded', content: { 'application/json': { schema: errorResponse } } },
-          500: { description: 'Server error', content: { 'application/json': { schema: errorResponse } } }
-        }
-      }
+          400: {
+            description: 'Invalid input',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          401: {
+            description: 'Unauthorized',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          403: {
+            description: 'Forbidden',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          429: {
+            description: 'Rate limit exceeded',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          500: {
+            description: 'Server error',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+        },
+      },
     },
     '/assets/{assetId}': {
       get: {
@@ -153,8 +175,8 @@ const openApiSpec = {
             in: 'path',
             required: true,
             schema: { type: 'string' },
-            description: 'Asset ID'
-          }
+            description: 'Asset ID',
+          },
         ],
         security: [{ ApiKeyAuth: [] }],
         responses: {
@@ -164,17 +186,29 @@ const openApiSpec = {
               'application/json': {
                 schema: {
                   type: 'object',
-                  properties: { data: assetSchema }
-                }
-              }
-            }
+                  properties: { data: assetSchema },
+                },
+              },
+            },
           },
-          401: { description: 'Unauthorized', content: { 'application/json': { schema: errorResponse } } },
-          404: { description: 'Asset not found', content: { 'application/json': { schema: errorResponse } } },
-          429: { description: 'Rate limit exceeded', content: { 'application/json': { schema: errorResponse } } },
-          500: { description: 'Server error', content: { 'application/json': { schema: errorResponse } } }
-        }
-      }
+          401: {
+            description: 'Unauthorized',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          404: {
+            description: 'Asset not found',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          429: {
+            description: 'Rate limit exceeded',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          500: {
+            description: 'Server error',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+        },
+      },
     },
     '/users': {
       get: {
@@ -188,17 +222,26 @@ const openApiSpec = {
                 schema: {
                   type: 'object',
                   properties: {
-                    data: { type: 'array', items: userSchema }
-                  }
-                }
-              }
-            }
+                    data: { type: 'array', items: userSchema },
+                  },
+                },
+              },
+            },
           },
-          401: { description: 'Unauthorized', content: { 'application/json': { schema: errorResponse } } },
-          429: { description: 'Rate limit exceeded', content: { 'application/json': { schema: errorResponse } } },
-          500: { description: 'Server error', content: { 'application/json': { schema: errorResponse } } }
-        }
-      }
+          401: {
+            description: 'Unauthorized',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          429: {
+            description: 'Rate limit exceeded',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          500: {
+            description: 'Server error',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+        },
+      },
     },
     '/analytics': {
       get: {
@@ -209,16 +252,28 @@ const openApiSpec = {
             description: 'Analytics summary',
             content: {
               'application/json': {
-                schema: analyticsResponseSchema
-              }
-            }
+                schema: analyticsResponseSchema,
+              },
+            },
           },
-          401: { description: 'Unauthorized', content: { 'application/json': { schema: errorResponse } } },
-          403: { description: 'Analytics not enabled', content: { 'application/json': { schema: errorResponse } } },
-          429: { description: 'Rate limit exceeded', content: { 'application/json': { schema: errorResponse } } },
-          500: { description: 'Server error', content: { 'application/json': { schema: errorResponse } } }
-        }
-      }
+          401: {
+            description: 'Unauthorized',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          403: {
+            description: 'Analytics not enabled',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          429: {
+            description: 'Rate limit exceeded',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          500: {
+            description: 'Server error',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+        },
+      },
     },
     '/webhooks': {
       post: {
@@ -228,26 +283,38 @@ const openApiSpec = {
           required: true,
           content: {
             'application/json': {
-              schema: webhookRequestSchema
-            }
-          }
+              schema: webhookRequestSchema,
+            },
+          },
         },
         responses: {
           200: {
             description: 'Webhook registered',
             content: {
               'application/json': {
-                schema: webhookResponseSchema
-              }
-            }
+                schema: webhookResponseSchema,
+              },
+            },
           },
-          400: { description: 'Invalid input', content: { 'application/json': { schema: errorResponse } } },
-          401: { description: 'Unauthorized', content: { 'application/json': { schema: errorResponse } } },
-          429: { description: 'Rate limit exceeded', content: { 'application/json': { schema: errorResponse } } },
-          500: { description: 'Server error', content: { 'application/json': { schema: errorResponse } } }
-        }
-      }
-    }
+          400: {
+            description: 'Invalid input',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          401: {
+            description: 'Unauthorized',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          429: {
+            description: 'Rate limit exceeded',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          500: {
+            description: 'Server error',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+        },
+      },
+    },
   },
   components: {
     securitySchemes: {
@@ -255,12 +322,12 @@ const openApiSpec = {
         type: 'apiKey',
         in: 'header',
         name: 'Authorization',
-        description: 'Use Bearer <API_KEY>'
-      }
-    }
-  }
-};
+        description: 'Use Bearer <API_KEY>',
+      },
+    },
+  },
+}
 
 export async function GET() {
-  return NextResponse.json(openApiSpec);
-} 
+  return NextResponse.json(openApiSpec)
+}

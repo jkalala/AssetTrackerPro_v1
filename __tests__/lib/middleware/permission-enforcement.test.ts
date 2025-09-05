@@ -7,20 +7,24 @@ import { NextRequest } from 'next/server'
 import { RoleValidationMiddleware, PERMISSIONS } from '@/lib/middleware/role-validation'
 import { PermissionService } from '@/lib/services/permission-service'
 import { globalPermissionCache } from '@/lib/utils/permission-cache'
-import { DataPermissionFilter, filterAssetsByPermissions, globalDataFilter } from '@/lib/utils/data-permission-filters'
+import {
+  DataPermissionFilter,
+  filterAssetsByPermissions,
+  globalDataFilter,
+} from '@/lib/utils/data-permission-filters'
 
 // Mock dependencies
 jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(() => ({
     auth: {
-      getUser: jest.fn()
+      getUser: jest.fn(),
     },
     from: jest.fn().mockReturnThis(),
     select: jest.fn().mockReturnThis(),
     eq: jest.fn().mockReturnThis(),
     single: jest.fn().mockReturnThis(),
-    rpc: jest.fn().mockReturnThis()
-  }))
+    rpc: jest.fn().mockReturnThis(),
+  })),
 }))
 
 jest.mock('@/lib/services/permission-service')
@@ -32,7 +36,9 @@ describe('RoleValidationMiddleware', () => {
   beforeEach(() => {
     middleware = new RoleValidationMiddleware()
     mockPermissionService = new PermissionService() as jest.Mocked<PermissionService>
-    ;(middleware as unknown as { permissionService: jest.Mocked<PermissionService> }).permissionService = mockPermissionService
+    ;(
+      middleware as unknown as { permissionService: jest.Mocked<PermissionService> }
+    ).permissionService = mockPermissionService
   })
 
   afterEach(() => {
@@ -44,30 +50,29 @@ describe('RoleValidationMiddleware', () => {
       const mockRequest = {
         nextUrl: { pathname: '/api/assets' },
         method: 'GET',
-        headers: new Map([['user-agent', 'test-agent']])
+        headers: new Map([['user-agent', 'test-agent']]),
       } as unknown as NextRequest
 
       // Mock user context extraction
-      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest.fn().mockResolvedValue({
-        userId: 'user-123',
-        tenantId: 'tenant-123',
-        role: 'admin',
-        sessionId: 'session-123',
-        email: 'test@example.com'
-      })
+      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest
+        .fn()
+        .mockResolvedValue({
+          userId: 'user-123',
+          tenantId: 'tenant-123',
+          role: 'admin',
+          sessionId: 'session-123',
+          email: 'test@example.com',
+        })
 
       // Mock permission check
       mockPermissionService.checkMultiplePermissions.mockResolvedValue({
         'read:asset': {
           granted: true,
-          source: 'direct'
-        }
+          source: 'direct',
+        },
       })
 
-      const result = await middleware.validateApiRoute(
-        mockRequest,
-        [PERMISSIONS.ASSETS.READ]
-      )
+      const result = await middleware.validateApiRoute(mockRequest, [PERMISSIONS.ASSETS.READ])
 
       expect(result.valid).toBe(true)
       expect(result.userContext).toBeDefined()
@@ -78,28 +83,27 @@ describe('RoleValidationMiddleware', () => {
       const mockRequest = {
         nextUrl: { pathname: '/api/assets' },
         method: 'DELETE',
-        headers: new Map()
+        headers: new Map(),
       } as unknown as NextRequest
 
-      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest.fn().mockResolvedValue({
-        userId: 'user-123',
-        tenantId: 'tenant-123',
-        role: 'user',
-        sessionId: 'session-123',
-        email: 'test@example.com'
-      })
+      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest
+        .fn()
+        .mockResolvedValue({
+          userId: 'user-123',
+          tenantId: 'tenant-123',
+          role: 'user',
+          sessionId: 'session-123',
+          email: 'test@example.com',
+        })
 
       mockPermissionService.checkMultiplePermissions.mockResolvedValue({
         'delete:asset': {
           granted: false,
-          reason: 'Permission not found'
-        }
+          reason: 'Permission not found',
+        },
       })
 
-      const result = await middleware.validateApiRoute(
-        mockRequest,
-        [PERMISSIONS.ASSETS.DELETE]
-      )
+      const result = await middleware.validateApiRoute(mockRequest, [PERMISSIONS.ASSETS.DELETE])
 
       expect(result.valid).toBe(false)
       expect(result.reason).toContain('Missing required permissions')
@@ -109,15 +113,14 @@ describe('RoleValidationMiddleware', () => {
       const mockRequest = {
         nextUrl: { pathname: '/api/assets' },
         method: 'GET',
-        headers: new Map()
+        headers: new Map(),
       } as unknown as NextRequest
 
-      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest.fn().mockResolvedValue(null)
+      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest
+        .fn()
+        .mockResolvedValue(null)
 
-      const result = await middleware.validateApiRoute(
-        mockRequest,
-        [PERMISSIONS.ASSETS.READ]
-      )
+      const result = await middleware.validateApiRoute(mockRequest, [PERMISSIONS.ASSETS.READ])
 
       expect(result.valid).toBe(false)
       expect(result.reason).toBe('User not authenticated')
@@ -127,26 +130,28 @@ describe('RoleValidationMiddleware', () => {
       const mockRequest = {
         nextUrl: { pathname: '/api/assets' },
         method: 'POST',
-        headers: new Map()
+        headers: new Map(),
       } as unknown as NextRequest
 
-      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest.fn().mockResolvedValue({
-        userId: 'user-123',
-        tenantId: 'tenant-123',
-        role: 'manager',
-        sessionId: 'session-123',
-        email: 'test@example.com'
-      })
+      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest
+        .fn()
+        .mockResolvedValue({
+          userId: 'user-123',
+          tenantId: 'tenant-123',
+          role: 'manager',
+          sessionId: 'session-123',
+          email: 'test@example.com',
+        })
 
       mockPermissionService.checkMultiplePermissions.mockResolvedValue({
         'create:asset': {
           granted: false,
-          reason: 'Permission not found'
+          reason: 'Permission not found',
         },
         'manage:asset': {
           granted: true,
-          source: 'inherited'
-        }
+          source: 'inherited',
+        },
       })
 
       const result = await middleware.validateApiRoute(
@@ -162,26 +167,28 @@ describe('RoleValidationMiddleware', () => {
       const mockRequest = {
         nextUrl: { pathname: '/api/assets/transfer' },
         method: 'POST',
-        headers: new Map()
+        headers: new Map(),
       } as unknown as NextRequest
 
-      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest.fn().mockResolvedValue({
-        userId: 'user-123',
-        tenantId: 'tenant-123',
-        role: 'manager',
-        sessionId: 'session-123',
-        email: 'test@example.com'
-      })
+      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest
+        .fn()
+        .mockResolvedValue({
+          userId: 'user-123',
+          tenantId: 'tenant-123',
+          role: 'manager',
+          sessionId: 'session-123',
+          email: 'test@example.com',
+        })
 
       mockPermissionService.checkMultiplePermissions.mockResolvedValue({
         'update:asset': {
           granted: true,
-          source: 'direct'
+          source: 'direct',
         },
         'transfer:asset': {
           granted: false,
-          reason: 'Permission not found'
-        }
+          reason: 'Permission not found',
+        },
       })
 
       const result = await middleware.validateApiRoute(
@@ -200,22 +207,24 @@ describe('RoleValidationMiddleware', () => {
       const mockRequest = {
         nextUrl: { pathname: '/api/assets/asset-123' },
         method: 'GET',
-        headers: new Map()
+        headers: new Map(),
       } as unknown as NextRequest
 
-      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest.fn().mockResolvedValue({
-        userId: 'user-123',
-        tenantId: 'tenant-123',
-        role: 'user',
-        sessionId: 'session-123',
-        email: 'test@example.com'
-      })
+      ;(middleware as unknown as { extractUserContext: jest.Mock }).extractUserContext = jest
+        .fn()
+        .mockResolvedValue({
+          userId: 'user-123',
+          tenantId: 'tenant-123',
+          role: 'user',
+          sessionId: 'session-123',
+          email: 'test@example.com',
+        })
 
       mockPermissionService.checkMultiplePermissions.mockResolvedValue({
         'read:asset': {
           granted: true,
-          source: 'direct'
-        }
+          source: 'direct',
+        },
       })
 
       const resourceExtractor = (req: NextRequest) => {
@@ -223,11 +232,9 @@ describe('RoleValidationMiddleware', () => {
         return pathParts[pathParts.length - 1]
       }
 
-      const result = await middleware.validateApiRoute(
-        mockRequest,
-        [PERMISSIONS.ASSETS.READ],
-        { resourceIdExtractor: resourceExtractor }
-      )
+      const result = await middleware.validateApiRoute(mockRequest, [PERMISSIONS.ASSETS.READ], {
+        resourceIdExtractor: resourceExtractor,
+      })
 
       expect(result.valid).toBe(true)
       expect(mockPermissionService.checkMultiplePermissions).toHaveBeenCalledWith(
@@ -235,8 +242,8 @@ describe('RoleValidationMiddleware', () => {
         'user-123',
         expect.arrayContaining([
           expect.objectContaining({
-            resource_id: 'asset-123'
-          })
+            resource_id: 'asset-123',
+          }),
         ])
       )
     })
@@ -263,8 +270,8 @@ describe('PermissionCache', () => {
         scope: 'tenant' as const,
         conditions: {},
         resource_filters: {},
-        source: 'direct' as const
-      }
+        source: 'direct' as const,
+      },
     ]
 
     // Set permissions in cache
@@ -291,7 +298,7 @@ describe('PermissionCache', () => {
     expect(cached).toBe(granted)
   })
 
-  it('should handle cache expiration', (done) => {
+  it('should handle cache expiration', done => {
     const tenantId = 'tenant-123'
     const userId = 'user-123'
     const permissions = [
@@ -302,8 +309,8 @@ describe('PermissionCache', () => {
         scope: 'tenant' as const,
         conditions: {},
         resource_filters: {},
-        source: 'direct' as const
-      }
+        source: 'direct' as const,
+      },
     ]
 
     // Set permissions with very short TTL
@@ -330,8 +337,8 @@ describe('PermissionCache', () => {
         scope: 'tenant' as const,
         conditions: {},
         resource_filters: {},
-        source: 'direct' as const
-      }
+        source: 'direct' as const,
+      },
     ]
 
     globalPermissionCache.setUserPermissions(tenantId, userId, permissions)
@@ -360,8 +367,8 @@ describe('PermissionCache', () => {
         scope: 'tenant' as const,
         conditions: {},
         resource_filters: {},
-        source: 'direct' as const
-      }
+        source: 'direct' as const,
+      },
     ]
 
     globalPermissionCache.setUserPermissions(tenantId, userId, permissions)
@@ -382,7 +389,9 @@ describe('DataPermissionFilter', () => {
   beforeEach(() => {
     dataFilter = new DataPermissionFilter()
     mockPermissionService = new PermissionService() as jest.Mocked<PermissionService>
-    ;(dataFilter as unknown as { permissionService: jest.Mocked<PermissionService> }).permissionService = mockPermissionService
+    ;(
+      dataFilter as unknown as { permissionService: jest.Mocked<PermissionService> }
+    ).permissionService = mockPermissionService
   })
 
   describe('filterAssets', () => {
@@ -390,7 +399,7 @@ describe('DataPermissionFilter', () => {
       const assets = [
         { id: 'asset-1', assignee_id: 'user-1', department: 'IT' },
         { id: 'asset-2', assignee_id: 'user-2', department: 'HR' },
-        { id: 'asset-3', assignee_id: 'user-3', department: 'Finance' }
+        { id: 'asset-3', assignee_id: 'user-3', department: 'Finance' },
       ]
 
       mockPermissionService.getUserPermissions.mockResolvedValue([
@@ -401,15 +410,15 @@ describe('DataPermissionFilter', () => {
           scope: 'tenant',
           conditions: {},
           resource_filters: {},
-          source: 'direct'
-        }
+          source: 'direct',
+        },
       ])
 
       const result = await dataFilter.filterAssets(assets, {
         tenantId: 'tenant-123',
         userId: 'user-123',
         resourceType: 'asset',
-        action: 'read'
+        action: 'read',
       })
 
       expect(result.data).toEqual(assets)
@@ -422,7 +431,7 @@ describe('DataPermissionFilter', () => {
       const assets = [
         { id: 'asset-1', assignee_id: 'user-123', created_by: 'admin' },
         { id: 'asset-2', assignee_id: 'user-456', created_by: 'user-123' },
-        { id: 'asset-3', assignee_id: 'user-789', created_by: 'admin' }
+        { id: 'asset-3', assignee_id: 'user-789', created_by: 'admin' },
       ]
 
       mockPermissionService.getUserPermissions.mockResolvedValue([
@@ -433,15 +442,15 @@ describe('DataPermissionFilter', () => {
           scope: 'personal',
           conditions: {},
           resource_filters: {},
-          source: 'direct'
-        }
+          source: 'direct',
+        },
       ])
 
       const result = await dataFilter.filterAssets(assets, {
         tenantId: 'tenant-123',
         userId: 'user-123',
         resourceType: 'asset',
-        action: 'read'
+        action: 'read',
       })
 
       expect(result.data).toHaveLength(2)
@@ -454,7 +463,7 @@ describe('DataPermissionFilter', () => {
     it('should return empty array for users with no permissions', async () => {
       const assets = [
         { id: 'asset-1', assignee_id: 'user-1' },
-        { id: 'asset-2', assignee_id: 'user-2' }
+        { id: 'asset-2', assignee_id: 'user-2' },
       ]
 
       mockPermissionService.getUserPermissions.mockResolvedValue([])
@@ -463,7 +472,7 @@ describe('DataPermissionFilter', () => {
         tenantId: 'tenant-123',
         userId: 'user-123',
         resourceType: 'asset',
-        action: 'read'
+        action: 'read',
       })
 
       expect(result.data).toEqual([])
@@ -477,7 +486,7 @@ describe('DataPermissionFilter', () => {
       const users = [
         { id: 'user-1', tenant_id: 'tenant-123', department: 'IT' },
         { id: 'user-2', tenant_id: 'tenant-123', department: 'HR' },
-        { id: 'user-3', tenant_id: 'tenant-123', department: 'IT' }
+        { id: 'user-3', tenant_id: 'tenant-123', department: 'IT' },
       ]
 
       mockPermissionService.getUserPermissions.mockResolvedValue([
@@ -488,18 +497,20 @@ describe('DataPermissionFilter', () => {
           scope: 'department',
           conditions: {},
           resource_filters: {},
-          source: 'direct'
-        }
+          source: 'direct',
+        },
       ])
 
       // Mock user department lookup
-      ;(dataFilter as unknown as { getUserDepartment: jest.Mock }).getUserDepartment = jest.fn().mockResolvedValue('IT')
+      ;(dataFilter as unknown as { getUserDepartment: jest.Mock }).getUserDepartment = jest
+        .fn()
+        .mockResolvedValue('IT')
 
       const result = await dataFilter.filterUsers(users, {
         tenantId: 'tenant-123',
         userId: 'user-123',
         resourceType: 'user',
-        action: 'read'
+        action: 'read',
       })
 
       expect(result.data).toHaveLength(2)
@@ -517,7 +528,7 @@ describe('convenience functions', () => {
   it('should filter assets by permissions', async () => {
     const assets = [
       { id: 'asset-1', assignee_id: 'user-123', created_by: 'admin' },
-      { id: 'asset-2', assignee_id: 'user-456', created_by: 'user-123' }
+      { id: 'asset-2', assignee_id: 'user-456', created_by: 'user-123' },
     ]
 
     // Mock the global data filter
@@ -526,17 +537,12 @@ describe('convenience functions', () => {
       filtered: true,
       totalCount: 2,
       filteredCount: 1,
-      appliedFilters: ['resource_filters']
+      appliedFilters: ['resource_filters'],
     })
 
     ;(globalDataFilter.filterAssets as jest.Mock) = mockFilter
 
-    const result = await filterAssetsByPermissions(
-      assets,
-      'tenant-123',
-      'user-123',
-      'read'
-    )
+    const result = await filterAssetsByPermissions(assets, 'tenant-123', 'user-123', 'read')
 
     expect(result.data).toHaveLength(1)
     expect(result.filtered).toBe(true)
@@ -544,7 +550,7 @@ describe('convenience functions', () => {
       tenantId: 'tenant-123',
       userId: 'user-123',
       resourceType: 'asset',
-      action: 'read'
+      action: 'read',
     })
   })
 })

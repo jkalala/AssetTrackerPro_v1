@@ -1,8 +1,8 @@
-import { SupabaseDashboardGuide } from "@/components/supabase-dashboard-guide"
+import { SupabaseDashboardGuide } from '@/components/supabase-dashboard-guide'
 
 export const metadata = {
-  title: "Authentication Setup Guide",
-  description: "Configure email confirmations and GitHub OAuth for your application",
+  title: 'Authentication Setup Guide',
+  description: 'Configure email confirmations and GitHub OAuth for your application',
 }
 
 export default function AuthSetupPage() {

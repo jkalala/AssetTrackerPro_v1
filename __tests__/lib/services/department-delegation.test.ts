@@ -10,19 +10,19 @@ import { createClient } from '@/lib/supabase/server'
 
 // Mock Supabase client
 jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn()
+  createClient: jest.fn(),
 }))
 
 describe('DepartmentService', () => {
   let departmentService: DepartmentService
   let mockSupabase: {
-    from: jest.Mock;
-    select: jest.Mock;
-    insert: jest.Mock;
-    update: jest.Mock;
-    delete: jest.Mock;
-    eq: jest.Mock;
-    single: jest.Mock;
+    from: jest.Mock
+    select: jest.Mock
+    insert: jest.Mock
+    update: jest.Mock
+    delete: jest.Mock
+    eq: jest.Mock
+    single: jest.Mock
   }
 
   beforeEach(() => {
@@ -38,9 +38,8 @@ describe('DepartmentService', () => {
       order: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       or: jest.fn().mockReturnThis(),
-      in: jest.fn().mockReturnThis()
+      in: jest.fn().mockReturnThis(),
     }
-
     ;(createClient as jest.Mock).mockReturnValue(mockSupabase)
     departmentService = new DepartmentService()
   })
@@ -56,7 +55,7 @@ describe('DepartmentService', () => {
         name: 'engineering',
         display_name: 'Engineering Department',
         description: 'Software engineering team',
-        department_type: 'technical' as const
+        department_type: 'technical' as const,
       }
       const createdBy = 'user-123'
 
@@ -76,9 +75,9 @@ describe('DepartmentService', () => {
           is_active: true,
           created_by: createdBy,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         },
-        error: null
+        error: null,
       })
 
       const result = await departmentService.createDepartment(tenantId, departmentData, createdBy)
@@ -93,14 +92,14 @@ describe('DepartmentService', () => {
       const tenantId = 'tenant-123'
       const departmentData = {
         name: 'existing_dept',
-        display_name: 'Existing Department'
+        display_name: 'Existing Department',
       }
       const createdBy = 'user-123'
 
       // Mock existing department check (department exists)
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: 'existing-dept-id' },
-        error: null
+        error: null,
       })
 
       await expect(
@@ -113,7 +112,7 @@ describe('DepartmentService', () => {
       const departmentData = {
         name: 'sub_dept',
         display_name: 'Sub Department',
-        parent_department_id: 'nonexistent-parent'
+        parent_department_id: 'nonexistent-parent',
       }
       const createdBy = 'user-123'
 
@@ -135,13 +134,13 @@ describe('DepartmentService', () => {
       const departmentId = 'dept-456'
       const updates = {
         display_name: 'Updated Department Name',
-        description: 'Updated description'
+        description: 'Updated description',
       }
 
       // Mock department existence check
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: departmentId, name: 'engineering', code: 'ENG' },
-        error: null
+        error: null,
       })
 
       // Mock department update
@@ -151,9 +150,9 @@ describe('DepartmentService', () => {
           tenant_id: tenantId,
           display_name: updates.display_name,
           description: updates.description,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         },
-        error: null
+        error: null,
       })
 
       const result = await departmentService.updateDepartment(tenantId, departmentId, updates)
@@ -171,13 +170,13 @@ describe('DepartmentService', () => {
       // Mock department existence check
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: departmentId, name: 'old_name', code: 'OLD' },
-        error: null
+        error: null,
       })
 
       // Mock name conflict check (name exists)
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: 'other-dept-id' },
-        error: null
+        error: null,
       })
 
       await expect(
@@ -194,24 +193,24 @@ describe('DepartmentService', () => {
       // Mock department existence check
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: departmentId, name: 'test_dept' },
-        error: null
+        error: null,
       })
 
       // Mock no assigned users
       mockSupabase.limit.mockResolvedValueOnce({
         data: [],
-        error: null
+        error: null,
       })
 
       // Mock no child departments
       mockSupabase.limit.mockResolvedValueOnce({
         data: [],
-        error: null
+        error: null,
       })
 
       // Mock successful deletion
       mockSupabase.delete.mockResolvedValueOnce({
-        error: null
+        error: null,
       })
 
       const result = await departmentService.deleteDepartment(tenantId, departmentId)
@@ -226,18 +225,18 @@ describe('DepartmentService', () => {
       // Mock department existence check
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: departmentId, name: 'test_dept' },
-        error: null
+        error: null,
       })
 
       // Mock assigned users exist
       mockSupabase.limit.mockResolvedValueOnce({
         data: [{ id: 'user-dept-1' }],
-        error: null
+        error: null,
       })
 
-      await expect(
-        departmentService.deleteDepartment(tenantId, departmentId)
-      ).rejects.toThrow('Cannot delete department with assigned users')
+      await expect(departmentService.deleteDepartment(tenantId, departmentId)).rejects.toThrow(
+        'Cannot delete department with assigned users'
+      )
     })
   })
 
@@ -250,13 +249,13 @@ describe('DepartmentService', () => {
       // Mock department validation
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: departmentId, is_active: true },
-        error: null
+        error: null,
       })
 
       // Mock user validation
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: userId },
-        error: null
+        error: null,
       })
 
       // Mock assignment creation
@@ -267,14 +266,12 @@ describe('DepartmentService', () => {
           user_id: userId,
           department_id: departmentId,
           is_primary: false,
-          assigned_at: new Date().toISOString()
+          assigned_at: new Date().toISOString(),
         },
-        error: null
+        error: null,
       })
 
-      const result = await departmentService.assignUserToDepartment(
-        tenantId, userId, departmentId
-      )
+      const result = await departmentService.assignUserToDepartment(tenantId, userId, departmentId)
 
       expect(result).toBeDefined()
       expect(result.user_id).toBe(userId)
@@ -289,7 +286,7 @@ describe('DepartmentService', () => {
       // Mock department not found
       mockSupabase.single.mockResolvedValueOnce({
         data: null,
-        error: null
+        error: null,
       })
 
       await expect(
@@ -307,15 +304,15 @@ describe('DepartmentService', () => {
           name: 'root',
           display_name: 'Root Department',
           parent_department_id: null,
-          level: 0
+          level: 0,
         },
         {
           id: 'dept-2',
           name: 'child',
           display_name: 'Child Department',
           parent_department_id: 'dept-1',
-          level: 1
-        }
+          level: 1,
+        },
       ]
 
       // Mock getDepartments call
@@ -326,17 +323,15 @@ describe('DepartmentService', () => {
         data: [
           { department_id: 'dept-1' },
           { department_id: 'dept-1' },
-          { department_id: 'dept-2' }
+          { department_id: 'dept-2' },
         ],
-        error: null
+        error: null,
       })
 
       // Mock department roles
       mockSupabase.select.mockResolvedValueOnce({
-        data: [
-          { department_id: 'dept-1', roles: { id: 'role-1', name: 'admin' } }
-        ],
-        error: null
+        data: [{ department_id: 'dept-1', roles: { id: 'role-1', name: 'admin' } }],
+        error: null,
       })
 
       const result = await departmentService.getDepartmentHierarchy(tenantId)
@@ -352,13 +347,13 @@ describe('DepartmentService', () => {
 describe('DelegationService', () => {
   let delegationService: DelegationService
   let mockSupabase: {
-    from: jest.Mock;
-    select: jest.Mock;
-    insert: jest.Mock;
-    update: jest.Mock;
-    delete: jest.Mock;
-    eq: jest.Mock;
-    single: jest.Mock;
+    from: jest.Mock
+    select: jest.Mock
+    insert: jest.Mock
+    update: jest.Mock
+    delete: jest.Mock
+    eq: jest.Mock
+    single: jest.Mock
   }
 
   beforeEach(() => {
@@ -373,9 +368,8 @@ describe('DelegationService', () => {
       gte: jest.fn().mockReturnThis(),
       lt: jest.fn().mockReturnThis(),
       single: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis()
+      order: jest.fn().mockReturnThis(),
     }
-
     ;(createClient as jest.Mock).mockReturnValue(mockSupabase)
     delegationService = new DelegationService()
   })
@@ -388,13 +382,13 @@ describe('DelegationService', () => {
         delegatee_id: 'user-456',
         permission_names: ['read:asset', 'update:asset'],
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
-        reason: 'Temporary delegation for project'
+        reason: 'Temporary delegation for project',
       }
 
       // Mock delegatee validation
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: request.delegatee_id, email: 'delegatee@example.com' },
-        error: null
+        error: null,
       })
 
       // Mock permission validation
@@ -402,11 +396,8 @@ describe('DelegationService', () => {
 
       // Mock permission ID lookup
       mockSupabase.select.mockResolvedValueOnce({
-        data: [
-          { id: 'perm-1' },
-          { id: 'perm-2' }
-        ],
-        error: null
+        data: [{ id: 'perm-1' }, { id: 'perm-2' }],
+        error: null,
       })
 
       // Mock delegation creation
@@ -420,9 +411,9 @@ describe('DelegationService', () => {
           expires_at: request.expires_at,
           reason: request.reason,
           status: 'active',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         },
-        error: null
+        error: null,
       })
 
       const result = await delegationService.createDelegation(tenantId, delegatorId, request)
@@ -438,13 +429,13 @@ describe('DelegationService', () => {
       const delegatorId = 'user-123'
       const request = {
         delegatee_id: 'nonexistent-user',
-        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       }
 
       // Mock delegatee not found
       mockSupabase.single.mockResolvedValueOnce({
         data: null,
-        error: null
+        error: null,
       })
 
       await expect(
@@ -457,13 +448,13 @@ describe('DelegationService', () => {
       const delegatorId = 'user-123'
       const request = {
         delegatee_id: 'user-456',
-        expires_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() // Yesterday
+        expires_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
       }
 
       // Mock delegatee validation
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: request.delegatee_id, email: 'delegatee@example.com' },
-        error: null
+        error: null,
       })
 
       await expect(
@@ -483,14 +474,14 @@ describe('DelegationService', () => {
         data: {
           id: delegationId,
           delegator_id: revokedBy,
-          status: 'active'
+          status: 'active',
         },
-        error: null
+        error: null,
       })
 
       // Mock revocation update
       mockSupabase.update.mockResolvedValueOnce({
-        error: null
+        error: null,
       })
 
       const result = await delegationService.revokeDelegation(tenantId, delegationId, revokedBy)
@@ -508,9 +499,9 @@ describe('DelegationService', () => {
         data: {
           id: delegationId,
           delegator_id: 'user-123', // Different delegator
-          status: 'active'
+          status: 'active',
         },
-        error: null
+        error: null,
       })
 
       await expect(
@@ -527,13 +518,13 @@ describe('DelegationService', () => {
         email: 'guest@example.com',
         full_name: 'Guest User',
         expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
-        max_sessions: 3
+        max_sessions: 3,
       }
 
       // Mock existing guest check (no existing guest)
       mockSupabase.single.mockResolvedValueOnce({
         data: null,
-        error: null
+        error: null,
       })
 
       // Mock guest access creation
@@ -548,9 +539,9 @@ describe('DelegationService', () => {
           max_sessions: request.max_sessions,
           is_active: true,
           login_count: 0,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         },
-        error: null
+        error: null,
       })
 
       const result = await delegationService.createGuestAccess(tenantId, invitedBy, request)
@@ -566,7 +557,7 @@ describe('DelegationService', () => {
       const invitedBy = 'user-123'
       const request = {
         email: 'invalid-email',
-        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       }
 
       await expect(
@@ -579,13 +570,13 @@ describe('DelegationService', () => {
       const invitedBy = 'user-123'
       const request = {
         email: 'existing@example.com',
-        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       }
 
       // Mock existing guest check (active guest exists)
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: 'existing-guest', is_active: true },
-        error: null
+        error: null,
       })
 
       await expect(
@@ -601,7 +592,7 @@ describe('DelegationService', () => {
       // Mock cleanup update
       mockSupabase.update.mockResolvedValueOnce({
         error: null,
-        count: 5
+        count: 5,
       })
 
       const result = await delegationService.cleanupExpiredDelegations(tenantId)
@@ -621,18 +612,15 @@ describe('DelegationService', () => {
         data: [
           { status: 'active', permission_ids: ['perm-1', 'perm-2'] },
           { status: 'expired', permission_ids: ['perm-3'] },
-          { status: 'revoked', permission_ids: ['perm-4'] }
+          { status: 'revoked', permission_ids: ['perm-4'] },
         ],
-        error: null
+        error: null,
       })
 
       // Mock guest access data
       mockSupabase.select.mockResolvedValueOnce({
-        data: [
-          { id: 'guest-1' },
-          { id: 'guest-2' }
-        ],
-        error: null
+        data: [{ id: 'guest-1' }, { id: 'guest-2' }],
+        error: null,
       })
 
       const result = await delegationService.getDelegationStats(tenantId, days)

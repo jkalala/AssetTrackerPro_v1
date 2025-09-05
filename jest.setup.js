@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom"
+import '@testing-library/jest-dom'
 
 // Ensure jest is available globally
 if (typeof jest === 'undefined') {
@@ -6,13 +6,13 @@ if (typeof jest === 'undefined') {
 }
 
 // Mock Next.js router
-jest.mock("next/router", () => ({
+jest.mock('next/router', () => ({
   useRouter() {
     return {
-      route: "/",
-      pathname: "/",
+      route: '/',
+      pathname: '/',
       query: {},
-      asPath: "/",
+      asPath: '/',
       push: jest.fn(),
       pop: jest.fn(),
       reload: jest.fn(),
@@ -29,7 +29,7 @@ jest.mock("next/router", () => ({
 }))
 
 // Mock Next.js navigation
-jest.mock("next/navigation", () => ({
+jest.mock('next/navigation', () => ({
   useRouter() {
     return {
       push: jest.fn(),
@@ -44,12 +44,12 @@ jest.mock("next/navigation", () => ({
     return new URLSearchParams()
   },
   usePathname() {
-    return "/"
+    return '/'
   },
 }))
 
 // Mock Supabase
-jest.mock("@supabase/supabase-js", () => ({
+jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(() => ({
     auth: {
       getUser: jest.fn(),
@@ -71,10 +71,10 @@ jest.mock("@supabase/supabase-js", () => ({
 }))
 
 // Mock Next.js server APIs
-jest.mock("next/server", () => ({
+jest.mock('next/server', () => ({
   NextRequest: jest.fn().mockImplementation((url, options) => ({
-    url: url || "http://localhost:3000",
-    method: options?.method || "GET",
+    url: url || 'http://localhost:3000',
+    method: options?.method || 'GET',
     headers: new Map(Object.entries(options?.headers || {})),
     ...options,
   })),
@@ -87,7 +87,7 @@ jest.mock("next/server", () => ({
 }))
 
 // Mock Next.js cookies
-jest.mock("next/headers", () => ({
+jest.mock('next/headers', () => ({
   cookies: jest.fn(() => ({
     get: jest.fn(),
     set: jest.fn(),
@@ -98,7 +98,7 @@ jest.mock("next/headers", () => ({
 // Mock crypto for Node.js environment
 Object.defineProperty(global, 'crypto', {
   value: {
-    randomBytes: jest.fn((size) => Buffer.alloc(size, 'mock')),
+    randomBytes: jest.fn(size => Buffer.alloc(size, 'mock')),
     createHash: jest.fn(() => ({
       update: jest.fn().mockReturnThis(),
       digest: jest.fn(() => 'mocked-hash'),

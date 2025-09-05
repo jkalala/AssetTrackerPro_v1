@@ -1,11 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  RefreshControl,
-  Alert,
-} from 'react-native';
+import React, { useState, useEffect } from 'react'
+import { View, FlatList, StyleSheet, RefreshControl, Alert } from 'react-native'
 import {
   Card,
   Title,
@@ -19,136 +13,139 @@ import {
   Button,
   Menu,
   IconButton,
-} from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useTheme } from 'react-native-paper';
-import { assetAPI, offlineStorage } from '../services/api';
+} from 'react-native-paper'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { useTheme } from 'react-native-paper'
+import { assetAPI, offlineStorage } from '../services/api'
 
 export default function AssetsScreen({ navigation }) {
-  const theme = useTheme();
-  const [assets, setAssets] = useState([]);
-  const [filteredAssets, setFilteredAssets] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [categories, setCategories] = useState([]);
-  const [offlineMode, setOfflineMode] = useState(false);
-  const [sortMenuVisible, setSortMenuVisible] = useState(false);
-  const [sortBy, setSortBy] = useState('name');
+  const theme = useTheme()
+  const [assets, setAssets] = useState([])
+  const [filteredAssets, setFilteredAssets] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [categories, setCategories] = useState([])
+  const [offlineMode, setOfflineMode] = useState(false)
+  const [sortMenuVisible, setSortMenuVisible] = useState(false)
+  const [sortBy, setSortBy] = useState('name')
 
   useEffect(() => {
-    loadAssets();
-  }, []);
+    loadAssets()
+  }, [])
 
   useEffect(() => {
-    filterAssets();
-  }, [assets, searchQuery, selectedCategory, sortBy]);
+    filterAssets()
+  }, [assets, searchQuery, selectedCategory, sortBy])
 
   const loadAssets = async () => {
     try {
-      setLoading(true);
-      
+      setLoading(true)
+
       // Try to load from API first
       try {
-        const response = await assetAPI.getAssets();
-        const assetsData = response.assets || [];
-        setAssets(assetsData);
-        
+        const response = await assetAPI.getAssets()
+        const assetsData = response.assets || []
+        setAssets(assetsData)
+
         // Extract unique categories
-        const uniqueCategories = [...new Set(assetsData.map(asset => asset.category).filter(Boolean))];
-        setCategories(uniqueCategories);
-        
-        setOfflineMode(false);
-        
+        const uniqueCategories = [
+          ...new Set(assetsData.map(asset => asset.category).filter(Boolean)),
+        ]
+        setCategories(uniqueCategories)
+
+        setOfflineMode(false)
+
         // Store for offline use
-        await offlineStorage.storeData('assets', assetsData);
-        await offlineStorage.storeData('categories', uniqueCategories);
+        await offlineStorage.storeData('assets', assetsData)
+        await offlineStorage.storeData('categories', uniqueCategories)
       } catch (error) {
-        console.log('API unavailable, loading from offline storage');
-        setOfflineMode(true);
-        
+        console.log('API unavailable, loading from offline storage')
+        setOfflineMode(true)
+
         // Load from offline storage
-        const offlineAssets = await offlineStorage.getData('assets');
-        const offlineCategories = await offlineStorage.getData('categories');
-        
-        if (offlineAssets) setAssets(offlineAssets);
-        if (offlineCategories) setCategories(offlineCategories);
+        const offlineAssets = await offlineStorage.getData('assets')
+        const offlineCategories = await offlineStorage.getData('categories')
+
+        if (offlineAssets) setAssets(offlineAssets)
+        if (offlineCategories) setCategories(offlineCategories)
       }
     } catch (error) {
-      console.error('Error loading assets:', error);
+      console.error('Error loading assets:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const onRefresh = async () => {
-    setRefreshing(true);
-    await loadAssets();
-    setRefreshing(false);
-  };
+    setRefreshing(true)
+    await loadAssets()
+    setRefreshing(false)
+  }
 
   const filterAssets = () => {
-    let filtered = [...assets];
+    let filtered = [...assets]
 
     // Filter by search query
     if (searchQuery) {
-      filtered = filtered.filter(asset =>
-        asset.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        asset.asset_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        asset.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      filtered = filtered.filter(
+        asset =>
+          asset.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          asset.asset_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          asset.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
     }
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(asset => asset.category === selectedCategory);
+      filtered = filtered.filter(asset => asset.category === selectedCategory)
     }
 
     // Sort assets
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'name':
-          return (a.name || '').localeCompare(b.name || '');
+          return (a.name || '').localeCompare(b.name || '')
         case 'status':
-          return (a.status || '').localeCompare(b.status || '');
+          return (a.status || '').localeCompare(b.status || '')
         case 'category':
-          return (a.category || '').localeCompare(b.category || '');
+          return (a.category || '').localeCompare(b.category || '')
         case 'date':
-          return new Date(b.updated_at || 0) - new Date(a.updated_at || 0);
+          return new Date(b.updated_at || 0) - new Date(a.updated_at || 0)
         default:
-          return 0;
+          return 0
       }
-    });
+    })
 
-    setFilteredAssets(filtered);
-  };
+    setFilteredAssets(filtered)
+  }
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
       case 'available':
-        return theme.colors.secondary;
+        return theme.colors.secondary
       case 'checked_out':
-        return theme.colors.tertiary;
+        return theme.colors.tertiary
       case 'maintenance':
-        return theme.colors.error;
+        return theme.colors.error
       default:
-        return theme.colors.onSurfaceVariant;
+        return theme.colors.onSurfaceVariant
     }
-  };
+  }
 
-  const getStatusIcon = (status) => {
+  const getStatusIcon = status => {
     switch (status) {
       case 'available':
-        return 'check-circle';
+        return 'check-circle'
       case 'checked_out':
-        return 'account-arrow-right';
+        return 'account-arrow-right'
       case 'maintenance':
-        return 'wrench';
+        return 'wrench'
       default:
-        return 'help-circle';
+        return 'help-circle'
     }
-  };
+  }
 
   const renderAssetItem = ({ item }) => (
     <Card style={styles.assetCard} onPress={() => handleAssetPress(item)}>
@@ -166,13 +163,13 @@ export default function AssetsScreen({ navigation }) {
             {item.status || 'Unknown'}
           </Chip>
         </View>
-        
+
         {item.description && (
           <Paragraph style={styles.assetDescription} numberOfLines={2}>
             {item.description}
           </Paragraph>
         )}
-        
+
         <View style={styles.assetDetails}>
           {item.category && (
             <Chip mode="outlined" style={styles.categoryChip}>
@@ -188,9 +185,9 @@ export default function AssetsScreen({ navigation }) {
         </View>
       </Card.Content>
     </Card>
-  );
+  )
 
-  const handleAssetPress = (asset) => {
+  const handleAssetPress = asset => {
     // Navigate to asset details or show quick actions
     Alert.alert(
       asset.name || `Asset ${asset.id}`,
@@ -200,8 +197,8 @@ export default function AssetsScreen({ navigation }) {
         { text: 'Check In/Out', onPress: () => navigation.navigate('Checkout', { asset }) },
         { text: 'View Details', onPress: () => navigation.navigate('Assets') },
       ]
-    );
-  };
+    )
+  }
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
@@ -217,7 +214,7 @@ export default function AssetsScreen({ navigation }) {
           : 'Assets will appear here once added to the system'}
       </Text>
     </View>
-  );
+  )
 
   if (loading) {
     return (
@@ -225,7 +222,7 @@ export default function AssetsScreen({ navigation }) {
         <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={styles.loadingText}>Loading assets...</Text>
       </View>
-    );
+    )
   }
 
   return (
@@ -253,7 +250,7 @@ export default function AssetsScreen({ navigation }) {
             value={searchQuery}
             style={styles.searchbar}
           />
-          
+
           <View style={styles.filtersContainer}>
             <View style={styles.categoryFilters}>
               <Chip
@@ -274,31 +271,38 @@ export default function AssetsScreen({ navigation }) {
                 </Chip>
               ))}
             </View>
-            
+
             <Menu
               visible={sortMenuVisible}
               onDismiss={() => setSortMenuVisible(false)}
-              anchor={
-                <IconButton
-                  icon="sort"
-                  onPress={() => setSortMenuVisible(true)}
-                />
-              }
+              anchor={<IconButton icon="sort" onPress={() => setSortMenuVisible(true)} />}
             >
               <Menu.Item
-                onPress={() => { setSortBy('name'); setSortMenuVisible(false); }}
+                onPress={() => {
+                  setSortBy('name')
+                  setSortMenuVisible(false)
+                }}
                 title="Sort by Name"
               />
               <Menu.Item
-                onPress={() => { setSortBy('status'); setSortMenuVisible(false); }}
+                onPress={() => {
+                  setSortBy('status')
+                  setSortMenuVisible(false)
+                }}
                 title="Sort by Status"
               />
               <Menu.Item
-                onPress={() => { setSortBy('category'); setSortMenuVisible(false); }}
+                onPress={() => {
+                  setSortBy('category')
+                  setSortMenuVisible(false)
+                }}
                 title="Sort by Category"
               />
               <Menu.Item
-                onPress={() => { setSortBy('date'); setSortMenuVisible(false); }}
+                onPress={() => {
+                  setSortBy('date')
+                  setSortMenuVisible(false)
+                }}
                 title="Sort by Date"
               />
             </Menu>
@@ -310,16 +314,14 @@ export default function AssetsScreen({ navigation }) {
       <FlatList
         data={filteredAssets}
         renderItem={renderAssetItem}
-        keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+        keyExtractor={item => item.id?.toString() || Math.random().toString()}
         contentContainerStyle={styles.listContainer}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListEmptyComponent={renderEmptyState}
         showsVerticalScrollIndicator={false}
       />
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -426,4 +428,4 @@ const styles = StyleSheet.create({
     color: '#666',
     paddingHorizontal: 32,
   },
-});
+})

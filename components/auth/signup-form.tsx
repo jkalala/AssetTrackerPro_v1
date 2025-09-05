@@ -1,26 +1,26 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, Mail, Lock, User, Github, Building2 } from "lucide-react"
-import Link from "next/link"
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Eye, EyeOff, Mail, Lock, User, Github, Building2 } from 'lucide-react'
+import Link from 'next/link'
 
 export default function SignupForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [fullName, setFullName] = useState("")
-  const [orgName, setOrgName] = useState("")
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [orgName, setOrgName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [githubLoading, setGithubLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -28,10 +28,10 @@ export default function SignupForm() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError("")
+    setError('')
 
     if (!orgName.trim()) {
-      setError("Organization name is required")
+      setError('Organization name is required')
       setLoading(false)
       return
     }
@@ -55,11 +55,11 @@ export default function SignupForm() {
         setSuccess(true)
       } else if (data.user && data.user.email_confirmed_at) {
         // User is already confirmed, redirect to dashboard
-        router.push("/")
+        router.push('/')
         router.refresh()
       }
     } catch (err) {
-      setError("An unexpected error occurred")
+      setError('An unexpected error occurred')
     } finally {
       setLoading(false)
     }
@@ -67,27 +67,27 @@ export default function SignupForm() {
 
   const handleGithubSignup = async () => {
     if (!orgName.trim()) {
-      setError("Organization name is required")
+      setError('Organization name is required')
       return
     }
     setGithubLoading(true)
-    setError("")
+    setError('')
     try {
       // Store org name in a cookie before GitHub OAuth
       document.cookie = `signup_org_name=${encodeURIComponent(orgName)}; path=/; max-age=300`
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: "github",
+        provider: 'github',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       })
       if (error) {
         setError(error.message)
-        document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+        document.cookie = 'signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
       }
     } catch (err) {
-      setError("Failed to authenticate with GitHub")
-      document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+      setError('Failed to authenticate with GitHub')
+      document.cookie = 'signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
     } finally {
       setGithubLoading(false)
     }
@@ -95,20 +95,20 @@ export default function SignupForm() {
 
   const handleGoogleSignup = async () => {
     if (!orgName.trim()) {
-      setError("Organization name is required")
+      setError('Organization name is required')
       return
     }
     // Store org name in a cookie before Google OAuth
     document.cookie = `signup_org_name=${encodeURIComponent(orgName)}; path=/; max-age=300`
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     })
     if (error) {
       setError(error.message)
-      document.cookie = "signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+      document.cookie = 'signup_org_name=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
     }
   }
 
@@ -118,14 +118,16 @@ export default function SignupForm() {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">Check your email</CardTitle>
-            <CardDescription className="text-center">We've sent you a confirmation link</CardDescription>
+            <CardDescription className="text-center">
+              We've sent you a confirmation link
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Alert>
               <Mail className="h-4 w-4" />
               <AlertDescription>
-                Please check your email at <strong>{email}</strong> and click the confirmation link to complete your
-                registration.
+                Please check your email at <strong>{email}</strong> and click the confirmation link
+                to complete your registration.
               </AlertDescription>
             </Alert>
 
@@ -134,7 +136,7 @@ export default function SignupForm() {
               <p className="text-xs">If you don't see the email, check your spam folder.</p>
             </div>
 
-            <Button onClick={() => router.push("/login")} className="w-full" variant="outline">
+            <Button onClick={() => router.push('/login')} className="w-full" variant="outline">
               Back to Login
             </Button>
           </CardContent>
@@ -148,7 +150,9 @@ export default function SignupForm() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Create your account</CardTitle>
-          <CardDescription className="text-center">Enter your details to get started with AssetTracker</CardDescription>
+          <CardDescription className="text-center">
+            Enter your details to get started with AssetTracker
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
@@ -169,7 +173,7 @@ export default function SignupForm() {
                 type="text"
                 placeholder="Enter your organization name"
                 value={orgName}
-                onChange={(e) => setOrgName(e.target.value)}
+                onChange={e => setOrgName(e.target.value)}
                 className="pl-10"
                 required
               />
@@ -237,7 +241,7 @@ export default function SignupForm() {
                   type="text"
                   placeholder="Enter your full name"
                   value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  onChange={e => setFullName(e.target.value)}
                   className="pl-10"
                   required
                 />
@@ -255,7 +259,7 @@ export default function SignupForm() {
                   type="email"
                   placeholder="Enter your email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   className="pl-10"
                   required
                 />
@@ -270,10 +274,10 @@ export default function SignupForm() {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   id="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="Create a password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   className="pl-10 pr-10"
                   required
                   minLength={6}
@@ -294,12 +298,12 @@ export default function SignupForm() {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating account..." : "Create account"}
+              {loading ? 'Creating account...' : 'Create account'}
             </Button>
           </form>
 
           <div className="text-center text-sm">
-            Already have an account?{" "}
+            Already have an account?{' '}
             <Link href="/login" className="text-blue-600 hover:text-blue-500 font-medium">
               Sign in
             </Link>

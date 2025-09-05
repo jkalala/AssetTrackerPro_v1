@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import React, { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
@@ -10,7 +10,7 @@ import { useAuth } from '@/components/auth/auth-provider'
 import { useToast } from '@/components/ui/use-toast'
 import { MapPin, Plus, Trash2, Edit, Eye, Shield, AlertTriangle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import GeofenceRuleManager from "@/components/geofence-rule-manager"
+import GeofenceRuleManager from '@/components/geofence-rule-manager'
 
 interface Geofence {
   id: string
@@ -38,21 +38,23 @@ export default function GeofenceManagementPage() {
     fetchUserRole()
   }, [user])
 
-  useEffect(() => { setShowMap(true) }, [])
+  useEffect(() => {
+    setShowMap(true)
+  }, [])
 
   const fetchUserRole = async () => {
     try {
-      const supabase = createClient();
+      const supabase = createClient()
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user?.id)
-        .single();
-      setUserRole(profile?.role || 'user');
+        .single()
+      setUserRole(profile?.role || 'user')
     } catch (error) {
-      console.error('Error fetching user role:', error);
+      console.error('Error fetching user role:', error)
     }
-  };
+  }
 
   const fetchGeofences = async () => {
     setLoading(true)
@@ -67,9 +69,9 @@ export default function GeofenceManagementPage() {
     } catch (err) {
       setError('Failed to load geofences')
       toast({
-        title: "Error",
-        description: "Failed to load geofence zones",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to load geofence zones',
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
@@ -80,8 +82,8 @@ export default function GeofenceManagementPage() {
     async function fetchData() {
       setLoading(true)
       try {
-        const assetsRes = await fetch("/api/assets?fields=id,asset_id,name")
-        const geofencesRes = await fetch("/api/geofence/zones")
+        const assetsRes = await fetch('/api/assets?fields=id,asset_id,name')
+        const geofencesRes = await fetch('/api/geofence/zones')
         const assetsData = await assetsRes.json()
         const geofencesData = await geofencesRes.json()
         setAssets(assetsData.assets || [])
@@ -96,13 +98,16 @@ export default function GeofenceManagementPage() {
   const handleGeofenceUpdate = async () => {
     await fetchGeofences()
     toast({
-      title: "Success",
-      description: "Geofence zones updated successfully"
+      title: 'Success',
+      description: 'Geofence zones updated successfully',
     })
   }
 
   const handleDeleteGeofence = async (geofenceId: string) => {
-    if (typeof window !== 'undefined' && !window.confirm('Are you sure you want to delete this geofence zone?')) {
+    if (
+      typeof window !== 'undefined' &&
+      !window.confirm('Are you sure you want to delete this geofence zone?')
+    ) {
       return
     }
 
@@ -119,14 +124,14 @@ export default function GeofenceManagementPage() {
 
       await fetchGeofences()
       toast({
-        title: "Success",
-        description: "Geofence zone deleted successfully"
+        title: 'Success',
+        description: 'Geofence zone deleted successfully',
       })
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to delete geofence zone",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to delete geofence zone',
+        variant: 'destructive',
       })
     }
   }
@@ -159,7 +164,8 @@ export default function GeofenceManagementPage() {
               Access Denied
             </CardTitle>
             <CardDescription>
-              You do not have permission to manage geofence zones. Only administrators and managers can access this feature.
+              You do not have permission to manage geofence zones. Only administrators and managers
+              can access this feature.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -263,7 +269,7 @@ export default function GeofenceManagementPage() {
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
-                
+
                 {loading ? (
                   <div className="h-96 flex items-center justify-center">
                     <div className="text-center">
@@ -274,7 +280,11 @@ export default function GeofenceManagementPage() {
                 ) : (
                   showMap && (
                     <div key={JSON.stringify(geofences) + userRole}>
-                      <GeofenceMapEditor geofences={geofences} onChange={handleGeofenceUpdate} userRole={userRole} />
+                      <GeofenceMapEditor
+                        geofences={geofences}
+                        onChange={handleGeofenceUpdate}
+                        userRole={userRole}
+                      />
                     </div>
                   )
                 )}
@@ -290,9 +300,7 @@ export default function GeofenceManagementPage() {
                   <span>Geofence Zones</span>
                   <Badge variant="outline">{geofences.length}</Badge>
                 </CardTitle>
-                <CardDescription>
-                  Manage your geofence zones and their properties
-                </CardDescription>
+                <CardDescription>Manage your geofence zones and their properties</CardDescription>
               </CardHeader>
               <CardContent>
                 {geofences.length === 0 ? (
@@ -305,7 +313,7 @@ export default function GeofenceManagementPage() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {geofences.map((geofence) => (
+                    {geofences.map(geofence => (
                       <div
                         key={geofence.id}
                         className={`p-3 border rounded-lg cursor-pointer transition-colors ${
@@ -335,7 +343,7 @@ export default function GeofenceManagementPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={(e) => {
+                            onClick={e => {
                               e.stopPropagation()
                               handleDeleteGeofence(geofence.id)
                             }}
@@ -383,4 +391,4 @@ export default function GeofenceManagementPage() {
       </div>
     </div>
   )
-} 
+}

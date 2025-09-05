@@ -24,14 +24,18 @@ interface AssetAttachmentsProps {
 
 const isImage = (type: string) => type.startsWith('image/')
 const isPdf = (type: string) => type === 'application/pdf'
-const isOfficeDoc = (type: string) => [
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-].includes(type)
+const isOfficeDoc = (type: string) =>
+  [
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  ].includes(type)
 const allowedTypes = [
-  'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
   'application/pdf',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -159,7 +163,10 @@ export default function AssetAttachments({ assetId, userRole }: AssetAttachments
             <AlertDescription>{success}</AlertDescription>
           </Alert>
         )}
-        <form className="flex flex-col sm:flex-row items-center gap-2" onSubmit={e => e.preventDefault()}>
+        <form
+          className="flex flex-col sm:flex-row items-center gap-2"
+          onSubmit={e => e.preventDefault()}
+        >
           <Input
             ref={fileInputRef}
             type="file"
@@ -182,7 +189,11 @@ export default function AssetAttachments({ assetId, userRole }: AssetAttachments
             variant="outline"
             type="button"
           >
-            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            {uploading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="h-4 w-4" />
+            )}
             {uploading ? 'Uploading...' : 'Upload'}
           </Button>
         </form>
@@ -195,13 +206,28 @@ export default function AssetAttachments({ assetId, userRole }: AssetAttachments
             <div className="text-gray-500">No attachments yet.</div>
           ) : (
             attachments.map(att => (
-              <div key={att.id} className="flex items-center gap-4 border rounded p-2 bg-gray-50 flex-wrap">
+              <div
+                key={att.id}
+                className="flex items-center gap-4 border rounded p-2 bg-gray-50 flex-wrap"
+              >
                 {isImage(att.type) ? (
-                  <button type="button" onClick={() => setPreview(att)} className="focus:outline-none">
-                    <img src={att.file_url} alt={att.file_name} className="w-16 h-16 object-cover rounded border" />
+                  <button
+                    type="button"
+                    onClick={() => setPreview(att)}
+                    className="focus:outline-none"
+                  >
+                    <img
+                      src={att.file_url}
+                      alt={att.file_name}
+                      className="w-16 h-16 object-cover rounded border"
+                    />
                   </button>
                 ) : isPdf(att.type) ? (
-                  <button type="button" onClick={() => setPreview(att)} className="focus:outline-none">
+                  <button
+                    type="button"
+                    onClick={() => setPreview(att)}
+                    className="focus:outline-none"
+                  >
                     <FileText className="h-10 w-10 text-red-600" />
                   </button>
                 ) : (
@@ -212,8 +238,12 @@ export default function AssetAttachments({ assetId, userRole }: AssetAttachments
                 <div className="flex-1 min-w-0">
                   <div className="font-medium truncate">{att.file_name}</div>
                   <div className="text-xs text-gray-500">{formatSize(att.size)}</div>
-                  <div className="text-xs text-gray-400">{new Date(att.uploaded_at).toLocaleString()}</div>
-                  {att.description && <div className="text-xs text-gray-700 italic mt-1">{att.description}</div>}
+                  <div className="text-xs text-gray-400">
+                    {new Date(att.uploaded_at).toLocaleString()}
+                  </div>
+                  {att.description && (
+                    <div className="text-xs text-gray-700 italic mt-1">{att.description}</div>
+                  )}
                 </div>
                 <Button asChild variant="outline" size="sm">
                   <a href={att.file_url} download target="_blank" rel="noopener noreferrer">
@@ -248,7 +278,11 @@ export default function AssetAttachments({ assetId, userRole }: AssetAttachments
         <Dialog open={!!preview} onOpenChange={() => setPreview(null)}>
           <DialogContent className="max-w-lg w-full p-0 bg-white">
             {preview && isImage(preview.type) && (
-              <img src={preview.file_url} alt={preview.file_name} className="w-full h-auto object-contain rounded" />
+              <img
+                src={preview.file_url}
+                alt={preview.file_name}
+                className="w-full h-auto object-contain rounded"
+              />
             )}
             {preview && isPdf(preview.type) && (
               <iframe
@@ -266,4 +300,4 @@ export default function AssetAttachments({ assetId, userRole }: AssetAttachments
       </CardContent>
     </Card>
   )
-} 
+}

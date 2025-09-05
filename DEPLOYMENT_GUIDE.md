@@ -9,6 +9,7 @@
 ## Step 1: Prepare Your Repository
 
 Ensure your repository contains:
+
 - ✅ `amplify.yml` - Build configuration
 - ✅ `next.config.mjs` - Next.js configuration
 - ✅ `package.json` - Dependencies
@@ -17,17 +18,20 @@ Ensure your repository contains:
 ## Step 2: Set Up AWS Amplify
 
 ### 2.1 Access AWS Amplify Console
+
 1. Go to [AWS Amplify Console](https://console.aws.amazon.com/amplify/)
 2. Sign in to your AWS account
 3. Click "New app" → "Host web app"
 
 ### 2.2 Connect Your Repository
+
 1. Choose "GitHub" as your repository service
 2. Authorize AWS Amplify to access your GitHub account
 3. Select your AssetPro repository
 4. Choose the branch you want to deploy (usually `main` or `master`)
 
 ### 2.3 Configure Build Settings
+
 1. **Build settings**: Amplify will auto-detect the `amplify.yml` file
 2. **Environment variables**: Add the following variables:
 
@@ -39,6 +43,7 @@ NEXT_PUBLIC_SITE_URL=your_amplify_domain
 ```
 
 ### 2.4 Deploy
+
 1. Click "Save and deploy"
 2. Amplify will start the build process
 3. Monitor the build logs for any issues
@@ -46,6 +51,7 @@ NEXT_PUBLIC_SITE_URL=your_amplify_domain
 ## Step 3: Environment Variables Setup
 
 ### Required Environment Variables:
+
 ```bash
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -63,12 +69,14 @@ SENTRY_DSN=your_sentry_dsn
 ## Step 4: Post-Deployment Configuration
 
 ### 4.1 Custom Domain (Optional)
+
 1. In Amplify Console, go to "Domain management"
 2. Click "Add domain"
 3. Enter your custom domain
 4. Follow the DNS configuration instructions
 
 ### 4.2 Environment Variables in Amplify
+
 1. Go to "App settings" → "Environment variables"
 2. Add all required environment variables
 3. Redeploy the app after adding variables
@@ -76,11 +84,13 @@ SENTRY_DSN=your_sentry_dsn
 ## Step 5: Monitoring and Maintenance
 
 ### 5.1 Build Monitoring
+
 - Monitor build logs in Amplify Console
 - Set up notifications for build failures
 - Check for any dependency issues
 
 ### 5.2 Performance Monitoring
+
 - Use AWS CloudWatch for monitoring
 - Set up alerts for performance issues
 - Monitor application logs
@@ -105,6 +115,7 @@ SENTRY_DSN=your_sentry_dsn
    - Verify Supabase connection
 
 ### Build Commands Reference:
+
 ```bash
 # Local build test
 pnpm install

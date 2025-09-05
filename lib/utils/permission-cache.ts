@@ -54,9 +54,9 @@ export class PermissionCache {
   }
 
   setUserPermissions(
-    tenantId: string, 
-    userId: string, 
-    permissions: UserPermission[], 
+    tenantId: string,
+    userId: string,
+    permissions: UserPermission[],
     ttl?: number
   ): void {
     const key = this.getUserPermissionKey(tenantId, userId)
@@ -66,14 +66,14 @@ export class PermissionCache {
     this.userPermissionsCache.set(key, {
       permissions,
       timestamp: now,
-      expiresAt
+      expiresAt,
     })
   }
 
   clearUserPermissions(tenantId: string, userId: string): void {
     const key = this.getUserPermissionKey(tenantId, userId)
     this.userPermissionsCache.delete(key)
-    
+
     // Also clear related permission checks
     this.clearUserPermissionChecks(tenantId, userId)
   }
@@ -91,7 +91,7 @@ export class PermissionCache {
   ): boolean | null {
     const userKey = this.getUserPermissionKey(tenantId, userId)
     const checkKey = this.getPermissionCheckKey(permissionName, resourceId, contextHash)
-    
+
     const userChecks = this.permissionChecksCache.get(userKey)
     if (!userChecks) {
       return null
@@ -121,7 +121,7 @@ export class PermissionCache {
   ): void {
     const userKey = this.getUserPermissionKey(tenantId, userId)
     const checkKey = this.getPermissionCheckKey(permissionName, resourceId, contextHash)
-    
+
     if (!this.permissionChecksCache.has(userKey)) {
       this.permissionChecksCache.set(userKey, {})
     }
@@ -133,7 +133,7 @@ export class PermissionCache {
     userChecks[checkKey] = {
       granted,
       timestamp: now,
-      expiresAt
+      expiresAt,
     }
   }
 
@@ -224,7 +224,7 @@ export class PermissionCache {
     // Clear all checks for a specific permission
     for (const [userKey, userChecks] of this.permissionChecksCache.entries()) {
       const checksToDelete: string[] = []
-      
+
       for (const checkKey of Object.keys(userChecks)) {
         if (checkKey.startsWith(`${permissionName}:`)) {
           checksToDelete.push(checkKey)
@@ -287,16 +287,16 @@ export class PermissionCache {
     return {
       userPermissions: {
         total: this.userPermissionsCache.size,
-        expired: expiredUserPermissions
+        expired: expiredUserPermissions,
       },
       permissionChecks: {
         total: totalPermissionChecks,
-        expired: expiredPermissionChecks
+        expired: expiredPermissionChecks,
       },
       memoryUsage: {
         userPermissions: this.estimateMemoryUsage(this.userPermissionsCache),
-        permissionChecks: this.estimateMemoryUsage(this.permissionChecksCache)
-      }
+        permissionChecks: this.estimateMemoryUsage(this.permissionChecksCache),
+      },
     }
   }
 
@@ -321,9 +321,12 @@ export class PermissionCache {
 
   private startCleanupInterval(): void {
     // Clean up expired entries every 10 minutes
-    this.cleanupInterval = setInterval(() => {
-      this.cleanup()
-    }, 10 * 60 * 1000)
+    this.cleanupInterval = setInterval(
+      () => {
+        this.cleanup()
+      },
+      10 * 60 * 1000
+    )
   }
 
   private cleanup(): void {
@@ -339,7 +342,7 @@ export class PermissionCache {
     // Clean up expired permission checks
     for (const [userKey, userChecks] of this.permissionChecksCache.entries()) {
       const checksToDelete: string[] = []
-      
+
       for (const [checkKey, check] of Object.entries(userChecks)) {
         if (now > check.expiresAt) {
           checksToDelete.push(checkKey)
@@ -387,17 +390,20 @@ export function hashContext(context?: Record<string, any>): string | undefined {
 
   // Create a stable hash of the context object
   const sortedKeys = Object.keys(context).sort()
-  const sortedContext = sortedKeys.reduce((acc, key) => {
-    acc[key] = context[key]
-    return acc
-  }, {} as Record<string, any>)
+  const sortedContext = sortedKeys.reduce(
+    (acc, key) => {
+      acc[key] = context[key]
+      return acc
+    },
+    {} as Record<string, any>
+  )
 
   // Simple hash function (for production, consider using a proper hash library)
   const str = JSON.stringify(sortedContext)
   let hash = 0
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
+    hash = (hash << 5) - hash + char
     hash = hash & hash // Convert to 32-bit integer
   }
   return hash.toString(36)

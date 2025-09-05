@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useEffect, useState } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 interface DebugInfo {
   supabaseUrl: string
@@ -26,13 +26,15 @@ export function SupabaseDebug() {
   const runDiagnostics = async () => {
     setLoading(true)
     try {
-      const { createClient, getConfig, checkSupabaseConnection } = await import("@/lib/supabase/client")
-      const { ENV, validateEnvironment } = await import("@/lib/env")
+      const { createClient, getConfig, checkSupabaseConnection } = await import(
+        '@/lib/supabase/client'
+      )
+      const { ENV, validateEnvironment } = await import('@/lib/env')
 
       const config = getConfig()
       const validation = validateEnvironment()
 
-      let connectionTest = { success: false, error: "Not tested" }
+      let connectionTest = { success: false, error: 'Not tested' }
       let clientCreated = false
 
       try {
@@ -42,12 +44,12 @@ export function SupabaseDebug() {
       } catch (error) {
         connectionTest = {
           success: false,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error.message : 'Unknown error',
         }
       }
 
       setDebugInfo({
-        supabaseUrl: config?.url || "Not configured",
+        supabaseUrl: config?.url || 'Not configured',
         hasAnonKey: !!config?.anonKey,
         clientCreated,
         connectionTest,
@@ -55,12 +57,14 @@ export function SupabaseDebug() {
           NEXT_PUBLIC_SUPABASE_URL: ENV.SUPABASE_URL,
           NEXT_PUBLIC_APP_URL: ENV.APP_URL,
           NODE_ENV: ENV.NODE_ENV,
-          hasAnonKey: ENV.SUPABASE_ANON_KEY ? "✓ Present" : "✗ Missing",
-          validationStatus: validation.valid ? "✓ Valid" : `✗ Invalid: ${validation.errors.join(", ")}`,
+          hasAnonKey: ENV.SUPABASE_ANON_KEY ? '✓ Present' : '✗ Missing',
+          validationStatus: validation.valid
+            ? '✓ Valid'
+            : `✗ Invalid: ${validation.errors.join(', ')}`,
         },
       })
     } catch (error) {
-      console.error("Debug diagnostics failed:", error)
+      console.error('Debug diagnostics failed:', error)
     } finally {
       setLoading(false)
     }
@@ -90,7 +94,9 @@ export function SupabaseDebug() {
   if (!debugInfo) {
     return (
       <Alert>
-        <AlertDescription>Failed to run diagnostics. Please check the console for errors.</AlertDescription>
+        <AlertDescription>
+          Failed to run diagnostics. Please check the console for errors.
+        </AlertDescription>
       </Alert>
     )
   }
@@ -100,7 +106,9 @@ export function SupabaseDebug() {
       <Card>
         <CardHeader>
           <CardTitle>Supabase Configuration Debug</CardTitle>
-          <CardDescription>Diagnostic information for troubleshooting Supabase connection issues</CardDescription>
+          <CardDescription>
+            Diagnostic information for troubleshooting Supabase connection issues
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -109,18 +117,20 @@ export function SupabaseDebug() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span>Client Created:</span>
-                  <Badge variant={debugInfo.clientCreated ? "default" : "destructive"}>
-                    {debugInfo.clientCreated ? "✓ Success" : "✗ Failed"}
+                  <Badge variant={debugInfo.clientCreated ? 'default' : 'destructive'}>
+                    {debugInfo.clientCreated ? '✓ Success' : '✗ Failed'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Connection Test:</span>
-                  <Badge variant={debugInfo.connectionTest.success ? "default" : "destructive"}>
-                    {debugInfo.connectionTest.success ? "✓ Connected" : "✗ Failed"}
+                  <Badge variant={debugInfo.connectionTest.success ? 'default' : 'destructive'}>
+                    {debugInfo.connectionTest.success ? '✓ Connected' : '✗ Failed'}
                   </Badge>
                 </div>
                 {debugInfo.connectionTest.error && (
-                  <p className="text-sm text-red-600 mt-1">Error: {debugInfo.connectionTest.error}</p>
+                  <p className="text-sm text-red-600 mt-1">
+                    Error: {debugInfo.connectionTest.error}
+                  </p>
                 )}
               </div>
             </div>
@@ -130,14 +140,16 @@ export function SupabaseDebug() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span>Supabase URL:</span>
-                  <Badge variant={debugInfo.supabaseUrl !== "Not configured" ? "default" : "destructive"}>
-                    {debugInfo.supabaseUrl !== "Not configured" ? "✓ Set" : "✗ Missing"}
+                  <Badge
+                    variant={debugInfo.supabaseUrl !== 'Not configured' ? 'default' : 'destructive'}
+                  >
+                    {debugInfo.supabaseUrl !== 'Not configured' ? '✓ Set' : '✗ Missing'}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Anon Key:</span>
-                  <Badge variant={debugInfo.hasAnonKey ? "default" : "destructive"}>
-                    {debugInfo.hasAnonKey ? "✓ Present" : "✗ Missing"}
+                  <Badge variant={debugInfo.hasAnonKey ? 'default' : 'destructive'}>
+                    {debugInfo.hasAnonKey ? '✓ Present' : '✗ Missing'}
                   </Badge>
                 </div>
               </div>
@@ -150,7 +162,7 @@ export function SupabaseDebug() {
               {Object.entries(debugInfo.environmentVariables).map(([key, value]) => (
                 <div key={key} className="flex justify-between">
                   <span className="text-gray-600">{key}:</span>
-                  <span className="text-gray-900">{value || "undefined"}</span>
+                  <span className="text-gray-900">{value || 'undefined'}</span>
                 </div>
               ))}
             </div>
@@ -164,7 +176,7 @@ export function SupabaseDebug() {
         </CardContent>
       </Card>
 
-      {debugInfo.supabaseUrl !== "Not configured" && (
+      {debugInfo.supabaseUrl !== 'Not configured' && (
         <Card>
           <CardHeader>
             <CardTitle>Configuration Details</CardTitle>
@@ -173,14 +185,16 @@ export function SupabaseDebug() {
             <div className="space-y-2 text-sm">
               <div>
                 <strong>Supabase URL:</strong>
-                <code className="ml-2 bg-gray-100 px-2 py-1 rounded text-xs">{debugInfo.supabaseUrl}</code>
+                <code className="ml-2 bg-gray-100 px-2 py-1 rounded text-xs">
+                  {debugInfo.supabaseUrl}
+                </code>
               </div>
               <div>
                 <strong>Project ID:</strong>
                 <code className="ml-2 bg-gray-100 px-2 py-1 rounded text-xs">
-                  {debugInfo.supabaseUrl.includes("supabase.co")
-                    ? debugInfo.supabaseUrl.split("//")[1]?.split(".")[0]
-                    : "Unknown"}
+                  {debugInfo.supabaseUrl.includes('supabase.co')
+                    ? debugInfo.supabaseUrl.split('//')[1]?.split('.')[0]
+                    : 'Unknown'}
                 </code>
               </div>
             </div>

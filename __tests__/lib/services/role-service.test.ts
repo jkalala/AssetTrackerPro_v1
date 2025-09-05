@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/server'
 
 // Mock Supabase client
 jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn()
+  createClient: jest.fn(),
 }))
 
 describe('RoleService', () => {
@@ -28,9 +28,8 @@ describe('RoleService', () => {
       single: jest.fn().mockReturnThis(),
       order: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
-      rpc: jest.fn().mockReturnThis()
+      rpc: jest.fn().mockReturnThis(),
     }
-
     ;(createClient as jest.Mock).mockReturnValue(mockSupabase)
     roleService = new RoleService()
   })
@@ -46,7 +45,7 @@ describe('RoleService', () => {
         name: 'test_role',
         display_name: 'Test Role',
         description: 'A test role',
-        permission_names: ['read:asset', 'create:asset']
+        permission_names: ['read:asset', 'create:asset'],
       }
       const createdBy = 'user-123'
 
@@ -54,9 +53,9 @@ describe('RoleService', () => {
       mockSupabase.single.mockResolvedValueOnce({ data: null, error: null })
 
       // Mock role creation
-      mockSupabase.rpc.mockResolvedValueOnce({ 
-        data: 'role-456', 
-        error: null 
+      mockSupabase.rpc.mockResolvedValueOnce({
+        data: 'role-456',
+        error: null,
       })
 
       // Mock role retrieval
@@ -71,9 +70,9 @@ describe('RoleService', () => {
           is_active: true,
           created_by: createdBy,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         },
-        error: null
+        error: null,
       })
 
       const result = await roleService.createRole(tenantId, roleData, createdBy)
@@ -88,7 +87,7 @@ describe('RoleService', () => {
         p_description: roleData.description,
         p_parent_role_id: null,
         p_permission_names: roleData.permission_names,
-        p_created_by: createdBy
+        p_created_by: createdBy,
       })
     })
 
@@ -96,19 +95,19 @@ describe('RoleService', () => {
       const tenantId = 'tenant-123'
       const roleData = {
         name: 'existing_role',
-        display_name: 'Existing Role'
+        display_name: 'Existing Role',
       }
       const createdBy = 'user-123'
 
       // Mock existing role check (role exists)
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: 'existing-role-id' },
-        error: null
+        error: null,
       })
 
-      await expect(
-        roleService.createRole(tenantId, roleData, createdBy)
-      ).rejects.toThrow("Role with name 'existing_role' already exists")
+      await expect(roleService.createRole(tenantId, roleData, createdBy)).rejects.toThrow(
+        "Role with name 'existing_role' already exists"
+      )
     })
   })
 
@@ -118,13 +117,13 @@ describe('RoleService', () => {
       const roleId = 'role-456'
       const updates = {
         display_name: 'Updated Role Name',
-        description: 'Updated description'
+        description: 'Updated description',
       }
 
       // Mock role existence check
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: roleId, is_system_role: false },
-        error: null
+        error: null,
       })
 
       // Mock role update
@@ -134,9 +133,9 @@ describe('RoleService', () => {
           tenant_id: tenantId,
           display_name: updates.display_name,
           description: updates.description,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         },
-        error: null
+        error: null,
       })
 
       const result = await roleService.updateRole(tenantId, roleId, updates)
@@ -154,12 +153,12 @@ describe('RoleService', () => {
       // Mock system role check
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: roleId, is_system_role: true },
-        error: null
+        error: null,
       })
 
-      await expect(
-        roleService.updateRole(tenantId, roleId, updates)
-      ).rejects.toThrow('Cannot modify system roles')
+      await expect(roleService.updateRole(tenantId, roleId, updates)).rejects.toThrow(
+        'Cannot modify system roles'
+      )
     })
   })
 
@@ -171,24 +170,24 @@ describe('RoleService', () => {
       // Mock role existence check
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: roleId, is_system_role: false, name: 'test_role' },
-        error: null
+        error: null,
       })
 
       // Mock no active user assignments
       mockSupabase.limit.mockResolvedValueOnce({
         data: [],
-        error: null
+        error: null,
       })
 
       // Mock no child roles
       mockSupabase.limit.mockResolvedValueOnce({
         data: [],
-        error: null
+        error: null,
       })
 
       // Mock successful deletion
       mockSupabase.delete.mockResolvedValueOnce({
-        error: null
+        error: null,
       })
 
       const result = await roleService.deleteRole(tenantId, roleId)
@@ -203,12 +202,12 @@ describe('RoleService', () => {
       // Mock system role check
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: roleId, is_system_role: true, name: 'system_role' },
-        error: null
+        error: null,
       })
 
-      await expect(
-        roleService.deleteRole(tenantId, roleId)
-      ).rejects.toThrow('Cannot delete system roles')
+      await expect(roleService.deleteRole(tenantId, roleId)).rejects.toThrow(
+        'Cannot delete system roles'
+      )
     })
 
     it('should throw error when role has active users', async () => {
@@ -218,18 +217,18 @@ describe('RoleService', () => {
       // Mock role existence check
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: roleId, is_system_role: false, name: 'test_role' },
-        error: null
+        error: null,
       })
 
       // Mock active user assignments exist
       mockSupabase.limit.mockResolvedValueOnce({
         data: [{ id: 'assignment-1' }],
-        error: null
+        error: null,
       })
 
-      await expect(
-        roleService.deleteRole(tenantId, roleId)
-      ).rejects.toThrow('Cannot delete role with active user assignments')
+      await expect(roleService.deleteRole(tenantId, roleId)).rejects.toThrow(
+        'Cannot delete role with active user assignments'
+      )
     })
   })
 
@@ -238,26 +237,26 @@ describe('RoleService', () => {
       const tenantId = 'tenant-123'
       const request = {
         user_id: 'user-123',
-        role_id: 'role-456'
+        role_id: 'role-456',
       }
       const assignedBy = 'admin-123'
 
       // Mock role validation
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: request.role_id, max_users: null, is_active: true },
-        error: null
+        error: null,
       })
 
       // Mock user validation
       mockSupabase.single.mockResolvedValueOnce({
         data: { id: request.user_id },
-        error: null
+        error: null,
       })
 
       // Mock role assignment
       mockSupabase.rpc.mockResolvedValueOnce({
         data: 'assignment-789',
-        error: null
+        error: null,
       })
 
       // Mock assignment retrieval
@@ -268,9 +267,9 @@ describe('RoleService', () => {
           user_id: request.user_id,
           role_id: request.role_id,
           assigned_by: assignedBy,
-          is_active: true
+          is_active: true,
         },
-        error: null
+        error: null,
       })
 
       const result = await roleService.assignRoleToUser(tenantId, request, assignedBy)
@@ -284,19 +283,19 @@ describe('RoleService', () => {
       const tenantId = 'tenant-123'
       const request = {
         user_id: 'user-123',
-        role_id: 'nonexistent-role'
+        role_id: 'nonexistent-role',
       }
       const assignedBy = 'admin-123'
 
       // Mock role not found
       mockSupabase.single.mockResolvedValueOnce({
         data: null,
-        error: null
+        error: null,
       })
 
-      await expect(
-        roleService.assignRoleToUser(tenantId, request, assignedBy)
-      ).rejects.toThrow('Role not found')
+      await expect(roleService.assignRoleToUser(tenantId, request, assignedBy)).rejects.toThrow(
+        'Role not found'
+      )
     })
   })
 
@@ -306,14 +305,14 @@ describe('RoleService', () => {
       const request = {
         user_id: 'user-123',
         role_id: 'role-456',
-        reason: 'User left department'
+        reason: 'User left department',
       }
       const revokedBy = 'admin-123'
 
       // Mock successful revocation
       mockSupabase.rpc.mockResolvedValueOnce({
         data: true,
-        error: null
+        error: null,
       })
 
       const result = await roleService.revokeRoleFromUser(tenantId, request, revokedBy)
@@ -324,7 +323,7 @@ describe('RoleService', () => {
         p_user_id: request.user_id,
         p_role_id: request.role_id,
         p_reason: request.reason,
-        p_revoked_by: revokedBy
+        p_revoked_by: revokedBy,
       })
     })
   })
@@ -338,20 +337,20 @@ describe('RoleService', () => {
           name: 'admin',
           display_name: 'Administrator',
           level: 0,
-          is_active: true
+          is_active: true,
         },
         {
           id: 'role-2',
           name: 'user',
           display_name: 'User',
           level: 1,
-          is_active: true
-        }
+          is_active: true,
+        },
       ]
 
       mockSupabase.order.mockResolvedValueOnce({
         data: mockRoles,
-        error: null
+        error: null,
       })
 
       const result = await roleService.getRoles(tenantId)
@@ -387,14 +386,14 @@ describe('RoleService', () => {
             name: 'admin',
             display_name: 'Administrator',
             level: 0,
-            is_active: true
-          }
-        }
+            is_active: true,
+          },
+        },
       ]
 
       mockSupabase.order.mockResolvedValueOnce({
         data: mockUserRoles,
-        error: null
+        error: null,
       })
 
       const result = await roleService.getUserRoles(tenantId, userId)
@@ -417,9 +416,8 @@ describe('PermissionService', () => {
       insert: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
       single: jest.fn().mockReturnThis(),
-      rpc: jest.fn().mockReturnThis()
+      rpc: jest.fn().mockReturnThis(),
     }
-
     ;(createClient as jest.Mock).mockReturnValue(mockSupabase)
     permissionService = new PermissionService()
   })
@@ -429,7 +427,7 @@ describe('PermissionService', () => {
       const tenantId = 'tenant-123'
       const userId = 'user-123'
       const request = {
-        permission_name: 'read:asset'
+        permission_name: 'read:asset',
       }
 
       // Mock user permissions
@@ -442,10 +440,10 @@ describe('PermissionService', () => {
             scope: 'tenant',
             conditions: {},
             resource_filters: {},
-            source: 'direct'
-          }
+            source: 'direct',
+          },
         ],
-        error: null
+        error: null,
       })
 
       const result = await permissionService.checkPermission(tenantId, userId, request)
@@ -458,13 +456,13 @@ describe('PermissionService', () => {
       const tenantId = 'tenant-123'
       const userId = 'user-123'
       const request = {
-        permission_name: 'delete:asset'
+        permission_name: 'delete:asset',
       }
 
       // Mock user permissions (empty)
       mockSupabase.rpc.mockResolvedValueOnce({
         data: [],
-        error: null
+        error: null,
       })
 
       const result = await permissionService.checkPermission(tenantId, userId, request)
@@ -482,14 +480,10 @@ describe('PermissionService', () => {
 
       mockSupabase.rpc.mockResolvedValueOnce({
         data: true,
-        error: null
+        error: null,
       })
 
-      const result = await permissionService.hasPermission(
-        tenantId,
-        userId,
-        permissionName
-      )
+      const result = await permissionService.hasPermission(tenantId, userId, permissionName)
 
       expect(result).toBe(true)
     })
@@ -501,14 +495,10 @@ describe('PermissionService', () => {
 
       mockSupabase.rpc.mockResolvedValueOnce({
         data: false,
-        error: null
+        error: null,
       })
 
-      const result = await permissionService.hasPermission(
-        tenantId,
-        userId,
-        permissionName
-      )
+      const result = await permissionService.hasPermission(tenantId, userId, permissionName)
 
       expect(result).toBe(false)
     })
@@ -526,7 +516,7 @@ describe('PermissionService', () => {
           scope: 'tenant',
           conditions: {},
           resource_filters: {},
-          source: 'direct'
+          source: 'direct',
         },
         {
           permission_name: 'create:asset',
@@ -535,13 +525,13 @@ describe('PermissionService', () => {
           scope: 'tenant',
           conditions: {},
           resource_filters: {},
-          source: 'inherited'
-        }
+          source: 'inherited',
+        },
       ]
 
       mockSupabase.rpc.mockResolvedValueOnce({
         data: mockPermissions,
-        error: null
+        error: null,
       })
 
       const result = await permissionService.getUserPermissions(tenantId, userId, false)

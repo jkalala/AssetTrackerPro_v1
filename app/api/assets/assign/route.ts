@@ -32,7 +32,10 @@ export async function POST(request: Request) {
       })
       .eq('id', assetId)
     if (updateError) {
-      return NextResponse.json({ error: 'Failed to assign asset: ' + updateError.message }, { status: 500 })
+      return NextResponse.json(
+        { error: 'Failed to assign asset: ' + updateError.message },
+        { status: 500 }
+      )
     }
     // Log assignment
     await supabase.from('asset_assignments').insert({
@@ -46,4 +49,4 @@ export async function POST(request: Request) {
   } catch (err) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-} 
+}

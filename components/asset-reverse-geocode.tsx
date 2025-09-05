@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react'
 
-export default function AssetReverseGeocode({ lat, lng }: { lat: number | null, lng: number | null }) {
+export default function AssetReverseGeocode({
+  lat,
+  lng,
+}: {
+  lat: number | null
+  lng: number | null
+}) {
   const [address, setAddress] = useState<string | null>(null)
   useEffect(() => {
     if (lat && lng) {
@@ -18,4 +24,4 @@ export default function AssetReverseGeocode({ lat, lng }: { lat: number | null, 
       <span className="font-medium">Address:</span> {address || 'Loading...'}
     </div>
   )
-} 
+}

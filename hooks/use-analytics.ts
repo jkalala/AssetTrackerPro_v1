@@ -60,12 +60,12 @@ export function useAnalytics() {
     try {
       setLoading(true)
       setError(null)
-      
+
       const response = await fetch('/api/analytics')
       if (!response.ok) {
         throw new Error('Failed to fetch analytics data')
       }
-      
+
       const result = await response.json()
       setData(result.analytics)
     } catch (err) {
@@ -88,7 +88,7 @@ export function useAnalytics() {
     data,
     loading,
     error,
-    refresh
+    refresh,
   }
 }
 
@@ -104,4 +104,4 @@ export function useAnalyticsWithInterval(intervalMs: number = 30000) {
   }, [intervalMs, analytics.refresh])
 
   return analytics
-} 
+}

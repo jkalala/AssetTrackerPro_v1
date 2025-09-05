@@ -4,16 +4,16 @@
 // Service for managing organizational departments and hierarchy
 
 import { createClient } from '@/lib/supabase/server'
-import { 
-  Department, 
-  DepartmentInsert, 
+import {
+  Department,
+  DepartmentInsert,
   DepartmentUpdate,
   DepartmentWithHierarchy,
   UserDepartment,
   DepartmentRole,
   DepartmentRoleInsert,
   DepartmentHierarchyNode,
-  DepartmentAnalytics
+  DepartmentAnalytics,
 } from '@/lib/types/rbac'
 
 export class DepartmentService {
@@ -25,10 +25,14 @@ export class DepartmentService {
   // DEPARTMENT MANAGEMENT
   // =====================================================
 
-  async createDepartment(tenantId: string, departmentData: Omit<DepartmentInsert, 'tenant_id' | 'created_by'>, createdBy: string): Promise<Department> {
+  async createDepartment(
+    tenantId: string,
+    departmentData: Omit<DepartmentInsert, 'tenant_id' | 'created_by'>,
+    createdBy: string
+  ): Promise<Department> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Validate department name uniqueness
       const { data: existingDept } = await supabase
         .from('departments')
@@ -80,7 +84,7 @@ export class DepartmentService {
         .insert({
           ...departmentData,
           tenant_id: tenantId,
-          created_by: createdBy
+          created_by: createdBy,
         })
         .select()
         .single()
@@ -96,10 +100,14 @@ export class DepartmentService {
     }
   }
 
-  async updateDepartment(tenantId: string, departmentId: string, updates: DepartmentUpdate): Promise<Department> {
+  async updateDepartment(
+    tenantId: string,
+    departmentId: string,
+    updates: DepartmentUpdate
+  ): Promise<Department> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Check if department exists
       const { data: existingDept } = await supabase
         .from('departments')
@@ -165,7 +173,7 @@ export class DepartmentService {
         .from('departments')
         .update({
           ...updates,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', departmentId)
         .eq('tenant_id', tenantId)
@@ -186,7 +194,7 @@ export class DepartmentService {
   async deleteDepartment(tenantId: string, departmentId: string): Promise<boolean> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Check if department exists
       const { data: department } = await supabase
         .from('departments')
@@ -248,20 +256,25 @@ export class DepartmentService {
     }
   }
 
-  async getDepartment(tenantId: string, departmentId: string): Promise<DepartmentWithHierarchy | null> {
+  async getDepartment(
+    tenantId: string,
+    departmentId: string
+  ): Promise<DepartmentWithHierarchy | null> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: department } = await supabase
         .from('departments')
-        .select(`
+        .select(
+          `
           *,
           manager:profiles!departments_manager_id_fkey (
             id,
             full_name,
             email
           )
-        `)
+        `
+        )
         .eq('id', departmentId)
         .eq('tenant_id', tenantId)
         .single()
@@ -280,7 +293,8 @@ export class DepartmentService {
       // Get department roles
       const { data: deptRoles } = await supabase
         .from('department_roles')
-        .select(`
+        .select(
+          `
           *,
           roles (
             id,
@@ -288,14 +302,15 @@ export class DepartmentService {
             display_name,
             description
           )
-        `)
+        `
+        )
         .eq('department_id', departmentId)
         .eq('tenant_id', tenantId)
 
       return {
         ...department,
         user_count: userCount?.length || 0,
-        roles: deptRoles?.map(dr => dr.roles).filter(Boolean) || []
+        roles: deptRoles?.map(dr => dr.roles).filter(Boolean) || [],
       }
     } catch (error) {
       console.error('Error getting department:', error)
@@ -306,7 +321,7 @@ export class DepartmentService {
   async getDepartments(tenantId: string, includeInactive = false): Promise<Department[]> {
     try {
       const supabase = await this.getSupabase()
-      
+
       let query = supabase
         .from('departments')
         .select('*')
@@ -335,22 +350,27 @@ export class DepartmentService {
     try {
       const supabase = await this.getSupabase()
       const departments = await this.getDepartments(tenantId)
-      
+
       // Get user counts for each department
       const { data: userCounts } = await supabase
         .from('user_departments')
         .select('department_id')
         .eq('tenant_id', tenantId)
 
-      const userCountMap = userCounts?.reduce((acc, ud) => {
-        acc[ud.department_id] = (acc[ud.department_id] || 0) + 1
-        return acc
-      }, {} as Record<string, number>) || {}
+      const userCountMap =
+        userCounts?.reduce(
+          (acc, ud) => {
+            acc[ud.department_id] = (acc[ud.department_id] || 0) + 1
+            return acc
+          },
+          {} as Record<string, number>
+        ) || {}
 
       // Get roles for each department
       const { data: deptRoles } = await supabase
         .from('department_roles')
-        .select(`
+        .select(
+          `
           department_id,
           roles (
             id,
@@ -358,18 +378,23 @@ export class DepartmentService {
             display_name,
             description
           )
-        `)
+        `
+        )
         .eq('tenant_id', tenantId)
 
-      const roleMap = deptRoles?.reduce((acc, dr) => {
-        if (!acc[dr.department_id]) {
-          acc[dr.department_id] = []
-        }
-        if (dr.roles) {
-          acc[dr.department_id].push(dr.roles)
-        }
-        return acc
-      }, {} as Record<string, any[]>) || {}
+      const roleMap =
+        deptRoles?.reduce(
+          (acc, dr) => {
+            if (!acc[dr.department_id]) {
+              acc[dr.department_id] = []
+            }
+            if (dr.roles) {
+              acc[dr.department_id].push(dr.roles)
+            }
+            return acc
+          },
+          {} as Record<string, any[]>
+        ) || {}
 
       // Build hierarchy
       const deptMap = new Map<string, DepartmentHierarchyNode>()
@@ -381,7 +406,7 @@ export class DepartmentService {
           department: dept,
           children: [],
           users: [], // Will be populated if needed
-          roles: roleMap[dept.id] || []
+          roles: roleMap[dept.id] || [],
         }
         deptMap.set(dept.id, node)
       })
@@ -411,16 +436,16 @@ export class DepartmentService {
   // =====================================================
 
   async assignUserToDepartment(
-    tenantId: string, 
-    userId: string, 
-    departmentId: string, 
+    tenantId: string,
+    userId: string,
+    departmentId: string,
     isPrimary = false,
     roleInDepartment?: string,
     assignedBy?: string
   ): Promise<UserDepartment> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Validate department exists
       const { data: department } = await supabase
         .from('departments')
@@ -466,13 +491,14 @@ export class DepartmentService {
           department_id: departmentId,
           is_primary: isPrimary,
           role_in_department: roleInDepartment,
-          assigned_by: assignedBy || userId
+          assigned_by: assignedBy || userId,
         })
         .select()
         .single()
 
       if (error) {
-        if (error.code === '23505') { // Unique constraint violation
+        if (error.code === '23505') {
+          // Unique constraint violation
           // Update existing assignment
           const { data: updated, error: updateError } = await supabase
             .from('user_departments')
@@ -480,7 +506,7 @@ export class DepartmentService {
               is_primary: isPrimary,
               role_in_department: roleInDepartment,
               assigned_by: assignedBy || userId,
-              assigned_at: new Date().toISOString()
+              assigned_at: new Date().toISOString(),
             })
             .eq('tenant_id', tenantId)
             .eq('user_id', userId)
@@ -505,10 +531,14 @@ export class DepartmentService {
     }
   }
 
-  async removeUserFromDepartment(tenantId: string, userId: string, departmentId: string): Promise<boolean> {
+  async removeUserFromDepartment(
+    tenantId: string,
+    userId: string,
+    departmentId: string
+  ): Promise<boolean> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { error } = await supabase
         .from('user_departments')
         .delete()
@@ -527,13 +557,17 @@ export class DepartmentService {
     }
   }
 
-  async getUserDepartments(tenantId: string, userId: string): Promise<(Department & { is_primary: boolean; role_in_department?: string })[]> {
+  async getUserDepartments(
+    tenantId: string,
+    userId: string
+  ): Promise<(Department & { is_primary: boolean; role_in_department?: string })[]> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: userDepts, error } = await supabase
         .from('user_departments')
-        .select(`
+        .select(
+          `
           is_primary,
           role_in_department,
           departments (
@@ -547,7 +581,8 @@ export class DepartmentService {
             hierarchy_path,
             is_active
           )
-        `)
+        `
+        )
         .eq('tenant_id', tenantId)
         .eq('user_id', userId)
         .order('is_primary', { ascending: false })
@@ -556,11 +591,13 @@ export class DepartmentService {
         throw new Error(`Failed to get user departments: ${error.message}`)
       }
 
-      return userDepts?.map((ud: any) => ({
-        ...ud.departments,
-        is_primary: ud.is_primary,
-        role_in_department: ud.role_in_department
-      })) || []
+      return (
+        userDepts?.map((ud: any) => ({
+          ...ud.departments,
+          is_primary: ud.is_primary,
+          role_in_department: ud.role_in_department,
+        })) || []
+      )
     } catch (error) {
       console.error('Error getting user departments:', error)
       throw error
@@ -570,10 +607,11 @@ export class DepartmentService {
   async getDepartmentUsers(tenantId: string, departmentId: string): Promise<any[]> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: deptUsers, error } = await supabase
         .from('user_departments')
-        .select(`
+        .select(
+          `
           is_primary,
           role_in_department,
           assigned_at,
@@ -584,7 +622,8 @@ export class DepartmentService {
             avatar_url,
             job_title
           )
-        `)
+        `
+        )
         .eq('tenant_id', tenantId)
         .eq('department_id', departmentId)
         .order('is_primary', { ascending: false })
@@ -594,12 +633,14 @@ export class DepartmentService {
         throw new Error(`Failed to get department users: ${error.message}`)
       }
 
-      return deptUsers?.map((du: any) => ({
-        ...du.profiles,
-        is_primary: du.is_primary,
-        role_in_department: du.role_in_department,
-        assigned_at: du.assigned_at
-      })) || []
+      return (
+        deptUsers?.map((du: any) => ({
+          ...du.profiles,
+          is_primary: du.is_primary,
+          role_in_department: du.role_in_department,
+          assigned_at: du.assigned_at,
+        })) || []
+      )
     } catch (error) {
       console.error('Error getting department users:', error)
       throw error
@@ -620,7 +661,7 @@ export class DepartmentService {
   ): Promise<DepartmentRole> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: deptRole, error } = await supabase
         .from('department_roles')
         .insert({
@@ -629,7 +670,7 @@ export class DepartmentService {
           role_id: roleId,
           is_default_role: isDefaultRole,
           max_users: maxUsers,
-          created_by: createdBy || 'system'
+          created_by: createdBy || 'system',
         })
         .select()
         .single()
@@ -648,10 +689,14 @@ export class DepartmentService {
     }
   }
 
-  async removeRoleFromDepartment(tenantId: string, departmentId: string, roleId: string): Promise<boolean> {
+  async removeRoleFromDepartment(
+    tenantId: string,
+    departmentId: string,
+    roleId: string
+  ): Promise<boolean> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { error } = await supabase
         .from('department_roles')
         .delete()
@@ -674,7 +719,11 @@ export class DepartmentService {
   // ANALYTICS AND REPORTING
   // =====================================================
 
-  async getDepartmentAnalytics(tenantId: string, departmentId: string, days = 30): Promise<DepartmentAnalytics> {
+  async getDepartmentAnalytics(
+    tenantId: string,
+    departmentId: string,
+    days = 30
+  ): Promise<DepartmentAnalytics> {
     try {
       const supabase = await this.getSupabase()
       const department = await this.getDepartment(tenantId, departmentId)
@@ -689,30 +738,39 @@ export class DepartmentService {
       // Get role distribution
       const { data: roleDistribution } = await supabase
         .from('user_roles')
-        .select(`
+        .select(
+          `
           role_id,
           roles (name, display_name)
-        `)
+        `
+        )
         .eq('tenant_id', tenantId)
         .eq('is_active', true)
-        .in('user_id', users.map(u => u.id))
+        .in(
+          'user_id',
+          users.map(u => u.id)
+        )
 
-      const roleDistMap = roleDistribution?.reduce((acc: Record<string, number>, ur: any) => {
-        const roleName = ur.roles?.display_name || ur.roles?.name || 'Unknown'
-        acc[roleName] = (acc[roleName] || 0) + 1
-        return acc
-      }, {} as Record<string, number>) || {}
+      const roleDistMap =
+        roleDistribution?.reduce(
+          (acc: Record<string, number>, ur: any) => {
+            const roleName = ur.roles?.display_name || ur.roles?.name || 'Unknown'
+            acc[roleName] = (acc[roleName] || 0) + 1
+            return acc
+          },
+          {} as Record<string, number>
+        ) || {}
 
       const roleDistributionArray = Object.entries(roleDistMap).map(([role_name, user_count]) => ({
         role_name,
-        user_count
+        user_count,
       }))
 
       // Get permission usage (placeholder - would need actual implementation)
       const permissionUsage = [
         { permission_name: 'read:asset', usage_count: 150 },
         { permission_name: 'create:asset', usage_count: 45 },
-        { permission_name: 'update:asset', usage_count: 89 }
+        { permission_name: 'update:asset', usage_count: 89 },
       ]
 
       return {
@@ -720,7 +778,7 @@ export class DepartmentService {
         department_name: department.name,
         user_count: userCount,
         role_distribution: roleDistributionArray,
-        permission_usage: permissionUsage
+        permission_usage: permissionUsage,
       }
     } catch (error) {
       console.error('Error getting department analytics:', error)
@@ -735,7 +793,7 @@ export class DepartmentService {
   async validateDepartmentHierarchy(tenantId: string): Promise<boolean> {
     try {
       const supabase = await this.getSupabase()
-      
+
       // Check for circular references
       const { data: departments } = await supabase
         .from('departments')
@@ -760,7 +818,7 @@ export class DepartmentService {
   async searchDepartments(tenantId: string, query: string, limit = 10): Promise<Department[]> {
     try {
       const supabase = await this.getSupabase()
-      
+
       const { data: departments, error } = await supabase
         .from('departments')
         .select('*')

@@ -1,16 +1,16 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { useAuth } from "@/components/auth/auth-provider"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Package, Loader2, AlertTriangle, RefreshCw } from "lucide-react"
-import Link from "next/link"
-import { useToast } from "@/hooks/use-toast"
-import AssetManagement from "@/components/asset-management"
-import { Asset, getAssets } from "@/lib/asset-actions"
-import BulkAssetImport from "@/components/BulkAssetImport"
+import { useEffect, useState } from 'react'
+import { useAuth } from '@/components/auth/auth-provider'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Package, Loader2, AlertTriangle, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
+import { useToast } from '@/hooks/use-toast'
+import AssetManagement from '@/components/asset-management'
+import { Asset, getAssets } from '@/lib/asset-actions'
+import BulkAssetImport from '@/components/BulkAssetImport'
 
 export default function AssetsPage() {
   const { user, loading: authLoading } = useAuth()
@@ -24,24 +24,24 @@ export default function AssetsPage() {
     try {
       setError(null)
       const result = await getAssets()
-      
+
       if (result.error) {
         setError(result.error)
         toast({
-          title: "Error Loading Assets",
+          title: 'Error Loading Assets',
           description: result.error,
-          variant: "destructive"
+          variant: 'destructive',
         })
       } else {
         setAssets(result.data || [])
       }
     } catch (error) {
-      console.error("Error fetching assets:", error)
-      setError("Failed to load assets")
+      console.error('Error fetching assets:', error)
+      setError('Failed to load assets')
       toast({
-        title: "Error Loading Assets",
-        description: "An unexpected error occurred while loading assets",
-        variant: "destructive"
+        title: 'Error Loading Assets',
+        description: 'An unexpected error occurred while loading assets',
+        variant: 'destructive',
       })
     } finally {
       setLoading(false)
@@ -113,13 +113,8 @@ export default function AssetsPage() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefresh}
-                disabled={refreshing}
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
+              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
               <Button asChild>
@@ -195,11 +190,7 @@ export default function AssetsPage() {
         </div>
 
         {/* Asset Management Component */}
-        <AssetManagement 
-          assets={assets} 
-          loading={loading} 
-          onRefresh={handleRefresh}
-        />
+        <AssetManagement assets={assets} loading={loading} onRefresh={handleRefresh} />
       </div>
     </div>
   )

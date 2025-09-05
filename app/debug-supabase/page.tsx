@@ -1,4 +1,4 @@
-import AuthDebug from "@/components/auth-debug"
+import AuthDebug from '@/components/auth-debug'
 
 export default function DebugSupabasePage() {
   return (

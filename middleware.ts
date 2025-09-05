@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isAuthorized } from '@/lib/rbac/utils'
 import { Ratelimit } from "@upstash/ratelimit"
-import { Redis } from "@upstash/redis"
+import { redis, hasRedis } from "@/lib/config/redis"
 
 const PUBLIC_ROUTES = [
   '/login',
@@ -22,14 +22,9 @@ const ADMIN_ROUTES = [
   '/settings/roles',
 ]
 
-const hasRedis = !!process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_URL.startsWith("https") && !!process.env.UPSTASH_REDIS_REST_TOKEN;
-
 const ratelimit = hasRedis
   ? new Ratelimit({
-      redis: new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL!,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-      }),
+      redis: redis!,
       limiter: Ratelimit.fixedWindow(60, "1m"), // 60 requests per minute
       analytics: true,
     })

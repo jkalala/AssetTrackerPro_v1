@@ -1,16 +1,7 @@
 import { Ratelimit, type Duration } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import { redis, hasRedis } from "@/lib/config/redis";
 import { ratelimit as sharedRatelimit } from "./rate-limit";
 import { NextResponse } from "next/server";
-
-const hasRedis = !!process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_URL.startsWith("https") && !!process.env.UPSTASH_REDIS_REST_TOKEN;
-
-const redis = hasRedis
-  ? new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-    })
-  : null;
 
 export async function withRateLimit(
   req: Request,
